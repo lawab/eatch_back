@@ -1,0 +1,24 @@
+{
+  "name": "eatch_gateway",
+  "version": "1.0.0",
+  "description": "MIcroservice de passerelle de publication des differnts microservices du projet eatch",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lawab/eatch_gateway.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lawab/eatch_gateway/issues"
+  },
+  "homepage": "https://github.com/lawab/eatch_gateway#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-http-proxy": "^1.6.3"
+  }
+}
