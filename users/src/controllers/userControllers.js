@@ -13,6 +13,8 @@ const { fieldsValidator } = require("../models/validators");
 const createUser = async (req, res) => {
   try {
     let body = JSON.parse(req.headers?.body);
+    // let body = req.body;
+
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
 
@@ -195,6 +197,8 @@ const UpdateRole = async (req, res) => {
 const UpdateUser = async (req, res) => {
   try {
     let body = JSON.parse(req.headers?.body);
+    // let body = req.body;
+
     // get author that update current user
     let creator = await userService.findUser({
       _id: body._creator,
@@ -273,7 +277,9 @@ const UpdateUser = async (req, res) => {
 //Delete user in database
 const deleteUser = async (req, res) => {
   try {
-    let body = JSON.parse(req.headers?.body);
+    // let body = JSON.parse(req.headers?.body);
+    let body = req.body;
+
     let creator = await userService.findUser({
       _id: body?._creator,
     });
