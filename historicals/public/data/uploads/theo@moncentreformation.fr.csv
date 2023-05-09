@@ -1,0 +1,8 @@
+completionStatus,successStatus,totalSecondsTracked,currentTime,launchTime,exitTime,lastRuntimeUpdate,email,lastName,firstName
+INCOMPLETE,UNKNOWN,127.41,0,12/01/2023 17:32:05,12/01/2023 17:32:08,12/01/2023 17:32:08,theo@moncentreformation.fr,fischer,test
+INCOMPLETE,UNKNOWN,127.41,2.3100000000000023,12/01/2023 10:11:10,12/01/2023 10:11:15,12/01/2023 10:11:15,theo@moncentreformation.fr,fischer,test
+INCOMPLETE,UNKNOWN,125.1,90.99,29/12/2022 17:27:57,29/12/2022 17:29:34,29/12/2022 17:29:34,theo@moncentreformation.fr,fischer,test
+INCOMPLETE,UNKNOWN,34.11,8.370000000000001,29/12/2022 17:27:15,29/12/2022 17:27:35,29/12/2022 17:27:35,theo@moncentreformation.fr,fischer,test
+INCOMPLETE,UNKNOWN,25.74,7.949999999999999,29/12/2022 16:20:07,29/12/2022 16:20:18,29/12/2022 16:20:18,theo@moncentreformation.fr,fischer,test
+INCOMPLETE,UNKNOWN,17.79,5.52,29/12/2022 16:01:11,29/12/2022 16:01:19,29/12/2022 16:01:19,theo@moncentreformation.fr,fischer,test
+INCOMPLETE,UNKNOWN,12.27,12.27,29/12/2022 15:57:48,29/12/2022 15:58:03,29/12/2022 15:58:03,theo@moncentreformation.fr,fischer,test
