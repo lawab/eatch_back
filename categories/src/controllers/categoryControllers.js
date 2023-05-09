@@ -8,11 +8,12 @@ const category = require("../models/category");
 
 //Create Category in Data Base
 const createCategory = async (req, res) =>{
+    const body = req.headers.body;
     const newCategory = {
-        title: req.headers.title,
-        user_id: req.headers.user_id,
-        image: req.file? "/datas/"+req.file.filename: "",
-        //restaurant_id: req.headers.restaurant_id,
+        title: req.body.title,
+        user_id: req.body.user_id,
+        image: req.file? "/datas/"+req.file.filename: "/datas/avatar.jpeg",
+        restaurant_id: req.body.restaurant_id,
         
     };
     
@@ -24,16 +25,16 @@ const createCategory = async (req, res) =>{
         console.log("THE USER:");
         //console.log(user)
         const creator = {
-            _id : user.data._id,
-            role: user.data.role,
-            email: user.data.email,
-            firstName: user.data.firstName,
-            lastName: user.data.lastName
+            _id : user?.data._id,
+            role: user?.data.role,
+            email: user?.data.email,
+            firstName: user?.data.firstName,
+            lastName: user?.data.lastName
         };
         const restaurant = {
-            _id : user.data.restaurant?._id,
-            name_restaurant : user.data.restaurant?.name_restaurant,
-            image_restaurant: user.data.restaurant?.image_restaurant
+            _id : user?.data.restaurant?._id,
+            name_restaurant : user?.data.restaurant?.name_restaurant,
+            image_restaurant: user?.data.restaurant?.image_restaurant
         }
         newCategory._creator = creator;
         newCategory.restaurant = restaurant;
@@ -50,9 +51,10 @@ const createCategory = async (req, res) =>{
 
 //Update Category in Data Base
 const updateCategory = async (req, res) =>{
+    const body = req.headers.body;
     const newCategory = new category({
-        title: req.headers.title,
-        image: req.file? "/data/uploads/"+req.file.filename: req.headers.image
+        title: req.body.title,
+        image: req.file? "/data/uploads/"+req.file.filename: req.body.image
     });
     try{
         const category = await categoryService.updateCategoryById(req.params.categoryId, newCategory);
@@ -79,9 +81,22 @@ const getCategory = async (req, res) =>{
 
 //Get All Categories in Data Base
 const getCategories = async (req, res) =>{
-    
+    const restaurant = req.body;
     try{
         const categories = await categoryService.getCategories();
+        res.status(200).json(categories);
+    }
+    catch(err){
+        console.log(err)
+        res.status(500).json({"message" : "Categories not exist in DB!!!"});
+    }
+}
+
+//Get All Categories By Restaurant in Data Base
+const getCategoriesByRestaurant = async (req, res) =>{
+    const restaurant = req.body;
+    try{
+        const categories = await categoryService.getCategoriesByRestaurantId(restaurant);
         res.status(200).json(categories);
     }
     catch(err){
@@ -95,5 +110,6 @@ module.exports = {
     createCategory,
     updateCategory,
     getCategory,
-    getCategories
+    getCategories,
+    getCategoriesByRestaurant
 }

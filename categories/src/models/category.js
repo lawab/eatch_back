@@ -39,6 +39,11 @@ const CategorySchemaObject = {
         firstName: {type: String},
         lastName: {type: String},
       },
+      restaurant: {
+        _id: {type: String},
+        name_restaurant: {type: String},
+        image_restaurant: {type: String},
+      },
     
 };
 
