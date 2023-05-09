@@ -10,10 +10,10 @@ const category = require("../models/category");
 const createCategory = async (req, res) =>{
     const body = req.headers.body;
     const newCategory = {
-        title: req.body.title,
-        user_id: req.body.user_id,
+        title: body.title,
+        user_id: body.user_id,
         image: req.file? "/datas/"+req.file.filename: "/datas/avatar.jpeg",
-        restaurant_id: req.body.restaurant_id,
+        restaurant_id: body.restaurant_id,
         
     };
     
@@ -53,8 +53,8 @@ const createCategory = async (req, res) =>{
 const updateCategory = async (req, res) =>{
     const body = req.headers.body;
     const newCategory = new category({
-        title: req.body.title,
-        image: req.file? "/data/uploads/"+req.file.filename: req.body.image
+        title: body.title,
+        image: req.file? "/data/uploads/"+req.file.filename: body.image
     });
     try{
         const category = await categoryService.updateCategoryById(req.params.categoryId, newCategory);
