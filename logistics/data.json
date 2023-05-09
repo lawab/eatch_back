@@ -1,0 +1,18 @@
+{
+  "clients": [
+    {
+      "_id": "6433e8a9bd4f93d742bb0ee8",
+      "fisrtName": "john",
+      "lastName": "doe",
+      "isOnline": true,
+      "phoneNumber": null
+    },
+    {
+      "_id": "6433e8a9bd4f93d742bb0ef8",
+      "fisrtName": "john",
+      "lastName": "doe",
+      "isOnline": true,
+      "phoneNumber": null
+    }
+  ]
+}
