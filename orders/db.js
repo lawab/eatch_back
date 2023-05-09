@@ -4,6 +4,8 @@ const { mode } = require("./env.config");
 mongoose.set("strictQuery", false);
 module.exports = async function connection() {
   try {
+    mongoose.Promise = global.Promise;
+
     // const connectionOptions = {
     //   useNewUrlParser: true,
     //   useUnifiedTopology: true,
@@ -18,7 +20,7 @@ module.exports = async function connection() {
     //   connectionOptions["user"] = process.env.DBUSERNAME;
     //   connectionOptions["pass"] = process.env.DBPWD;
     // }
-    //  mongoose.connect(process.env.MONG0_URL, connectionOptions);
+    // mongoose.connect(process.env.MONG0_URL, connectionOptions);
     mongoose.connect(process.env.MONG0_URL, {
       user: process.env.DBUSERNAME,
       pass: process.env.DBPWD,
