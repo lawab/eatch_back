@@ -17,6 +17,7 @@ module.exports = async function connection() {
     //   connectionOptions["user"] = process.env.DBUSERNAME;
     //   connectionOptions["pass"] = process.env.DBPWD;
     // }
+    //  mongoose.connect(process.env.MONG0_URL, connectionOptions);
     mongoose.connect(process.env.MONG0_URL, {
       user: process.env.DBUSERNAME,
       pass: process.env.DBPWD,
