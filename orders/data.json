@@ -1,0 +1,68 @@
+{
+  "clients": [
+    {
+      "_id": "6433e8a9bd4f93d742bb0ee8",
+      "fisrtName": "toto",
+      "lastName": "tata",
+      "isOnline": true,
+      "phoneNumber": null
+    },
+    {
+      "_id": "6433e8a9bd4f93d742bb0ef8",
+      "fisrtName": "john",
+      "lastName": "doe",
+      "isOnline": true,
+      "phoneNumber": null
+    }
+  ],
+  "restaurants": [
+    {
+      "_id": "6433e8a9bd4f93d742bb0ee8",
+      "infos": {
+        "town": "fes",
+        "address": "fes rue 200 immeuble 20 appt 1",
+        "restaurant_name": "hotel five etoiles"
+      }
+    },
+    {
+      "_id": "6433e8a9bd4f93d742bb0ea8",
+      "infos": {
+        "town": "tanger",
+        "address": "tanger rue 200 immeuble 20 appt 1",
+        "restaurant_name": "tacos de nice"
+      }
+    }
+  ],
+  "produts": [
+    {
+      "_id": "6433e8a9bd4f93d742bb0ee8",
+      "productName": "tacos",
+      "quantity": 4,
+      "price": 50,
+      "category": {
+        "_id": "6433e8a9bd4f93d742bb0ee8",
+        "category_name": "dessers"
+      },
+      "promotion": false,
+      "devise": "MAD",
+      "image": "/data/uploads/mcf.png",
+      "liked": 0,
+      "likedPersonCount": 0
+    },
+    {
+      "_id": "6433e8a9bd4f93d742bb0ee8",
+      "productName": "kfc",
+      "quantity": 2,
+      "price": 50,
+      "category": {
+        "_id": "6433e8a9bd4f93d742bb0ee8",
+        "category_name": "dessers"
+      },
+      "promotion": false,
+      "devise": "MAD",
+      "image": "/data/uploads/mcf.png",
+      "liked": 0,
+      "likedPersonCount": 0
+    }
+  ]
+}
