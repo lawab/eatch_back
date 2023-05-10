@@ -1,69 +1,69 @@
 const { default: axios } = require("axios");
-const { Logistic } = require("../models/logistic/logistic");
+const { Promotion } = require("../models/promotion/promotion");
 
 /**
  *
- * @param {Object} logisticBody [Body to create new logistic in database]
+ * @param {Object} promotionBody [Body to create new promotion in database]
  * @returns {Promise}
  */
-const createLogistic = async (logisticBody = {}) => {
-  const logistic = await Logistic.create(logisticBody);
-  return logistic;
+const createPromotion = async (promotionBody = {}) => {
+  const promotion = await Promotion.create(promotionBody);
+  return promotion;
 };
 /**
  *
- * @param {Object} query [query to find one logistic in database]
+ * @param {Object} query [query to find one promotion in database]
  * @returns {Promise}
  */
-const findOneLogistic = async (query = {}) => {
-  const logistic = await Logistic.findOne(query);
-  return logistic;
+const findOnePromotion = async (query = {}) => {
+  const promotion = await Promotion.findOne(query);
+  return promotion;
 };
 /**
  *
- * @param {Object} query [query to delete one logistic in database]
+ * @param {Object} query [query to delete one promotion in database]
  * @returns {Promise}
  */
 const deleteOne = async (query = {}, bodyUpdate = {}) => {
-  const logistic = await Logistic.findOneAndUpdate(
+  const promotion = await Promotion.findOneAndUpdate(
     query,
     { $set: { ...bodyUpdate } },
     { new: true }
   );
-  return logistic;
+  return promotion;
 };
 /**
  *
- * @param {Object} query [query to get logistics in database]
+ * @param {Object} query [query to get promotions in database]
  * @returns {Promise}
  */
-const findLogistics = async (query = null) => {
-  const logistics = await Logistic.find(query);
-  return logistics;
+const findPromotions = async (query = null) => {
+  const promotions = await Promotion.find(query);
+  return promotions;
 };
 /**
  *
- * @param {Object} query [query to get logistic in database]
+ * @param {Object} query [query to get promotion in database]
  * @returns {Promise}
  */
-const findLogistic = async (query = null) => {
-  const logistic = await Logistic.findOne(query);
-  return logistic;
+const findPromotion = async (query = null) => {
+  const promotion = await Promotion.findOne(query);
+  return promotion;
 };
 
 /**
  *
- * @param {Object} query [query to update logistics in database]
- * @param {Object} bodyUpdate [body to update logistics in database]
+ * @param {Object} query [query to update promotions in database]
+ * @param {Object} bodyUpdate [body to update promotions in database]
  * @returns {Promise}
  */
-const updateLogistic = async (query = null, bodyUpdate = {}) => {
-  const logistic = await Logistic.findOneAndUpdate(
+const updatePromotion = async (query = null, bodyUpdate = {}) => {
+  const promotion = await Promotion.findOneAndUpdate(
     query,
     { ...bodyUpdate },
     { new: true }
   );
-  return logistic;
+  return promotion;
 };
 
 // get creator since microservice users
@@ -104,12 +104,12 @@ const getRestaurant = async (id = null, token = null) => {
 };
 
 module.exports = {
-  createLogistic,
-  findOneLogistic,
+  createPromotion,
+  findOnePromotion,
   deleteOne,
-  findLogistics,
-  updateLogistic,
+  findPromotions,
+  updatePromotion,
   getUserAuthor,
-  findLogistic,
+  findPromotion,
   getRestaurant,
 };
