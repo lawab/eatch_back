@@ -11,7 +11,7 @@ const {
   fetchRestaurants,
   updateRestaurant,
   fetchOneRestaurant,
-  fetchClients,
+  // fetchClients,
 } = require("../controllers/restaurantControllers");
 
 //Create restaurant
@@ -22,7 +22,7 @@ restaurantRouter.post(
   createRestaurant
 );
 //delete restaurant
-restaurantRouter.delete("/delete/:id", authmiddleware, deleteRestaurant);
+restaurantRouter.put("/delete/:id", authmiddleware, deleteRestaurant);
 
 //update restaurant
 restaurantRouter.put(
@@ -39,7 +39,7 @@ restaurantRouter.get("/fetch/one/:id", authmiddleware, fetchOneRestaurant);
 restaurantRouter.get("/fetch/all", authmiddleware, fetchRestaurants);
 
 //get clients
-restaurantRouter.get("/fetch/restaurant/:id", authmiddleware, fetchClients);
+//restaurantRouter.get("/fetch/restaurants/:id", authmiddleware, fetchClients);
 
 //Export route to be used on another place
 module.exports = restaurantRouter;
