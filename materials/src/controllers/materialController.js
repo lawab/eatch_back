@@ -8,7 +8,8 @@ const updateForeignFields = require("./updateForeignFields");
 // create one Material
 const createMaterial = async (req, res) => {
   try {
-    let body = req.body;
+    // let body = req.body;
+    let body = req.headers?.body;
     // verify fields on body
     let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
 
@@ -83,7 +84,8 @@ const createMaterial = async (req, res) => {
 const updateMaterial = async (req, res) => {
   try {
     // get body request
-    let body = req.body;
+    // let body = req.body;
+    let body = req.headers?.body;
     // get the auathor to update Material
     const { validate } = fieldsValidator(Object.keys(req.body), fieldsRequired);
     if (!validate) {
