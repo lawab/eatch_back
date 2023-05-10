@@ -120,6 +120,24 @@ const getOrder = async (id = null, token = null) => {
   return orders;
 };
 
+/**
+ *
+ * @param {String} id [id to find client in database from eatch_clients microservice]
+ * @param {String} token [token to valid the session of author before to fetch him in database]
+ * @returns {Promise} [return the current client (if exists) send by eatch_clients microservice]
+ */
+const getClient = async (id = null, token = null) => {
+  let { data: client } = await axios.get(
+    `${process.env.APP_URL_CLIENT}/fetch/one/${id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return client;
+};
+
 module.exports = {
   createPromotion,
   findOnePromotion,
@@ -130,4 +148,5 @@ module.exports = {
   findPromotion,
   getRestaurant,
   getOrder,
+  getClient,
 };

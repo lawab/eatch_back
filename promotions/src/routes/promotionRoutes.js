@@ -6,6 +6,7 @@ const {
   updatePromotion,
   fetchPromotions,
   fetchPromotionsByRestaurant,
+  addClientToPromotion,
 } = require("../controllers/promotionController");
 const uploadFileService = require("../services/uploadFile");
 const { authmiddleware } = require("../middlewares/authmiddleware");
@@ -47,6 +48,9 @@ promotionRouter.put(
   upload.single("file"),
   updatePromotion
 );
+
+//update promotion
+promotionRouter.put("/add/client/:id", authmiddleware, addClientToPromotion);
 
 //Export route to be used on another place
 module.exports = promotionRouter;

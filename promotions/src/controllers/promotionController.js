@@ -109,7 +109,7 @@ const updatePromotion = async (req, res) => {
   } catch (error) {
     print(error, "x");
     res.status(500).json({
-      message: "Erros occured during the update promotion!!!",
+      message: "Error occured during the update promotion!!!",
     });
   }
 };
@@ -166,7 +166,7 @@ const deletePromotion = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({
-      message: "Error(s) occured during the deletion of promotion!!!",
+      message: "Error occured during the deletion of promotion!!!",
     });
   }
 };
@@ -206,6 +206,70 @@ const fetchPromotionsByRestaurant = async (req, res) => {
   }
 };
 
+// add clients to promotion
+const addClientToPromotion = async (req, res) => {
+  try {
+    let body = req.body;
+
+    let creator = await promotionServices.getUserAuthor(
+      body?._creator,
+      req.token
+    );
+
+    if (!creator?._id) {
+      return res.status(401).json({
+        message:
+          "unable to add this client to promotion because creator not exists!!!",
+      });
+    }
+
+    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+      return res.status(401).json({
+        message:
+          "your cannot add client to promotion because you don't have an authorization,please see your administrator",
+      });
+    }
+
+    let newClient = await promotionServices.getClient(
+      req.body?.client,
+      req.token
+    );
+
+    if (!newClient?._id) {
+      return res.status(401).json({
+        message:
+          "unable to add client to promotion because he not have account!!!",
+      });
+    }
+
+    let clientAdded = await promotionServices.updatePromotion(
+      {
+        _id: req.params?.id,
+      },
+      {
+        _creator: creator,
+        $push: { clients: newClient },
+      }
+    );
+
+    if (clientAdded?._id) {
+      print({ clientAdded });
+      res
+        .status(200)
+        .json({ message: "client has been added to promotion successfully!!" });
+    } else {
+      res.status(401).json({
+        message: "client has been not added to promotion successfully!!",
+      });
+    }
+  } catch (error) {
+    print(error, "x");
+    res.status(500).json({
+      message: "Error occured during added client to promotion!!!",
+    });
+  }
+};
+
 module.exports = {
   createPromotion,
   deletePromotion,
@@ -213,4 +277,5 @@ module.exports = {
   updatePromotion,
   fetchPromotion,
   fetchPromotionsByRestaurant,
+  addClientToPromotion,
 };
