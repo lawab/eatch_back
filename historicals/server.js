@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, "./build/web")));
 app.use(cors());
 
 // All router app
-app.use("/api/historicals", historicalRouter);
+app.use("", historicalRouter);
 
 //Public files
 app.use(express.static(path.join(__dirname, "public")));
