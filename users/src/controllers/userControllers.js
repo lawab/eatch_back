@@ -1,13 +1,20 @@
 const cryptoJS = require("crypto-js");
 const userService = require("../services/userServices");
+const roleService = require("../services/roleServices");
+
 const roles = require("../models/roles");
 const { fieldsRequired } = require("../models/user/users");
+const { fieldsRequired: fieldsRoleRequired } = require("../models/role/role");
+
 const print = require("../log/print");
+const { fieldsValidator } = require("../models/validators");
 
 //Create user in Data Base
 const createUser = async (req, res) => {
   try {
     let body = JSON.parse(req.headers?.body);
+    // let body = req.body;
+
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
 
@@ -78,10 +85,120 @@ const createUser = async (req, res) => {
   }
 };
 
+//Create new role of user in Data Base
+const createUserRole = async (req, res) => {
+  try {
+    let body = req.body;
+
+    // verify fields on body
+    let { validate } = fieldsValidator(Object.keys(body), fieldsRoleRequired);
+
+    // if body have invalid fields
+    if (!validate) {
+      return res.status(401).json({ message: "invalid data!!!" });
+    }
+
+    // fetch creator inside of database
+    let creator = await userService.findUser({ _id: req.body?._creator });
+
+    if (!creator) {
+      return res.status(401).json({ message: "invalid data!!!" });
+    }
+
+    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+      return res.status(401).json({
+        message:
+          "your cannot create role because you don't have an authorization!!!",
+      });
+    }
+
+    let role = await roleService.findRole({
+      value: req.body?.value,
+    });
+
+    if (role) {
+      return res.status(401).json({
+        message:
+          "your cannot duplicate role it already exists,please take another role name",
+      });
+    }
+
+    // save new role in database
+    let newRole = await roleService.createRole(body);
+    print({ newRole });
+    if (newRole?._id) {
+      res
+        .status(200)
+        .json({ message: "role has been created successfully!!!" });
+    } else {
+      res
+        .status(401)
+        .json({ message: "role bas been not created successfully!!!" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error encounterd creating role!!!" });
+  }
+};
+
+//update user role in Data Base
+const UpdateRole = async (req, res) => {
+  try {
+    let body = req.body;
+    const message = "invalid data!!!";
+
+    // verify fields on body
+    let { validate } = fieldsValidator(Object.keys(body), fieldsRoleRequired);
+
+    // fetch role creator inside of database
+    let creator = await userService.findUser({ _id: req.body?._creator });
+
+    // if body have invalid fields
+    if (!validate) {
+      return res.status(401).json({ message });
+    }
+
+    if (!creator) {
+      return res.status(401).json({ message: "invalid data!!!" });
+    }
+
+    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+      return res.status(401).json({
+        message:
+          "your cannot create role because you don't have an authorization!!!",
+      });
+    }
+
+    // find and update role in database
+    let newRole = await roleService.updateRole(
+      {
+        _id: req.params?.id,
+      },
+      {
+        ...body,
+      }
+    );
+    print({ newRole });
+
+    if (newRole?._id) {
+      res
+        .status(200)
+        .json({ message: "role has been updated successfully!!!" });
+    } else {
+      res.status(401).json({ message: "role not exists!!!" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error encounterd creating role!!!" });
+  }
+};
+
 // Update user in database
 const UpdateUser = async (req, res) => {
   try {
     let body = JSON.parse(req.headers?.body);
+    // let body = req.body;
+
     // get author that update current user
     let creator = await userService.findUser({
       _id: body._creator,
@@ -160,7 +277,9 @@ const UpdateUser = async (req, res) => {
 //Delete user in database
 const deleteUser = async (req, res) => {
   try {
-    let body = JSON.parse(req.headers?.body);
+    // let body = JSON.parse(req.headers?.body);
+    let body = req.body;
+
     let creator = await userService.findUser({
       _id: body?._creator,
     });
@@ -207,6 +326,79 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const deleteRole = async (req, res) => {
+  try {
+    let body = req.body;
+    let creator = await userService.findUser({
+      _id: body?._creator,
+    });
+
+    if (!creator) {
+      return res.status(401).json({
+        message: "you must authenticated to delete current role!!!",
+      });
+    }
+
+    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+      return res.status(401).json({
+        message:
+          "your cannot delete role because you don't have an authorization,please see your administrator!!!",
+      });
+    }
+
+    //behind, mongoose find and delete role if exists
+    let roleDeleted = await roleService.deleteRole(
+      { _id: req.params?.id, deletedAt: null },
+      { _creator: creator } // the current user who do this action
+    ); // if role exists in database, role must be not null otherwise role must be null
+
+    if (!roleDeleted) {
+      return res.status(401).json({
+        message:
+          "unable to delete role because it not exists or already deleted in database!!!",
+      });
+    }
+
+    if (roleDeleted?.deletedAt) {
+      print({ roleDeleted });
+      return res
+        .status(200)
+        .json({ message: "role has been delete successfully!!!" });
+    } else {
+      return res
+        .status(401)
+        .json({ message: "role has been not delete successfully!!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error occured during delete request!!" });
+  }
+};
+
+// fetch one employerType in database
+const fetchOneRole = async (req, res) => {
+  try {
+    let role = await roleService.findRole({
+      _id: req.params?.id,
+    });
+    return res.status(200).json(role);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during fetch action" });
+  }
+};
+
+// fetch one employerType in database
+const fetchAllRoles = async (req, res) => {
+  try {
+    let roles = await roleService.findRoles();
+    return res.status(200).json(roles);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during fetch action" });
+  }
+};
+
 // fetch one user in database
 const fetchUser = async (req, res) => {
   try {
@@ -219,7 +411,6 @@ const fetchUser = async (req, res) => {
 };
 
 // fetch all users in database
-
 const fetchUsers = async (req, res) => {
   try {
     let users = await userService.findUsers();
@@ -251,4 +442,9 @@ module.exports = {
   fetchUsers,
   fetchUser,
   fetchUsersInRestaurant,
+  createUserRole,
+  UpdateRole,
+  deleteRole,
+  fetchAllRoles,
+  fetchOneRole,
 };

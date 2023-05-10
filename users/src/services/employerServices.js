@@ -4,7 +4,7 @@ const {
 const axios = require("axios");
 /**
  *
- * @param {Object} EmployerTypeBody [body to create user. default value is {}]
+ * @param {Object} EmployerTypeBody [body to create employerType. default value is {}]
  * @returns {Promise}
  */
 const createEmployerType = async (EmployerTypeBody = {}) => {
@@ -13,12 +13,12 @@ const createEmployerType = async (EmployerTypeBody = {}) => {
 };
 /**
  *
- * @param {Object} query [query to find user in documents list. Default value is {}]
+ * @param {Object} query [query to find employerType in documents list. Default value is {}]
  * @returns {Promise}
  */
 const findEmployerType = async (query = {}) => {
-  const user = await EmployerType.findOne(query);
-  return user;
+  const employerType = await EmployerType.findOne(query);
+  return employerType;
 };
 
 const findEmployerTypes = async (query = {}) => {
@@ -27,36 +27,36 @@ const findEmployerTypes = async (query = {}) => {
 };
 /**
  *
- * @param {Object} query [query to find user in documents list. Default value is {}]
+ * @param {Object} query [query to find employerType in documents list. Default value is {}]
  * @param {Object} updateBody [body to update document. Default value is {}]
  * @returns {Promise}
  */
 const deleteEmployerType = async (query = {}, updateBody = {}) => {
-  const user = await EmployerType.findOneAndUpdate(
+  const employerType = await EmployerType.findOneAndUpdate(
     query,
     { deletedAt: Date.now(), ...updateBody },
     { new: true } //tell mongoose to return the update document
   );
-  return user;
+  return employerType;
 };
 /**
  *
- * @param {Object} query [query to update user in documents list. Default value is {}]
+ * @param {Object} query [query to update employerType in documents list. Default value is {}]
  * @param {Object} updateBody [body to update document. Default value is {}]
  * @returns {Promise}
  */
-const UpdateEmployerType = async (query = {}, updateBody = {}) => {
-  const user = await EmployerType.findOneAndUpdate(
+const updateEmployerType = async (query = {}, updateBody = {}) => {
+  const employerType = await EmployerType.findOneAndUpdate(
     query,
     { ...updateBody },
     { new: true } //tell mongoose to return the update document
   );
-  return user;
+  return employerType;
 };
 /**
  *
  * @param {Number} id [id from restaurant will fetch]
- * @param {*} token [token to valid session of user authenticated]
+ * @param {*} token [token to valid session of employerType authenticated]
  * @returns {Promise}
  */
 const getRestaurant = async (id = null, token = null) => {
@@ -75,7 +75,7 @@ module.exports = {
   createEmployerType,
   findEmployerType,
   deleteEmployerType,
-  UpdateEmployerType,
+  updateEmployerType,
   findEmployerTypes,
   getRestaurant,
 };
