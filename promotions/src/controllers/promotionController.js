@@ -143,7 +143,7 @@ const deletePromotion = async (req, res) => {
         _id: req.params?.id,
         deletedAt: null,
       },
-      { deletedAt: Date.now(), _creator: creator } //set date of deletion and client who delete promotion,no drop promotion
+      { deletedAt: Date.now(), _creator: creator } //set date of deletion and user who delete promotion,no drop promotion
     );
 
     // if promotion not exits or had already deleted
