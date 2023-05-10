@@ -14,7 +14,7 @@ const upload = uploadFileService.uploadMiddleFile();
 
 //Create promotion
 promotionRouter.post(
-  "/create/:id",
+  "/create",
   authmiddleware,
   upload.single("file"),
   createPromotion

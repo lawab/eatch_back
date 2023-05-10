@@ -41,6 +41,7 @@ const createPromotion = async (req, res) => {
 
     // if field already exists,document must be found on database,or null in ortherwise
     if (newPromotion?._id) {
+      print({ newPromotion });
       return res.status(200).json({
         message: "Promotion has been created successfully!!!",
       });

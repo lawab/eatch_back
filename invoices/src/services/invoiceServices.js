@@ -87,7 +87,7 @@ const getUserAuthor = async (id = null, token = null) => {
 
 /**
  *
- * @param {Array<String>} id [_id products that we want to get in database]
+ * @param {string} id [_id products that we want to get in database]
  * @param {String} token [token to authenticate user]
  * @returns {Promise<Object>} [Array of products found in database]
  */

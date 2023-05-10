@@ -1,4 +1,5 @@
-const promotionServices = require("../services/romotionServices");
+const print = require("../log/print");
+const promotionServices = require("../services/promotionServices");
 
 /**
  *
@@ -23,13 +24,15 @@ module.exports = async (body, token) => {
     body["restaurant"] = restaurant; //set restaurant found in database
 
     // get restaurant required field
-    let order = await promotionServices.getRestaurant(body?.restaurant, token);
+    let order = await promotionServices.getOrder(body?.order, token);
 
-    if (!restaurant?._id) {
+    if (!order?._id) {
       throw new Error(errorMessage("order"));
     }
 
     body["order"] = order; //set order found in database
+
+    print({ body });
 
     return body;
   } catch (error) {

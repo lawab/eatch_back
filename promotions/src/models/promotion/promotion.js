@@ -12,7 +12,25 @@ const restaurantType = {
     },
   },
 };
-
+const clientType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+  fisrtName: {
+    type: String,
+    maxlenght: 50,
+    default: null,
+  },
+  lastName: {
+    type: String,
+    maxlenght: 50,
+    default: null,
+  },
+  isOnline: { type: Boolean, default: false },
+  phoneNumber: {
+    type: String,
+    maxlenght: 50,
+    default: null,
+  },
+};
 const productType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   pusharePrice: {
@@ -70,7 +88,6 @@ const productType = {
     default: 0,
   },
 };
-
 const OrderType = {
   order_title: {
     type: String,
@@ -98,30 +115,11 @@ const OrderType = {
   },
   deletedAt: { type: Date, default: null },
 };
-const clientType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
-  fisrtName: {
-    type: String,
-    maxlenght: 50,
-    default: null,
-  },
-  lastName: {
-    type: String,
-    maxlenght: 50,
-    default: null,
-  },
-  isOnline: { type: Boolean, default: false },
-  phoneNumber: {
-    type: String,
-    maxlenght: 50,
-    default: null,
-  },
-};
 
 const promotionSchemaObject = {
   promotion_name: { type: String, required: true },
   clients: { type: [{ type: clientType }] },
-  end_date: { type: Date, required: true, default: null }, //must remove default value for production
+  end_date: { type: Date, required: false, default: null }, //must remove default value for production
   order: { type: OrderType, required: true },
   restaurant: {
     required: true,

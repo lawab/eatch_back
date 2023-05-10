@@ -5,25 +5,25 @@ module.exports = async function connection() {
   try {
     mongoose.Promise = global.Promise;
 
-    // const connectionOptions = {
-    //   useNewUrlParser: true,
-    //   useUnifiedTopology: true,
-    // };
-    // console.log({ env: mode });
-    // const MONG0_URL =
-    //   mode === "producion"
-    //     ? `${process.env.MONG0_URL}?authSource=admin`
-    //     : process.env.MONG0_URL;
+    const connectionOptions = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    };
+    console.log({ env: mode });
+    const MONG0_URL =
+      mode === "producion"
+        ? `${process.env.MONG0_URL}?authSource=admin`
+        : process.env.MONG0_URL;
 
-    // if (mode === "production") {
-    //   connectionOptions["user"] = process.env.DBUSERNAME;
-    //   connectionOptions["pass"] = process.env.DBPWD;
-    // }
+    if (mode === "production") {
+      connectionOptions["user"] = process.env.DBUSERNAME;
+      connectionOptions["pass"] = process.env.DBPWD;
+    }
     // mongoose.connect(process.env.MONG0_URL, connectionOptions);
-    mongoose.connect(process.env.MONG0_URL, {
-      user: process.env.DBUSERNAME,
-      pass: process.env.DBPWD,
-    });
+    // mongoose.connect(process.env.MONG0_URL, {
+    //   user: process.env.DBUSERNAME,
+    //   pass: process.env.DBPWD,
+    // });
     console.log("base cree avec succès");
     //Create a first super user automatically
 
