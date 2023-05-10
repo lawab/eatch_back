@@ -1,12 +1,14 @@
 const {
   dynamicTypeRequired,
   promotionSchema,
+  Promotion,
 } = require("../models/promotion/promotion");
 const print = require("../log/print");
 const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
 const { default: mongoose } = require("mongoose");
 const setValuesFromRequiredForeignFields = require("./setValuesFromRequiredForeignFields");
+const setUpdateValuesFromForeignFields = require("./setUpdateValuesFromForeignFields");
 
 // create one promotion in database
 const createPromotion = async (req, res) => {
@@ -84,38 +86,10 @@ const updatePromotion = async (req, res) => {
     //set creator found in database
     body["_creator"] = creator;
 
-    // if restaurant value exists update it with new content found in database
-    if (body?.restaurant) {
-      let restaurant = await promotionServices.getRestaurant(
-        req?.params?.id,
-        req.token
-      );
-
-      if (!restaurant?._id) {
-        return res.status(401).json({
-          message:
-            "you cannot update promotion because restauranst not exists!!!",
-        });
-      }
-      body["restaurant"] = restaurant; //set restaurant found in database
-    }
-
-    let promotionFound = await promotionServices.findPromotion({
-      _id: req.params?.id,
-    });
-
-    if (!promotionFound?._id) {
-      return res.status(401).json({
-        message: "unable to update promotion because it not exists!!!",
-      });
-    }
-
-    promotionSchema.add(dynamicTypeRequired); // add dynamic field in default schema mongoose
-
-    let Promotion = mongoose.model("Promotion", promotionSchema); // create new model with new field added
+    body = await setUpdateValuesFromForeignFields(body, req.token);
 
     let promotionUpdated = await Promotion.updateOne(
-      { _id: promotionFound?._id },
+      { _id: req.params?.id },
       {
         ...body,
       }
