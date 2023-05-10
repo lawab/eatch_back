@@ -6,6 +6,7 @@ const print = require("../log/print");
 const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
 const { default: mongoose } = require("mongoose");
+const setValuesFromRequiredForeignFields = require("./setValuesFromRequiredForeignFields");
 
 // create one promotion in database
 const createPromotion = async (req, res) => {
@@ -33,49 +34,16 @@ const createPromotion = async (req, res) => {
 
     body["_creator"] = creator; //set creator found in database
 
-    let restaurant = await promotionServices.getRestaurant(
-      req?.params?.id,
-      req.token
-    );
-
-    if (!restaurant?._id) {
-      return res.status(401).json({
-        message:
-          "you cannot create promotion because restauranst not exists!!!",
-      });
-    }
-
-    body["restaurant"] = restaurant; //set restaurant found in database
+    body = await setValuesFromRequiredForeignFields(body, req.token);
 
     // verify that document with [field] exists
-    let element = await promotionServices.findPromotion({
-      name: body?.name,
-    });
+    let newPromotion = await promotionServices.createPromotion(body);
 
     // if field already exists,document must be found on database,or null in ortherwise
-    if (element) {
-      return res.status(401).json({
-        message:
-          "Promotion element name already exists, please take another name!!!",
+    if (newPromotion?._id) {
+      return res.status(200).json({
+        message: "Promotion has been created successfully!!!",
       });
-    }
-
-    // create new filed with dynamically
-
-    print({ dynamicTypeRequired });
-
-    promotionSchema.add(dynamicTypeRequired); // add dynamic field in default schema mongoose
-
-    let Promotion = mongoose.model("Promotion", promotionSchema); // create new model with new field added
-
-    let newElement = await Promotion.create(body);
-
-    print({ newElement }, "*");
-
-    if (newElement?._id) {
-      res
-        .status(200)
-        .json({ message: "Promotion has been created successfully!!!" });
     } else {
       res
         .status(401)
@@ -222,11 +190,9 @@ const deletePromotion = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
-    return res
-      .status(500)
-      .json({
-        message: "Error(s) occured during the deletion of promotion!!!",
-      });
+    return res.status(500).json({
+      message: "Error(s) occured during the deletion of promotion!!!",
+    });
   }
 };
 // get one promotion in database

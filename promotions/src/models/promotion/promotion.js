@@ -121,7 +121,7 @@ const clientType = {
 const promotionSchemaObject = {
   promotion_name: { type: String, required: true },
   clients: { type: [{ type: clientType }] },
-  lifetime: { type: Date, required: true },
+  end_date: { type: Date, required: true, default: null }, //must remove default value for production
   order: { type: OrderType, required: true },
   restaurant: {
     required: true,
