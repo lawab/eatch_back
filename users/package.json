@@ -7,7 +7,7 @@
   "author": "",
   "scripts": {
     "start": "nodemon server.js",
-    "server": "json-server -w --port=4000 data.json"
+    "server": "json-server -w --port=5000 data.json"
   },
   "license": "ISC",
   "dependencies": {

@@ -5,7 +5,7 @@
   "description": "",
   "scripts": {
     "start": "nodemon server.js",
-    "server": "json-server -w --port=4000 --id _id --routes routes.json data.json"
+    "server": "json-server -w --port=5000 --id _id --routes routes.json data.json"
   },
   "author": "",
   "license": "ISC",
