@@ -3,12 +3,13 @@ const { fieldsValidator } = require("../models/validators");
 const roles = require("../models/roles");
 const ClientServices = require("../services/ClientServices");
 const { default: mongoose } = require("mongoose");
-const updateForeignFields = require("../controllers/updateForeignField");
+const updateForeignField = require("../controllers/updateForeignField");
 
 //Create Client in Data Base
 const createClient = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
+    //let body = req.body;
     let fields = Object.keys(body);
 
     // fill data before store it in database
@@ -24,8 +25,12 @@ const createClient = async (req, res) => {
     if (client?._id) {
       return res.status(401).json({ message: "user already exists !!!" });
     }
-    let restaurant = await ClientServices.getRestaurant(data?.restaurant_id);
-    data.restaurant = restaurant;
+
+    let restaurant = await ClientServices.getRestaurant(
+      data?.restaurant,
+      req.token
+    );
+    data["restaurant"] = restaurant;
     let clientCreated = await ClientServices.createClient(data);
 
     console.log("###########################");
@@ -51,6 +56,16 @@ const createClient = async (req, res) => {
 };
 const deleteClient = async (req, res) => {
   try {
+    let creator = await ClientServices.getUserAuthor(
+      req.body?._creator,
+      req.token
+    );
+    if (!creator?._id) {
+      return res.status(401).json({
+        message: "invalid data send!!!",
+      });
+    }
+
     let deleteClient = await ClientServices.deleteOne(
       {
         _id: req.params?.id,
@@ -73,86 +88,86 @@ const deleteClient = async (req, res) => {
         .json({ message: "Client has been delete sucessfully" });
     }
 
-    let Client = await ClientServices.deleClient(ClientBody);
+    /*let Client = await ClientServices.deleClient(ClientBody);
     if (Client) {
       res
         .status(200)
         .json({ message: "Client has been deleted successfully " });
     } else {
       res.status(500).json({ message: "Client has been not deleted" });
-    }
+    }*/
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "Error encounterd delete Client!!!" });
+    res.status(500).json({ message: "Error encounterd delete Client!!!" });
   }
 };
 
 const updateClient = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
-    let ClientBody = {
-      commandes: body?.ClientCommande,
-      firstname: body?.firstname,
-      id_client: body?.id_client,
-      id_Client: body?.id_Client,
-      is_auth: body?.is_auth,
-      lastname: body?.lastname,
-      phone_number: body?.phone_number,
-      products_liked: body?.products_liked,
-      _creator: body?._creator,
-    };
+    // let body = req.body;
     const id = req.params.id;
 
-    let Client = await ClientServices.updateClient(id, ClientBody);
-    console.log(Client);
-    if (Client) {
+    let restaurant = await ClientServices.getRestaurant(
+      body?.restaurant,
+      req.token
+    );
+    body["restaurant"] = restaurant;
+
+    let client = await ClientServices.updateClient(id, body);
+    console.log(client);
+    if (client) {
       res.status(200).json({ message: "Client has been update successfully " });
     } else {
       res.status(401).json({ message: "Client has been not updated" });
     }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "Error encounterd updated Client!!!" });
+    res.status(500).json({ message: "Error encounterd updated Client!!!" });
   }
 };
 
 // get one Client in database
 const fetchClient = async (req, res) => {
   try {
-    let Client = await ClientServices.findOneClient({
+    let client = await ClientServices.findOneClient({
       _id: req.params?.id,
     });
-    if (Client?._id) {
-      res.status(200).json(Client);
+    if (client?._id) {
+      res.status(200).json(client);
     } else {
       res.status(401).json({ message: "Client not found!!!" });
     }
   } catch (error) {
     console.log(error.message);
-    res.status(400).json({ message: "Error occured during get request!!!" });
+    res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
 // get Clients  in database
 const fetchClients = async (req, res) => {
   try {
-    let Client = await ClientServices.findClients();
-    res.status(200).json(Client);
+    let clients = await ClientServices.findClients();
+    if (clients) {
+      res.status(200).json(clients);
+    } else {
+      res.status(401).json({ message: "Client has been not fetch" });
+    }
   } catch (error) {
     console.log(error.message);
-    res.status(400).json({ message: "Error occured during get request!!!" });
+    res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
 
 // fetch clients by restaurant in database
 const fetchClientByRestaurant = async (req, res) => {
   try {
-    let Client = await ClientServices.findClients({
+    let clients = await ClientServices.findClients({
       "restaurant._id": req.params?.id,
     });
-    res.status(200).json(Client);
+    res.status(200).json(clients);
   } catch (error) {
     console.log(error.message);
-    res.status(400).json({ message: "Error occured during get request!!!" });
+    res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
 

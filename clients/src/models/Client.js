@@ -60,19 +60,21 @@ const productType = {
 };
 
 const clientSchemaObject = {
-  commandes: [
-    {
-      _id: { type: String },
-      order_title: {
-        type: String,
-        default: null,
+  commandes: {
+    type: [
+      {
+        _id: { type: String },
+        order_title: {
+          type: String,
+          default: null,
+        },
+        products: {
+          required: false,
+          type: [{ type: productType }],
+        },
       },
-      products: {
-        required: false,
-        type: [{ type: productType }],
-      },
-    },
-  ],
+    ],
+  },
   status: {
     type: String,
     enum: [status.DONE, status.TREATMENT, status.PAID, status.WAITED],
@@ -82,12 +84,15 @@ const clientSchemaObject = {
   firstname: { type: String, required: true, default: null, maxlength: 50 },
 
   restaurant: {
-    _id: { type: String },
-    restaurant_name: { type: String, maxlength: 50 },
-    info: {
-      town: { type: String },
-      address: { type: String },
-      logo: { type: String },
+    required: true,
+    type: {
+      _id: { type: String },
+      restaurant_name: { type: String, maxlength: 50 },
+      info: {
+        town: { type: String },
+        address: { type: String },
+        logo: { type: String },
+      },
     },
   },
   is_auth: { type: Boolean, maxlength: 50 },

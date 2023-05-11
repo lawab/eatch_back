@@ -68,6 +68,26 @@ const updateClient = async (id, bodyUpdate = {}) => {
   return client;
   0;
 };
+
+// get creator since microservice users
+/**
+ *
+ * @param {Number} id [id to find author in database from eatch_users microservice]
+ * @param {String} token [token to valid the session of author before to fetch him in database]
+ * @returns {Promise} [return the current author send by eatch_users microservice]
+ */
+const getUserAuthor = async (id = null, token = null) => {
+  let { data: creator } = await axios.get(
+    `${process.env.APP_URL_USER}/fetch/one/${id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return creator;
+};
+
 // get creator since microservice users
 /**
  *
@@ -77,15 +97,15 @@ const updateClient = async (id, bodyUpdate = {}) => {
  */
 
 const getRestaurant = async (id = null, token = null) => {
+  console.log({ token });
   let { data: restaurant } = await axios.get(
-    `${process.env.APP_URL_RESTAURANT}/api/restaurants/fetch/one/${id}`,
+    `${process.env.APP_URL_RESTAURANT}/fetch/one/${id}`,
     {
       headers: {
         authorization: `Bearer ${token}`,
       },
     }
   );
-  console.log(restaurant);
   return restaurant;
 };
 
@@ -97,4 +117,5 @@ module.exports = {
   updateClient,
   findClient,
   getRestaurant,
+  getUserAuthor,
 };
