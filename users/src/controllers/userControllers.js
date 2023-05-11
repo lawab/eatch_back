@@ -433,6 +433,34 @@ const fetchUsersInRestaurant = async (req, res) => {
     res.status(500).json({ message: "Error occured during fetch action" });
   }
 };
+const disconnectUser = async (req, res) => {
+  let userUpdated = await userService.UpdateUser(
+    {
+      _id: req.params?.id,
+    },
+    {
+      isOnline: false,
+    }
+  );
+
+  if (!userUpdated) {
+    return res.status(401).json({
+      message: "unable to disconnect user because it not exists",
+    });
+  }
+
+  print({ userUpdated });
+
+  if (!userUpdated?.isOnline) {
+    return res.status(200).json({
+      message: "User disconnected successfully",
+    });
+  } else {
+    return res.status(401).json({
+      message: "User has not be disconnected successfully!!!",
+    });
+  }
+};
 
 //EXPORTS ALL CONTROLLER'S SERVICES
 module.exports = {
@@ -447,4 +475,5 @@ module.exports = {
   deleteRole,
   fetchAllRoles,
   fetchOneRole,
+  disconnectUser,
 };

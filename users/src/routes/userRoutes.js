@@ -9,9 +9,9 @@ const {
   createUserRole,
   UpdateRole,
   deleteRole,
-  fetchAllRole,
   fetchAllRoles,
   fetchOneRole,
+  disconnectUser,
 } = require("../controllers/userControllers");
 const {
   createEmployerType,
@@ -85,6 +85,9 @@ userRouter.put(
   upload.single("file"),
   UpdateUser
 );
+
+//************DISCONNECT ONE USER********************
+userRouter.put("/disconnect/:id", authmiddleware, disconnectUser);
 
 //**************************************** GET ALL ROUTE //****************************************//
 
