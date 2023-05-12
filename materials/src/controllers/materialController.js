@@ -8,8 +8,7 @@ const updateForeignFields = require("./updateForeignFields");
 // create one Material
 const createMaterial = async (req, res) => {
   try {
-    // let body = req.body;
-    let body = JSON.parse(req.headers?.body);
+    let body = req.body;
     // verify fields on body
     let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
 
@@ -84,18 +83,17 @@ const createMaterial = async (req, res) => {
 const updateMaterial = async (req, res) => {
   try {
     // get body request
-    // let body = req.body;
-    let body = JSON.parse(req.headers?.body);
+    let body = req.body;
 
     // get the auathor to update Material
-    const { validate } = fieldsValidator(Object.keys(req.body), fieldsRequired);
+    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
     if (!validate) {
       return res.status(401).json({
         message: "invalid data send!!!",
       });
     }
     let creator = await materialServices.getUserAuthor(
-      req.body?._creator,
+      body?._creator,
       req.token
     );
 
@@ -128,9 +126,8 @@ const updateMaterial = async (req, res) => {
 
     body = await updateForeignFields(materialServices, body, req.token);
 
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png"; //update image for material
+    // update image url
+    body["image"] = req.file ? "/datas/" + req.file?.filename : body["image"]; //update image for material
 
     // update all valid fields before save it in database
     for (let key in body) {
@@ -160,9 +157,10 @@ const updateMaterial = async (req, res) => {
 // delete one Material
 const deleteMaterial = async (req, res) => {
   try {
+    let body = req.body;
     // check if creator have authorization
     let creator = await materialServices.getUserAuthor(
-      req.body?._creator,
+      body?._creator,
       req.token
     );
 

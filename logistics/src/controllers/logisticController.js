@@ -45,6 +45,10 @@ const createLogistic = async (req, res) => {
 
     body["restaurant"] = restaurant; //set restaurant found in database
 
+    body["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : "/datas/avatar.png"; //set image for logistic
+
     // verify that document with [field] exists
     let element = await logisticServices.findLogistic({
       name: body?.name,
@@ -112,6 +116,8 @@ const updateLogistic = async (req, res) => {
 
     //set creator found in database
     body["_creator"] = creator;
+
+    body["image"] = req.file ? "/datas/" + req.file?.filename : body["image"]; //set image for logistic
 
     // if restaurant value exists update it with new content found in database
     if (body?.restaurant) {

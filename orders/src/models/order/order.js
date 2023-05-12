@@ -46,7 +46,7 @@ const productType = {
   },
   image: {
     type: String,
-    default: "/data/uploads/mcf.png",
+    default: "/datas/avatar.png",
   },
   liked: {
     type: Number,

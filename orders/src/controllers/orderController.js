@@ -49,7 +49,10 @@ const createOrder = async (req, res) => {
 // update order in database
 const updateOrder = async (req, res) => {
   try {
-    const { validate } = fieldsValidator(Object.keys(req.body), fieldsRequired);
+    // get body request
+    let body = req.body;
+
+    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
 
     if (!validate) {
       return res.status(401).json({
@@ -58,10 +61,7 @@ const updateOrder = async (req, res) => {
     }
 
     // get the author who update order
-    let creator = await orderServices.getUserAuthor(
-      req.body?._creator,
-      req.token
-    );
+    let creator = await orderServices.getUserAuthor(body?._creator, req.token);
 
     if (!creator?._id) {
       return res.status(401).json({
@@ -87,9 +87,6 @@ const updateOrder = async (req, res) => {
       });
     }
 
-    // get body request
-    let body = req.body;
-
     body["_creator"] = creator; // set user that make update in database
 
     body = await updateForeignFields(orderServices, body, req.token);
@@ -99,6 +96,8 @@ const updateOrder = async (req, res) => {
       order[key] = body[key];
     }
 
+    // update avatar if exists
+    order["image"] = req.file ? "/datas/" + req.file?.filename : order["image"];
     // update order in database
     let orderUpdated = await order.save({ validateModifiedOnly: true });
 
@@ -123,11 +122,10 @@ const updateOrder = async (req, res) => {
 // delete one order in database
 const deleteOrder = async (req, res) => {
   try {
+    let body = req.body;
     // check if creator has authorization
-    let creator = await orderServices.getUserAuthor(
-      req.body?._creator,
-      req.token
-    );
+    let creator = await orderServices.getUserAuthor(body?._creator, req.token);
+
     if (!creator?._id) {
       return res.status(401).json({
         message: "you must authenticated to delete current order!!!",

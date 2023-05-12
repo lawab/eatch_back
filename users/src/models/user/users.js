@@ -65,7 +65,7 @@ const UserSchemaObject = {
   },
   avatar: {
     type: String,
-    default: "/data/uploads/mcf.png",
+    default: "/datas/avatar.png",
   },
 
   isOnline: {

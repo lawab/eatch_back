@@ -120,6 +120,7 @@ const invoiceSchemaObject = {
   order: { required: true, type: orderType },
   _creator: { type: mongoose.Types.ObjectId, required: true },
   devise: { type: String, default: "MAD" },
+  image: { type: String, default: "/datas/avatar.png" },
   total: { type: Number, default: 0 },
   deletedAt: { type: Date, default: null },
 };

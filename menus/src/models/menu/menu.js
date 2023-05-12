@@ -99,7 +99,7 @@ const menuSchemaObject = {
   _creator: { required: true, type: userSchemaObject },
   description: { type: String, minlength: 1, default: "description" },
   menu_title: { type: String, minlength: 1, required: true },
-  image: { type: String, default: "/data/mcf.png" },
+  image: { type: String, default: "/datas/avatar.png" },
   deletedAt: { type: Date, default: null },
 };
 const fieldsRequired = Object.keys(menuSchemaObject);
