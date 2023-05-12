@@ -12,8 +12,7 @@ const { fieldsValidator } = require("../models/validators");
 //Create user in Data Base
 const createUser = async (req, res) => {
   try {
-    let body = JSON.parse(req.headers?.body);
-    // let body = req.body;
+    let body = req.body;
 
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
@@ -99,7 +98,7 @@ const createUserRole = async (req, res) => {
     }
 
     // fetch creator inside of database
-    let creator = await userService.findUser({ _id: req.body?._creator });
+    let creator = await userService.findUser({ _id: body?._creator });
 
     if (!creator) {
       return res.status(401).json({ message: "invalid data!!!" });
@@ -113,7 +112,7 @@ const createUserRole = async (req, res) => {
     }
 
     let role = await roleService.findRole({
-      value: req.body?.value,
+      value: body?.value,
     });
 
     if (role) {
@@ -151,7 +150,7 @@ const UpdateRole = async (req, res) => {
     let { validate } = fieldsValidator(Object.keys(body), fieldsRoleRequired);
 
     // fetch role creator inside of database
-    let creator = await userService.findUser({ _id: req.body?._creator });
+    let creator = await userService.findUser({ _id: body?._creator });
 
     // if body have invalid fields
     if (!validate) {
@@ -196,8 +195,7 @@ const UpdateRole = async (req, res) => {
 // Update user in database
 const UpdateUser = async (req, res) => {
   try {
-    let body = JSON.parse(req.headers?.body);
-    // let body = req.body;
+    let body = body;
 
     // get author that update current user
     let creator = await userService.findUser({
@@ -256,6 +254,9 @@ const UpdateUser = async (req, res) => {
       }
     }
 
+    // update avatar if exists
+    user["avatar"] = req.file ? "/datas/" + req.file?.filename : user["avatar"];
+
     // update user in database
     let userUpdated = await user.save();
 
@@ -277,7 +278,6 @@ const UpdateUser = async (req, res) => {
 //Delete user in database
 const deleteUser = async (req, res) => {
   try {
-    // let body = JSON.parse(req.headers?.body);
     let body = req.body;
 
     let creator = await userService.findUser({

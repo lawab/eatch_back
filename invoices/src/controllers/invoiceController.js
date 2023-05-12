@@ -8,7 +8,7 @@ const orderStatus = require("../models/invoice/orderStatus");
 const createInvoice = async (req, res) => {
   try {
     let idOrder = req.params?.id;
-    let body = {};
+    let body = req.body;
     // if body have invalid fields
     if (!idOrder) {
       return res.status(401).json({ message: "invalid data!!!" });
@@ -16,7 +16,7 @@ const createInvoice = async (req, res) => {
 
     // get creator since microservice users
     let creator = await invoiceServices.getUserAuthor(
-      req.body?._creator,
+      body?._creator,
       req.token
     );
 
@@ -71,6 +71,9 @@ const createInvoice = async (req, res) => {
 
     body["order"] = order; //set order value found in database
     body["total"] = getInvoicePrice(order?.products); // set total frpice to current invoice
+    body["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : "/datas/avatar.png"; //set image for current invoice
 
     let invoice = await invoiceServices.createInvoice(body);
 

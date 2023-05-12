@@ -40,6 +40,11 @@ const createMenu = async (req, res) => {
 
     body = await setForeignFields(menuServices, body, req.token);
 
+    // set user avatar
+    body["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : "/datas/avatar.png";
+
     let menu = await menuServices.createMenu(body);
 
     print({ menu }, "*");
@@ -67,16 +72,13 @@ const updateMenu = async (req, res) => {
     // get body request
     let body = req.body;
     // get the auathor to update Menu
-    const { validate } = fieldsValidator(Object.keys(req.body), fieldsRequired);
+    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
     if (!validate) {
       return res.status(401).json({
         message: "invalid data send!!!",
       });
     }
-    let creator = await menuServices.getUserAuthor(
-      req.body?._creator,
-      req.token
-    );
+    let creator = await menuServices.getUserAuthor(body?._creator, req.token);
 
     if (!creator?._id) {
       return res.status(401).json({
@@ -112,6 +114,9 @@ const updateMenu = async (req, res) => {
       menu[key] = body[key];
     }
 
+    // update avatar if exists
+    menu["image"] = req.file ? "/datas/" + req.file?.filename : menu["image"];
+
     // update field in database
     let menusaved = await menu.save();
 
@@ -135,11 +140,9 @@ const updateMenu = async (req, res) => {
 // delete one Menu
 const deleteMenu = async (req, res) => {
   try {
+    let body = req.body;
     // check if creator have authorization
-    let creator = await menuServices.getUserAuthor(
-      req.body?._creator,
-      req.token
-    );
+    let creator = await menuServices.getUserAuthor(body?._creator, req.token);
 
     if (!creator?._id) {
       return res.status(401).json({

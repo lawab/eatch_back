@@ -24,6 +24,7 @@ const logisticSchemaObject = {
     required: true,
     type: restaurantSchemaObject,
   },
+  image: { type: String, default: "/datas/avatar.png" },
   _creator: {
     type: mongoose.Types.ObjectId,
     required: true,

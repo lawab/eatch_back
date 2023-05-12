@@ -10,7 +10,7 @@ const print = require("../log/print");
 // create one product in database
 const createProduct = async (req, res) => {
   try {
-    let body = req.headers?.body || {};
+    let body = req.body;
     const message = "invalid data!!!";
 
     // verify fields on body
@@ -80,15 +80,13 @@ const createProduct = async (req, res) => {
 // update product in database
 const updateProduct = async (req, res) => {
   try {
+    let body = req.body;
     // get the author to update product
     let creator = await productServices.getUserAuthor(
-      req.headers?.body?._creator,
+      body?._creator,
       req.token
     );
-    const { validate } = fieldsValidator(
-      Object.keys(req.headers?.body),
-      fieldsRequired
-    );
+    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
 
     if (!creator?._id || !validate) {
       return res.status(401).json({
@@ -114,9 +112,6 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    // get body request
-    let body = req.headers?.body;
-
     body["_creator"] = creator; // set user that make update in database
 
     // update foreign fields and update body request before save in database
@@ -134,6 +129,11 @@ const updateProduct = async (req, res) => {
     for (let key in body) {
       product[key] = body[key];
     }
+
+    // update avatar if exists
+    product["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : product["image"];
 
     // update product in database
     let productUpdated = await product.save({ validateModifiedOnly: true });
@@ -160,9 +160,10 @@ const updateProduct = async (req, res) => {
 // delete one product in database
 const deleteProduct = async (req, res) => {
   try {
+    let body = req.body;
     // check if creator has authorization
     let creator = await productServices.getUserAuthor(
-      req.headers?.body?._creator,
+      body?._creator,
       req.token
     );
     if (!creator?._id) {

@@ -1,12 +1,7 @@
-const {
-  dynamicTypeRequired,
-  promotionSchema,
-  Promotion,
-} = require("../models/promotion/promotion");
+const { Promotion } = require("../models/promotion/promotion");
 const print = require("../log/print");
 const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
-const { default: mongoose } = require("mongoose");
 const setValuesFromRequiredForeignFields = require("./setValuesFromRequiredForeignFields");
 const setUpdateValuesFromForeignFields = require("./setUpdateValuesFromForeignFields");
 
@@ -35,6 +30,11 @@ const createPromotion = async (req, res) => {
     }
 
     body["_creator"] = creator; //set creator found in database
+
+    // set promotion avatar
+    body["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : "/datas/avatar.png";
 
     body = await setValuesFromRequiredForeignFields(body, req.token);
 
@@ -85,6 +85,11 @@ const updatePromotion = async (req, res) => {
 
     //set creator found in database
     body["_creator"] = creator;
+
+    // set promotion avatar if exists
+    if (req.file) {
+      body["image"] = req.file?.filename;
+    }
 
     body = await setUpdateValuesFromForeignFields(body, req.token);
 
@@ -230,10 +235,7 @@ const addClientToPromotion = async (req, res) => {
       });
     }
 
-    let newClient = await promotionServices.getClient(
-      req.body?.client,
-      req.token
-    );
+    let newClient = await promotionServices.getClient(body?.client, req.token);
 
     if (!newClient?._id) {
       return res.status(401).json({

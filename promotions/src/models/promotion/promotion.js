@@ -125,6 +125,7 @@ const promotionSchemaObject = {
     required: true,
     type: restaurantType,
   },
+  image: { type: String, default: "/datas/avatar.png" },
   _creator: {
     type: mongoose.Types.ObjectId,
     required: true,

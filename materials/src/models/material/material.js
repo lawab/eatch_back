@@ -22,7 +22,7 @@ const materialObject = {
     type: Date,
     default: Date.now,
   },
-  image: { type: String },
+  image: { type: String, default: "/datas/avatar.png" },
   mp_name: { required: true, type: String, maxlength: 50 },
   quantity: { type: Number, default: 0, required: true },
   consumer_quantity: { type: Number, default: 0 },
