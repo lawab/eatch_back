@@ -16,7 +16,7 @@ const createUser = async (req, res) => {
 
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
-
+    console.log({ user, email: body?.email });
     if (user) {
       return res.status(401).json({ message: "User already exists!!!" });
     }
@@ -71,7 +71,18 @@ const createUser = async (req, res) => {
 
     if (newuser?._id) {
       // add new user create in historical
+      let response = await userService.addUserToHistorical(
+        creator?._id,
+        {
+          users: {
+            _id: newuser?._id,
+            action: "CREATED",
+          },
+        },
+        req.token
+      );
 
+      console.log({ response });
       res
         .status(200)
         .json({ message: "User has been created successfully!!!" });
