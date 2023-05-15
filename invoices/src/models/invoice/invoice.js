@@ -80,10 +80,10 @@ const productType = {
 const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   infos: {
+    restaurant_name: { type: String, required: true },
     type: {
       town: { type: String, required: true },
       address: { type: String, required: true },
-      restaurant_name: { type: String, required: true },
     },
   },
 };

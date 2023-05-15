@@ -80,10 +80,9 @@ const materialType = {
       _id: { type: mongoose.Types.ObjectId, required: true },
       restaurant_name: { type: String, required: true },
       infos: {
-        type: {
-          town: { type: String, required: true },
-          address: { type: String, required: true },
-        },
+        town: { type: String, required: true },
+        address: { type: String, required: true },
+        logo: { type: String, require: false, default: "/datas/avatar.png" },
       },
     },
   },
@@ -140,13 +139,12 @@ const productType = {
   restaurant: {
     required: true,
     type: {
-      restaurant_name: { type: String, required: true },
       _id: { type: mongoose.Types.ObjectId, required: true },
+      restaurant_name: { type: String, required: true },
       infos: {
-        type: {
-          town: { type: String, required: true },
-          address: { type: String, required: true },
-        },
+        town: { type: String, required: true },
+        address: { type: String, required: true },
+        logo: { type: String, require: false, default: "/datas/avatar.png" },
       },
     },
   },
@@ -257,10 +255,9 @@ const OrderType = {
       _id: { type: mongoose.Types.ObjectId, required: true },
       restaurant_name: { type: String, required: true },
       infos: {
-        type: {
-          town: { type: String, required: true },
-          address: { type: String, required: true },
-        },
+        town: { type: String, required: true },
+        address: { type: String, required: true },
+        logo: { type: String, require: false, default: "/datas/avatar.png" },
       },
     },
   },
@@ -353,10 +350,10 @@ const OrderType = {
 const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant_name: { type: String, require: true, maxlength: 50 },
-  info: {
+  infos: {
     town: { type: String, require: true },
     address: { type: String, require: true },
-    logo: { type: String, require: true },
+    logo: { type: String, require: false, default: "/datas/avatar.png" },
   },
   _creator: {
     required: true,
@@ -379,10 +376,9 @@ const menuType = {
       _id: { type: mongoose.Types.ObjectId, required: true },
       restaurant_name: { type: String, required: true },
       infos: {
-        type: {
-          town: { type: String, required: true },
-          address: { type: String, required: true },
-        },
+        town: { type: String, required: true },
+        address: { type: String, required: true },
+        logo: { type: String, require: false, default: "/datas/avatar.png" },
       },
     },
   },
@@ -475,10 +471,9 @@ const invoiceType = {
       _id: { type: mongoose.Types.ObjectId, required: true },
       restaurant_name: { type: String, required: true },
       infos: {
-        type: {
-          town: { type: String, required: true },
-          address: { type: String, required: true },
-        },
+        town: { type: String, required: true },
+        address: { type: String, required: true },
+        logo: { type: String, require: false, default: "/datas/avatar.png" },
       },
     },
   },
@@ -493,11 +488,14 @@ const invoiceType = {
         required: true,
         type: {
           _id: { type: mongoose.Types.ObjectId, required: true },
+          restaurant_name: { type: String, required: true },
           infos: {
-            type: {
-              town: { type: String, required: true },
-              address: { type: String, required: true },
-              restaurant_name: { type: String, required: true },
+            town: { type: String, required: true },
+            address: { type: String, required: true },
+            logo: {
+              type: String,
+              require: false,
+              default: "/datas/avatar.png",
             },
           },
         },

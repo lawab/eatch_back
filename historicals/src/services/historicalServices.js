@@ -221,7 +221,7 @@ const getMenu = async (id = null, token = null) => {
 const getInvoice = async (id = null, token = null) => {
   try {
     let { data: invoice } = await axios.get(
-      `${process.env.APP_URL_MENU}/fetch/one/${id}`,
+      `${process.env.APP_URL_INVOICE}/fetch/one/${id}`,
       {
         headers: {
           authorization: `Bearer ${token}`,
