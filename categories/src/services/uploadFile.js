@@ -6,7 +6,7 @@ function uploadMiddleFile() {
 
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, "./public/data/uploads");
+            cb(null, "./public/datas");
         },
         filename: (req, file, cb) => {
             cb(null, Date.now()+'_'+file.originalname);

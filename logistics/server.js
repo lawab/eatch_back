@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, "./build/web")));
 app.use(cors());
 
 // All router app
-app.use("", logisticRouter);
+app.use("/api/logistics", logisticRouter);
 
 //Public files
 app.use(express.static(path.join(__dirname, "public")));

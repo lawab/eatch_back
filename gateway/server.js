@@ -12,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, './build/web')));
+//Public files
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "/data/uploads")));
 
 //Microservices proxy redirection
 app.use('/api/users', proxy(config.url_user));

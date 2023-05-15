@@ -8,12 +8,25 @@ const category = require("../models/category");
 
 //Create Category in Data Base
 const createCategory = async (req, res) =>{
-    const body = req.headers.body;
+
+    console.log("*********************************************")
+  console.log(req.headers);
+  console.log("*********************************************")
+
+  console.log("*********************************************")
+  console.log(req.body);
+  console.log("*********************************************")
+
+  console.log("*********************************************")
+  console.log(req.file);
+  console.log("*********************************************")
+
+  let body = JSON.parse(req.headers?.body);
     const newCategory = {
-        title: body.title,
-        user_id: body.user_id,
+        title: body?.title,
+        user_id: body?.user_id,
         image: req.file? "/datas/"+req.file.filename: "/datas/avatar.jpeg",
-        restaurant_id: body.restaurant_id,
+        restaurant_id: body?.restaurant_id,
         
     };
     
