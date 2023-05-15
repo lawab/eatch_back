@@ -5,7 +5,6 @@ const roles = require("../roles");
 const { isEmail } = require("validator");
 
 // users type
-
 const userType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant: {
@@ -494,7 +493,6 @@ const invoiceType = {
             address: { type: String, required: true },
             logo: {
               type: String,
-              require: false,
               default: "/datas/avatar.png",
             },
           },

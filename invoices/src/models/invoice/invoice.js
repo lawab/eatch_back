@@ -119,15 +119,7 @@ const invoiceSchemaObject = {
   order: { required: true, type: orderType },
   restaurant: {
     required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      restaurant_name: { type: String, required: true },
-      infos: {
-        town: { type: String, required: true },
-        address: { type: String, required: true },
-        logo: { type: String, default: "/datas/avatar.png" },
-      },
-    },
+    type: restaurantType,
   },
   _creator: { type: mongoose.Types.ObjectId, required: true },
   devise: { type: String, default: "MAD" },

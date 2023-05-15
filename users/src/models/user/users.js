@@ -8,6 +8,7 @@ const restaurantSchemaObject = {
   infos: {
     town: { type: String, required: true },
     address: { type: String, required: true },
+    logo: { type: String, default: "/datas/avatar.png" },
   },
 };
 const UserSchemaObject = {
