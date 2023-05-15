@@ -122,6 +122,28 @@ const updateOrder = async (id = null, bodyUpdate = {}, token = null) => {
   return order;
 };
 
+/**
+ *
+ * @param {String} id [ObjectId to find restaurant in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getRestaurant = async (id = null, token = null) => {
+  try {
+    let { data: restaurant } = await axios.get(
+      `${process.env.APP_URL_RESTAURANT}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return restaurant;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   createInvoice,
   findOneInvoice,
@@ -132,4 +154,5 @@ module.exports = {
   findInvoice,
   getOrder,
   updateOrder,
+  getRestaurant,
 };

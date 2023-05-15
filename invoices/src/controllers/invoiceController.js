@@ -36,6 +36,22 @@ const createInvoice = async (req, res) => {
       });
     }
 
+    // get restaurant before save invoice
+
+    let restaurant = await invoiceServices.getRestaurant(
+      body?.restaurant,
+      req.token
+    );
+
+    if (!restaurant) {
+      return res.status(401).json({
+        message:
+          "unable to create invoice because restaurant not know,please see your administrator,thanks!!!",
+      });
+    }
+
+    body["restaurant"] = restaurant; //set restaurant value found in database
+
     body["_creator"] = creator; //set creator value found in database
 
     // get order in databsase
@@ -74,7 +90,6 @@ const createInvoice = async (req, res) => {
     body["image"] = req.file
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png"; //set image for current invoice
-
     let invoice = await invoiceServices.createInvoice(body);
 
     print({ invoice }, "*");
