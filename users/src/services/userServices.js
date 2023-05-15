@@ -69,6 +69,18 @@ const getRestaurant = async (id = null, token = null) => {
   return restaurant;
 };
 
+const setUserInHistorical = async () => {
+  let { data: restaurant } = await axios.post(
+    `${process.env.APP_URL_RESTAURANT}/fetch/one/${id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return restaurant;
+};
+
 module.exports = {
   createUser,
   findUser,

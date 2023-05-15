@@ -2,78 +2,94 @@ const mongoose = require("mongoose");
 const { orderStatus, actionTypes } = require("../statusTypes");
 const Schema = mongoose.Schema;
 const roles = require("../roles");
-// client type
-const clientType = {
+const { isEmail } = require("validator");
+
+// users type
+
+const userType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  firstName: {
-    type: String,
-    maxlenght: 50,
-    default: null,
-  },
-  lastName: {
-    type: String,
-    maxlenght: 50,
-    default: null,
-  },
-  isOnline: { type: Boolean, default: false },
-  phoneNumber: {
-    type: String,
-    maxlenght: 50,
-    default: null,
-  },
-  _creator: {
+  restaurant: {
     required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
+      restaurant_name: { type: String, required: true },
+      infos: {
+        town: { type: String, required: true },
+        address: { type: String, required: true },
+        logo: { type: String, require: false, default: "/datas/avatar.png" },
       },
     },
+  },
+  password: {
+    type: String,
+  },
+  firstName: {
+    required: true,
+    type: String,
+    maxlength: 50,
+  },
+  lastName: {
+    required: true,
+    type: String,
+    maxlength: 50,
+  },
+  email: {
+    type: String,
+    validate: {
+      validator: function (email) {
+        return isEmail(this.email);
+      },
+    },
+  },
+  username: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    required: true,
+    default: roles.SUPER_ADMIN,
+    enum: [roles.SUPER_ADMIN, roles.RH, roles.COMPTABLE, roles.MANAGER],
+  },
+  avatar: {
+    type: String,
+    default: "/data/uploads/mcf.png",
+  },
+  isOnline: {
+    type: Boolean,
+    default: false,
+  },
+  _creator: {
+    required: true,
+    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,
     required: true,
     enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
   },
+  deletedAt: { type: Date, default: null },
 };
 
 // material type
 const materialType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant: {
     required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
+      restaurant_name: { type: String, required: true },
       infos: {
         type: {
           town: { type: String, required: true },
           address: { type: String, required: true },
-          restaurant_name: { type: String, required: true },
         },
       },
     },
   },
   _creator: {
     required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-    },
+    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,
@@ -92,6 +108,7 @@ const materialType = {
 };
 // product type
 const productType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   comments: {
     type: [
       {
@@ -123,12 +140,12 @@ const productType = {
   restaurant: {
     required: true,
     type: {
+      restaurant_name: { type: String, required: true },
       _id: { type: mongoose.Types.ObjectId, required: true },
       infos: {
         type: {
           town: { type: String, required: true },
           address: { type: String, required: true },
-          restaurant_name: { type: String, required: true },
         },
       },
     },
@@ -144,22 +161,9 @@ const productType = {
     type: Number,
     required: true,
   },
-
   _creator: {
     required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-    },
+    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,
@@ -219,6 +223,7 @@ const productType = {
 
 // orders type
 const OrderType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   order_title: {
     type: String,
     default: null,
@@ -250,30 +255,18 @@ const OrderType = {
     required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
+      restaurant_name: { type: String, required: true },
       infos: {
         type: {
           town: { type: String, required: true },
           address: { type: String, required: true },
-          restaurant_name: { type: String, required: true },
         },
       },
     },
   },
   _creator: {
     required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-    },
+    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,
@@ -358,6 +351,7 @@ const OrderType = {
 };
 
 const restaurantType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant_name: { type: String, require: true, maxlength: 50 },
   info: {
     town: { type: String, require: true },
@@ -366,117 +360,28 @@ const restaurantType = {
   },
   _creator: {
     required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-    },
+    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,
     required: true,
     enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
   },
-  deletedAt: { type: Date, default: null },
-};
-
-// users type
-
-const userType = {
-  restaurant: {
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      infos: {
-        type: {
-          town: { type: String, required: true },
-          address: { type: String, required: true },
-          restaurant_name: { type: String, required: true },
-        },
-      },
-    },
-  },
-  firstName: {
-    required: true,
-    type: String,
-    maxlength: 50,
-  },
-  lastName: {
-    required: true,
-    type: String,
-    maxlength: 50,
-  },
-  email: {
-    type: String,
-    validate: {
-      validator: function (email) {
-        return validator.isEmail(this.email);
-      },
-    },
-  },
-  username: {
-    type: String,
-    required: true,
-  },
-  role: {
-    type: String,
-    required: true,
-    default: roles.SUPER_ADMIN,
-    enum: [roles.SUPER_ADMIN, roles.RH, roles.COMPTABLE, roles.MANAGER],
-  },
-  avatar: {
-    type: String,
-    default: "/data/uploads/mcf.png",
-  },
-
-  isOnline: {
-    type: Boolean,
-    default: false,
-  },
-  _creator: {
-    required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-    },
-  },
-
-  action: {
-    type: String,
-    required: true,
-    enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
-  },
-
   deletedAt: { type: Date, default: null },
 };
 
 // menu type
 const menuType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant: {
     required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
+      restaurant_name: { type: String, required: true },
       infos: {
         type: {
           town: { type: String, required: true },
           address: { type: String, required: true },
-          restaurant_name: { type: String, required: true },
         },
       },
     },
@@ -547,19 +452,7 @@ const menuType = {
   },
   _creator: {
     required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-    },
+    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,
@@ -575,6 +468,20 @@ const menuType = {
 // invoice type
 
 const invoiceType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+  restaurant: {
+    required: true,
+    type: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      restaurant_name: { type: String, required: true },
+      infos: {
+        type: {
+          town: { type: String, required: true },
+          address: { type: String, required: true },
+        },
+      },
+    },
+  },
   order: {
     required: true,
     type: {
@@ -696,19 +603,7 @@ const invoiceType = {
   },
   _creator: {
     required: true,
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      firstName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-      lastName: {
-        type: String,
-        maxlenght: 50,
-        default: null,
-      },
-    },
+    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,
@@ -724,9 +619,6 @@ const invoiceType = {
 const hIstoricalSchemaObject = {
   users: {
     type: [{ type: userType }],
-  },
-  clients: {
-    type: [{ type: clientType }],
   },
   products: {
     type: [{ type: productType }],

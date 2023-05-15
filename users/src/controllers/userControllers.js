@@ -70,6 +70,8 @@ const createUser = async (req, res) => {
     let newuser = await userService.createUser(body);
 
     if (newuser?._id) {
+      // add new user create in historical
+
       res
         .status(200)
         .json({ message: "User has been created successfully!!!" });

@@ -6,7 +6,7 @@ const roles = require("../models/roles");
 const setValuesBody = require("./setValuesBody");
 const { actionTypes, orderStatus } = require("../models/statusTypes");
 // create one historical in database
-const createHistorical = async (req, res) => {
+const updateHistorical = async (req, res) => {
   try {
     let body = req.body;
 
@@ -18,7 +18,7 @@ const createHistorical = async (req, res) => {
       return res.status(401).json({ message: "invalid data!!!" });
     }
 
-    // get author since microservice clients
+    // get author since microservice users
     let creator = await historicalServices.getUser(
       req.params?._creator,
       req.token
@@ -42,9 +42,6 @@ const createHistorical = async (req, res) => {
       });
     }
 
-    // valid and set all value into body
-    body = await setValuesBody(historicalServices, body, creator, req.token);
-    print({ bodyUpdated: body });
     // save all value into database
     let historical = await historicalServices.findHIstorical({
       _id: { $exists: true },
@@ -56,33 +53,35 @@ const createHistorical = async (req, res) => {
           "unable to end the current action because historical not exists please see your administrator for more information!!!",
       });
     }
-    for (const key in body) {
-      if (
-        Object.hasOwnProperty.call(body, key) &&
-        fieldsRequired.includes(key)
-      ) {
-        console.log({ body });
-        body[key] = [...historical[key], body[key]];
-      }
-    }
 
-    let updatedHistoricalResponse = await historicalServices.createHIstorical(
-      {
-        _id: historical?._id,
-      },
-      body
-    );
+    // valid and set all value into body
+    body = await setValuesBody(historicalServices, body, req.token);
+
+    print({ body });
+
+    if (!body) {
+      return res.status(401).json({
+        message:
+          "unable to end the current action because data send had not valided!!!",
+      });
+    }
+    // update historical
+    let [key] = Object.keys(body);
+
+    historical[key] = [...historical[key], body[key]];
+
+    let updatedHistoricalResponse = await historical.save();
 
     print({ updatedHistoricalResponse }, "*");
 
-    if (updatedHistoricalResponse?.modifiedCount) {
+    if (updatedHistoricalResponse?._id) {
       res
         .status(200)
-        .json({ message: "HIstorical has been created successfully!!!" });
+        .json({ message: "HIstorical has been updated successfully!!!" });
     } else {
       res
         .status(401)
-        .json({ message: "HIstorical has been not created successfully!!!" });
+        .json({ message: "HIstorical has been not updated successfully!!!" });
     }
   } catch (error) {
     print(error, "x");
@@ -164,7 +163,7 @@ const fetchHistoricalByFieldWithAction = async (req, res) => {
 };
 
 module.exports = {
-  createHistorical,
+  updateHistorical,
   fetchHistorical,
   fetchHistoricalsByField,
   fetchHistoricalByFieldWithAction,

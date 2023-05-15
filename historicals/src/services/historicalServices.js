@@ -2,13 +2,19 @@ const { default: axios } = require("axios");
 const { HIstorical } = require("../models/historical/historical");
 
 /**
- * @param {String} field [field that we want to create a new historical in database]
- * @param {Object} hIstoricalBody [Body to create new hIstorical in database]
+ * @param {String} field [field that we want to update from historical in database]
+ * @param {Object} hIstoricalBody [Body to update hIstorical in database]
  * @returns {Promise}
  */
-const createHIstorical = async (query = {}, hIstoricalBody = {}) => {
-  const hIstorical = await HIstorical.updateOne(query, { ...hIstoricalBody });
-  return hIstorical;
+const updateHistorical = async (query = {}, bodyQueryUpdate = {}) => {
+  try {
+    const hIstorical = await HIstorical.updateOne(query, {
+      ...bodyQueryUpdate,
+    });
+    return hIstorical;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 /**
  *
@@ -16,8 +22,12 @@ const createHIstorical = async (query = {}, hIstoricalBody = {}) => {
  * @returns {Promise}
  */
 const findOneHIstorical = async (query = {}) => {
-  const hIstorical = await HIstorical.findOne(query);
-  return hIstorical;
+  try {
+    const hIstorical = await HIstorical.findOne(query);
+    return hIstorical;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 /**
@@ -26,8 +36,12 @@ const findOneHIstorical = async (query = {}) => {
  * @returns {Promise}
  */
 const findHIstoricals = async (query = null) => {
-  const hIstoricals = await HIstorical.find(query, {});
-  return hIstoricals;
+  try {
+    const hIstoricals = await HIstorical.find(query, {});
+    return hIstoricals;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 /**
  *
@@ -35,8 +49,12 @@ const findHIstoricals = async (query = null) => {
  * @returns {Promise}
  */
 const findHIstorical = async (query = null) => {
-  const hIstorical = await HIstorical.findOne(query);
-  return hIstorical;
+  try {
+    const hIstorical = await HIstorical.findOne(query);
+    return hIstorical;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 // get creator since microservice users
@@ -47,15 +65,19 @@ const findHIstorical = async (query = null) => {
  * @returns {Promise} [return the current author send by eatch_users microservice]
  */
 const getUser = async (id = null, token = null) => {
-  let { data: creator } = await axios.get(
-    `${process.env.APP_URL_USER}/fetch/one/${id}`,
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return creator;
+  try {
+    let { data: creator } = await axios.get(
+      `${process.env.APP_URL_USER}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return creator;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 /**
@@ -65,15 +87,19 @@ const getUser = async (id = null, token = null) => {
  * @returns {Promise} [return the current client (if exists) send by eatch_clients microservice]
  */
 const getClient = async (id = null, token = null) => {
-  let { data: client } = await axios.get(
-    `${process.env.APP_URL_CLIENT}/fetch/one/${id}`,
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return client;
+  try {
+    let { data: client } = await axios.get(
+      `${process.env.APP_URL_CLIENT}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return client;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 /**
@@ -83,42 +109,144 @@ const getClient = async (id = null, token = null) => {
  * @returns {Promise<Object>}
  */
 const getRestaurant = async (id = null, token = null) => {
-  let { data: restaurant } = await axios.get(
-    `${process.env.APP_URL_RESTAURANT}/fetch/one/${id}`,
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return restaurant;
+  try {
+    let { data: restaurant } = await axios.get(
+      `${process.env.APP_URL_RESTAURANT}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return restaurant;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 /**
  *
- * @param {String} id [ObjectId to find restaurant in database]
+ * @param {String} id [ObjectId to find product in database]
  * @param {String} token  [token to authenticated user before continuous treatment of his request ]
  * @returns {Promise<Object>}
  */
-const getProducts = async (id = null, token = null) => {
-  let { data: products } = await axios.get(
-    `${process.env.APP_URL_PRODUCTS}/fetch/one/${id}`,
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return products;
+const getProduct = async (id = null, token = null) => {
+  try {
+    let { data: product } = await axios.get(
+      `${process.env.APP_URL_PRODUCT}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return product;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
+ *
+ * @param {String} id [ObjectId to find material in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getMaterial = async (id = null, token = null) => {
+  try {
+    let { data: material } = await axios.get(
+      `${process.env.APP_URL_MATERIAL}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return material;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
+ *
+ * @param {String} id [ObjectId to find order in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getOrder = async (id = null, token = null) => {
+  try {
+    let { data: order } = await axios.get(
+      `${process.env.APP_URL_ORDER}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
+ *
+ * @param {String} id [ObjectId to find menu in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getMenu = async (id = null, token = null) => {
+  try {
+    let { data: menu } = await axios.get(
+      `${process.env.APP_URL_MENU}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return menu;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
+ *
+ * @param {String} id [ObjectId to find invoice in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getInvoice = async (id = null, token = null) => {
+  try {
+    let { data: invoice } = await axios.get(
+      `${process.env.APP_URL_MENU}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return invoice;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 module.exports = {
-  createHIstorical,
+  updateHistorical,
   findOneHIstorical,
   findHIstoricals,
-  getUser,
   findHIstorical,
+
+  // all methods to call all necessaires service and retrive data
+  getUser,
   getClient,
   getRestaurant,
-  getProducts,
+  getProduct,
+  getMaterial,
+  getOrder,
+  getMenu,
+  getInvoice,
 };

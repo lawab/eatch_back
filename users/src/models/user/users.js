@@ -4,12 +4,10 @@ const validator = require("validator");
 const Schema = mongoose.Schema;
 const restaurantSchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
+  restaurant_name: { type: String, required: true },
   infos: {
-    type: {
-      town: { type: String, required: true },
-      address: { type: String, required: true },
-      restaurant_name: { type: String, required: true },
-    },
+    town: { type: String, required: true },
+    address: { type: String, required: true },
   },
 };
 const UserSchemaObject = {
