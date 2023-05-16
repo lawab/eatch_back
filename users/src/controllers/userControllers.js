@@ -250,7 +250,7 @@ const UpdateUser = async (req, res) => {
     // find user that author want to update
     let user = await userService.findUser({ _id: req.params?.id });
 
-    /* contains value user before updated. 
+    /* copy values and fields from user found in database before updated it. 
        it will use to restore user updated if connection with historical failed
     */
     let bodyCopy = Object.assign({}, user._doc);
@@ -325,7 +325,7 @@ const UpdateUser = async (req, res) => {
               userUpdated[field] = bodyCopy[field];
             }
           }
-          let userRestored = await userUpdated.save(); // restore Object in database
+          let userRestored = await userUpdated.save({ timestamps: false }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
           print({ userRestored });
           return userRestored;
         }
@@ -371,24 +371,70 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    //behind, mongoose find and delete user if exists
-    let userDeleted = await userService.deleteUser(
-      { _id: req.params?.id, deletedAt: null },
-      { _creator: creator } // the current user who do this action
-    ); // if user exists in database, user must be not null otherwise user must be null
+    // find user that author want to update
+    let user = await userService.findUser({
+      _id: req.params?.id,
+      deletedAt: null,
+    });
 
-    if (!userDeleted) {
+    if (!user?._id) {
       return res.status(401).json({
         message:
           "unable to delete User because he not exists or already deleted in database!!!",
       });
     }
 
+    /* copy values and fields from user found in database before updated it. 
+       it will use to restore user updated if connection with historical failed
+      */
+    let userCopy = Object.assign({}, user._doc);
+
+    print({ userCopy });
+
+    //update deleteAt and cretor fields from user
+
+    user.deletedAt = Date.now(); // set date of deletion
+    user._creator = creator?._id; // the current user who do this action
+
+    let userDeleted = await user.save();
+
+    console.log({ userDeleted });
+
     if (userDeleted?.deletedAt) {
-      print({ userDeleted });
-      return res
-        .status(200)
-        .json({ message: "User has been delete successfully!!!" });
+      // add new user create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await userService.addUserToHistorical(
+            creator?._id,
+            {
+              users: {
+                _id: userDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in userCopy) {
+            if (Object.hasOwnProperty.call(userCopy, field)) {
+              userDeleted[field] = userCopy[field];
+            }
+          }
+          let userRestored = await userDeleted.save({ timestamps: false }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ userRestored });
+          return userRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "User has been delete successfully!!!",
+        "User has not been deleete successfully,please try again later,thanks!!!"
+      );
     } else {
       return res
         .status(401)
