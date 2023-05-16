@@ -87,7 +87,7 @@ const createProduct = async (req, res) => {
           let elementDeleted = await productServices.deleteTrustlyProduct({
             _id: newproduct?._id,
           });
-          print({elementDeleted});
+          print({ elementDeleted });
           return elementDeleted;
         }
       );
@@ -146,6 +146,8 @@ const updateProduct = async (req, res) => {
       });
     }
 
+    let productCopy = Object.assign({}, product._doc); // cppy documment before update it
+
     body["_creator"] = creator; // set user that make update in database
 
     // update foreign fields and update body request before save in database
@@ -175,12 +177,46 @@ const updateProduct = async (req, res) => {
     print({ productUpdated }, "U");
 
     if (productUpdated?._id) {
-      res
-        .status(200)
-        .json({ message: "Product has been updated successfully!!" });
+      // add new user create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await productServices.addProductToHistorical(
+            creator?._id,
+            {
+              products: {
+                _id: productUpdated?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in productCopy) {
+            if (Object.hasOwnProperty.call(productCopy, field)) {
+              productUpdated[field] = productCopy[field];
+            }
+          }
+          let userRestored = await productUpdated.save({
+            validateModifiedOnly: true,
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ userRestored });
+          return userRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Product has been updated successfully!!!",
+        "Product has not been Updated successfully,please try again later,thanks!!!"
+      );
     } else {
       res.status(401).json({
-        message: "Product update failed: product not exits in database!!",
+        message: "User has been not updated successfully!!",
       });
     }
   } catch (error) {
