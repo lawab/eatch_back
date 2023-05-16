@@ -6,6 +6,10 @@ const roles = require("../models/roles");
 const setForeignFieldsRequired = require("./setForeignFieldsRequired");
 const updateForeignFields = require("./updateForeignFields");
 const print = require("../log/print");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one product in database
 const createProduct = async (req, res) => {
@@ -58,12 +62,42 @@ const createProduct = async (req, res) => {
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png";
 
-    let product = await productServices.createProduct(body);
-    print({ product });
-    if (product?._id) {
-      res
-        .status(200)
-        .json({ message: "product has been created successfully!!!" });
+    let newproduct = await productServices.createProduct(body);
+
+    print({ newproduct });
+
+    if (newproduct?._id) {
+      // add new user create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await productServices.addProductToHistorical(
+            creator?._id,
+            {
+              products: {
+                _id: newproduct?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await productServices.deleteTrustlyProduct({
+            _id: newproduct?._id,
+          });
+          print({elementDeleted});
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Product has been created successfully!!!",
+        "Product has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(401)
