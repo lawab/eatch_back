@@ -11,6 +11,8 @@ const { fieldsValidator } = require("../models/validators");
 
 //Create user in Data Base
 const createUser = async (req, res) => {
+  let newuser = {}; //global varaible to do rollback if error occured during creating of user
+
   try {
     let body = req.body;
 
@@ -67,7 +69,7 @@ const createUser = async (req, res) => {
 
     print({ newUser: body, creator: creator?._id }, "*");
     // save new user in database
-    let newuser = await userService.createUser(body);
+    newuser = await userService.createUser(body);
 
     if (newuser?._id) {
       // add new user create in historical
@@ -82,17 +84,31 @@ const createUser = async (req, res) => {
         req.token
       );
 
-      console.log({ response });
-      res
-        .status(200)
-        .json({ message: "User has been created successfully!!!" });
+      if (response?.status === 200) {
+        console.log({ response:response.data?.message });
+        res
+          .status(200)
+          .json({ message: "User has been created successfully!!!" });
+      } else {
+        // generate the error because user has not be saved in historical
+        throw new Error(
+          "User has not been created successfully,please try again later,thanks!!!"
+        );
+      }
     } else {
       res
         .status(401)
-        .json({ message: "User bas been not created successfully!!!" });
+        .json({ message: "User has been not created successfully!!!" });
     }
   } catch (err) {
-    console.log(err);
+    print({ error: err.message }, "x");
+    // if error occured,remove user created if exists in database
+    if (newuser?._id) {
+      let userRemoved = await userService.deleteTrustlyUser({
+        _id: newuser?._id,
+      });
+      print({ userRemoved });
+    }
     res.status(500).json({ message: "Error encounterd creating user!!!" });
   }
 };

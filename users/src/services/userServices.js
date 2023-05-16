@@ -37,6 +37,16 @@ const deleteUser = async (query = {}, updateBody = {}) => {
   );
   return user;
 };
+
+/**
+ *
+ * @param {Object} query [query to find user in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyUser = async (query = {}) => {
+  const user = await User.deleteOne(query);
+  return user;
+};
 /**
  *
  * @param {Object} query [query to update user in documents list. Default value is {}]
@@ -95,4 +105,5 @@ module.exports = {
   findUsers,
   getRestaurant,
   addUserToHistorical,
+  deleteTrustlyUser,
 };

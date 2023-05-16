@@ -36,12 +36,7 @@ userRouter.post("/login", auth.login);
 userRouter.post("/create", authmiddleware, upload.single("file"), createUser);
 
 //************CREATE ROLE********************
-userRouter.post(
-  "/create/role",
-  authmiddleware,
-  upload.single("file"),
-  createUserRole
-);
+userRouter.post("/create/role", authmiddleware, createUserRole);
 
 //************ CREATE EMPLOYERTYPE********************
 userRouter.post("/create/employertype", authmiddleware, createEmployerType);
@@ -64,20 +59,10 @@ userRouter.delete("/delete/role/:id", authmiddleware, deleteRole);
 //**************************************** PUT ROUTES //****************************************//
 
 //************UPDATE ONE EMPLOYERTYPE********************
-userRouter.put(
-  "/update/employertype/:id",
-  authmiddleware,
-  upload.single("file"),
-  UpdateEmployerType
-);
+userRouter.put("/update/employertype/:id", authmiddleware, UpdateEmployerType);
 //************UPDATE ONE ROLE********************
 
-userRouter.put(
-  "/update/role/:id",
-  authmiddleware,
-  upload.single("file"),
-  UpdateRole
-);
+userRouter.put("/update/role/:id", authmiddleware, UpdateRole);
 //************UPDATE ONE USER********************
 userRouter.put(
   "/update/:id",
