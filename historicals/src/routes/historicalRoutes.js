@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  createHistorical,
+  updateHistorical,
   fetchHistorical,
   fetchHistoricalsByField,
   fetchHistoricalByFieldWithAction,
@@ -11,11 +11,11 @@ var historicalRouter = express.Router();
 const upload = uploadFileService.uploadMiddleFile();
 
 //Create historical
-historicalRouter.post(
-  "/create/:_creator",
+historicalRouter.put(
+  "/update/:_creator",
   authmiddleware,
   upload.single("file"),
-  createHistorical
+  updateHistorical
 );
 
 //get historical

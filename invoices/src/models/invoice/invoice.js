@@ -79,12 +79,11 @@ const productType = {
 };
 const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
+  restaurant_name: { type: String, required: true },
   infos: {
-    type: {
-      town: { type: String, required: true },
-      address: { type: String, required: true },
-      restaurant_name: { type: String, required: true },
-    },
+    town: { type: String, required: true },
+    address: { type: String, required: true },
+    logo: { type: String, default: "/datas/avatar.png" },
   },
 };
 const orderType = {
@@ -118,6 +117,10 @@ const orderType = {
 };
 const invoiceSchemaObject = {
   order: { required: true, type: orderType },
+  restaurant: {
+    required: true,
+    type: restaurantType,
+  },
   _creator: { type: mongoose.Types.ObjectId, required: true },
   devise: { type: String, default: "MAD" },
   image: { type: String, default: "/datas/avatar.png" },

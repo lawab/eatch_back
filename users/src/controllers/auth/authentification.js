@@ -4,20 +4,16 @@ const jwt = require("jsonwebtoken");
 const { isEmail } = require("validator"); // LOGIN WITH JWT
 const print = require("../../log/print");
 const login = async function (req, res) {
-  console.log("BOOODDDYYY:");
-    console.log(req.body);
-    // const body = JSON.parse(req.headers.body);
-    // console.log(body);
   try {
     // check if email of user is valided
-    if (!isEmail(body?.email) || !body?.password) {
-      console.log("Bad data!");
+    if (!isEmail(req.body?.email) || !req.body?.password) {
+      print("Bad data!");
       return res.status(401).json({ message: "Wrong credentials!" });
     } else {
-      const user = await User.findOne({ email: body.email });
+      const user = await User.findOne({ email: req.body.email });
 
       if (!user) {
-        console.log("Bad mail!");
+        print("Bad mail!");
         return res.status(401).json({ message: "Wrong credentials!" });
       } else {
         const hashedPassword = cryptoJS.AES.decrypt(
@@ -25,8 +21,8 @@ const login = async function (req, res) {
           process.env.PASS_SEC
         );
         const password = hashedPassword.toString(cryptoJS.enc.Utf8);
-        if (password !== body.password) {
-          console.log("Bad Password!");
+        if (password !== req.body.password) {
+          print("Bad Password!");
           return res.status(401).json({ message: "Wrong credentials!" });
         }
       }

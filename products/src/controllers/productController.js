@@ -6,6 +6,10 @@ const roles = require("../models/roles");
 const setForeignFieldsRequired = require("./setForeignFieldsRequired");
 const updateForeignFields = require("./updateForeignFields");
 const print = require("../log/print");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one product in database
 const createProduct = async (req, res) => {
@@ -33,14 +37,14 @@ const createProduct = async (req, res) => {
       return res.status(401).json({ message });
     }
 
-    // if user has authorization to create new product
+    // if product has authorization to create new product
     if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
       return res.status(401).json({
         message: "you cannot create the product please see you admin,thanks!!!",
       });
     }
 
-    // user has authorization
+    // product has authorization
 
     // set restaurant,category and materials fields required
     body = await setForeignFieldsRequired(
@@ -58,12 +62,42 @@ const createProduct = async (req, res) => {
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png";
 
-    let product = await productServices.createProduct(body);
-    print({ product });
-    if (product?._id) {
-      res
-        .status(200)
-        .json({ message: "product has been created successfully!!!" });
+    let newproduct = await productServices.createProduct(body);
+
+    print({ newproduct });
+
+    if (newproduct?._id) {
+      // add new product create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await productServices.addProductToHistorical(
+            creator?._id,
+            {
+              products: {
+                _id: newproduct?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await productServices.deleteTrustlyProduct({
+            _id: newproduct?._id,
+          });
+          print({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Product has been created successfully!!!",
+        "Product has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(401)
@@ -94,7 +128,7 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    // if user has authorization to update new product
+    // if product has authorization to update new product
     if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
       return res.status(401).json({
         message: "you cannot create the product please see you admin,thanks!!!",
@@ -111,6 +145,8 @@ const updateProduct = async (req, res) => {
         message: "unable to update product because it not exists!!!",
       });
     }
+
+    let productCopy = Object.assign({}, product._doc); // cppy documment before update it
 
     body["_creator"] = creator; // set user that make update in database
 
@@ -141,12 +177,46 @@ const updateProduct = async (req, res) => {
     print({ productUpdated }, "U");
 
     if (productUpdated?._id) {
-      res
-        .status(200)
-        .json({ message: "Product has been updated successfully!!" });
+      // add new product create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await productServices.addProductToHistorical(
+            creator?._id,
+            {
+              products: {
+                _id: productUpdated?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in productCopy) {
+            if (Object.hasOwnProperty.call(productCopy, field)) {
+              productUpdated[field] = productCopy[field];
+            }
+          }
+          let productRestored = await productUpdated.save({
+            validateModifiedOnly: true,
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ productRestored });
+          return productRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Product has been updated successfully!!!",
+        "Product has not been Updated successfully,please try again later,thanks!!!"
+      );
     } else {
       res.status(401).json({
-        message: "Product update failed: product not exits in database!!",
+        message: "product has been not updated successfully!!",
       });
     }
   } catch (error) {
@@ -172,36 +242,80 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    // if user has authorization to update new product
+    // if product has authorization to update new product
     if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
       return res.status(401).json({
         message: "you cannot create the product please see you admin,thanks!!!",
       });
     }
 
-    // find and delete product
-    let productDeleted = await productServices.deleteOne(
-      {
-        _id: req.params?.id,
-        deletedAt: null,
-      },
-      { _creator: creator._id, deletedAt: Date.now() } //set user creator and the date of deletion,no drop product
-    );
+    // find product that author want to update
+    let product = await productServices.findOneProduct({
+      _id: req.params?.id,
+      deletedAt: null,
+    });
 
-    // if product not exits or had already deleted
-    if (!productDeleted?._id) {
+    if (!product?._id) {
       return res.status(401).json({
         message:
-          "unable to delete product because it not exists or already deleted",
+          "unable to delete product because he not exists or already deleted in database!!!",
       });
     }
 
+    /* copy values and fields from product found in database before updated it. 
+       it will use to restore product updated if connection with historical failed
+      */
+    let productCopy = Object.assign({}, product._doc);
+
+    print({ productCopy });
+
+    //update deleteAt and cretor fields from product
+
+    product.deletedAt = Date.now(); // set date of deletion
+    product._creator = creator?._id; // the current product who do this action
+
+    let productDeleted = await product.save();
+
+    print({ productDeleted });
+
     // product exits and had deleted successfully
     if (productDeleted?.deletedAt) {
-      print({ productDeleted: productDeleted?._id }, "-");
-      return res
-        .status(200)
-        .json({ message: "product has been delete sucessfully" });
+      // add new product create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await productServices.addProductToHistorical(
+            creator?._id,
+            {
+              products: {
+                _id: productDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in productCopy) {
+            if (Object.hasOwnProperty.call(productCopy, field)) {
+              productDeleted[field] = productCopy[field];
+            }
+          }
+          let productRestored = await productDeleted.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ productRestored });
+          return productRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "product has been delete successfully!!!",
+        "product has not been deleete successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(500).json({ message: "deletion of product failed" });
     }
