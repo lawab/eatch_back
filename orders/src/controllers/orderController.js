@@ -119,6 +119,10 @@ const updateOrder = async (req, res) => {
       });
     }
 
+    console.log({ order });
+
+    let orderCopy = Object.assign({}, order._doc); // cppy documment before update it
+
     body["_creator"] = creator; // set user that make update in database
 
     body = await updateForeignFields(orderServices, body, req.token);
@@ -136,9 +140,42 @@ const updateOrder = async (req, res) => {
     print({ orderUpdated });
 
     if (orderUpdated?._id) {
-      return res
-        .status(200)
-        .json({ message: "Order has been updated successfully!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await orderServices.addOrderToHistorical(
+            creator?._id,
+            {
+              orders: {
+                _id: orderUpdated?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in orderCopy) {
+            if (Object.hasOwnProperty.call(orderCopy, field)) {
+              orderUpdated[field] = orderCopy[field];
+            }
+          }
+          let orderRestored = await orderUpdated.save({
+            validateModifiedOnly: true,
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ orderRestored });
+          return orderRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Order has been updated successfully!!!",
+        "Order has not been Updated successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(401).json({
         message: "Order update failed: order not exits in database!!",
