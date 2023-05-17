@@ -224,27 +224,66 @@ const deleteMenu = async (req, res) => {
       });
     }
 
-    // find and delete Menu
-    let MenuDeleted = await menuServices.deleteOne(
-      {
-        _id: req.params?.id,
-        deletedAt: null,
-      },
-      { _creator: creator, deletedAt: Date.now() } //set user creator and the date of deletion,no drop Menu
-    );
+    let menu = await menuServices.findOneMenu({
+      _id: req.params?.id,
+    });
 
-    // if menu not exits or had already deleted
-    if (!MenuDeleted) {
+    if (!menu?._id) {
       return res.status(401).json({
         message:
-          "unable to delete menu because it not exists or already deleted!!!",
+          "unable to update menu beacuse it not exists or alreday deleted!!!",
       });
     }
+
+    console.log({ menu });
+
+    let menuCopy = Object.assign({}, menu._doc); // cppy documment before update it
+
+    //update deleteAt and cretor fields from menu
+
+    menu.deletedAt = Date.now(); // set date of deletion
+    menu._creator = creator; // the current menu who do this action
+
+    let MenuDeleted = await menu.save();
+
+    print({ MenuDeleted });
+
     if (MenuDeleted?.deletedAt) {
-      print({ MenuDeleted: MenuDeleted }, "s");
-      return res
-        .status(200)
-        .json({ message: "menu has been deleted sucessfully" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await menuServices.addMenuToHistorical(
+            creator?._id,
+            {
+              menus: {
+                _id: MenuDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in menuCopy) {
+            if (Object.hasOwnProperty.call(menuCopy, field)) {
+              MenuDeleted[field] = menuCopy[field];
+            }
+          }
+          let menuRestored = await MenuDeleted.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ menuRestored });
+          return menuRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Order has been delete successfully!!!",
+        "Order has not been delete successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(500).json({ message: "deletion of menu failed" });
     }
