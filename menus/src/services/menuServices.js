@@ -102,6 +102,7 @@ const getRestaurant = async (id = null, token = null) => {
   );
   return restaurant;
 };
+
 /**
  *
  * @param {Array<String>} ids [list of _id products that we want to get in database]
@@ -120,6 +121,35 @@ const getProducts = async (ids = [], token = null) => {
   return products;
 };
 
+/**
+ *
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addMenuToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+/**
+ *
+ * @param {Object} query [query to find menu in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyMenu = async (query = {}) => {
+  const menu = await Menu.deleteOne(query);
+  return menu;
+};
+
 module.exports = {
   createMenu,
   findOneMenu,
@@ -130,4 +160,6 @@ module.exports = {
   findMenu,
   getRestaurant,
   getProducts,
+  addMenuToHistorical,
+  deleteTrustlyMenu,
 };

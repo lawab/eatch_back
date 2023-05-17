@@ -20,12 +20,15 @@ module.exports = async (historicalservices, body = {}, token) => {
     let keyMethod = `get${keyService}`;
     let method = historicalservices[keyMethod];
 
+    print({ value, method });
+
     let valueFound = await method(value?._id, token);
+
+    print({ valueFound });
 
     if (!valueFound?._id || !actionTypes.hasOwnProperty(value?.action)) {
       throw new Error(`invalid ${key} send`);
     }
-    print({ value, valueFound });
     body[key] = {
       ...valueFound,
       action: value?.action,

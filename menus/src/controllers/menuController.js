@@ -5,6 +5,10 @@ const menuServices = require("../services/menuServices");
 const roles = require("../models/roles");
 const updateForeignFields = require("./updateForeignFields");
 const setForeignFields = require("./setForeignFields");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one Menu
 const createMenu = async (req, res) => {
@@ -47,12 +51,39 @@ const createMenu = async (req, res) => {
 
     let menu = await menuServices.createMenu(body);
 
-    print({ menu }, "*");
+    print({ menucreated: menu }, "*");
 
     if (menu?._id) {
-      res
-        .status(200)
-        .json({ message: "Menu has been created successfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await menuServices.addMenuToHistorical(
+            creator._id,
+            {
+              menus: {
+                _id: menu?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await menuServices.deleteTrustlyMenu({
+            _id: menu?._id,
+          });
+          print({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Menu has been created successfully!!!",
+        "Menu has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(200)

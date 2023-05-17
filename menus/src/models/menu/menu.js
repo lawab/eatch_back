@@ -72,7 +72,6 @@ const userSchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   username: {
     type: String,
-    required: true,
   },
   email: {
     type: String,
