@@ -4,6 +4,10 @@ const print = require("../log/print");
 const materialServices = require("../services/materialServices");
 const roles = require("../models/roles");
 const updateForeignFields = require("./updateForeignFields");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one Material
 const createMaterial = async (req, res) => {
@@ -63,9 +67,36 @@ const createMaterial = async (req, res) => {
     print({ material }, "*");
 
     if (material?._id) {
-      res
-        .status(200)
-        .json({ message: "Material has been created successfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await materialServices.addMaterialToHistorical(
+            creator._id,
+            {
+              materials: {
+                _id: material?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await materialServices.deleteTrustlyMaterial({
+            _id: material?._id,
+          });
+          print({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Material has been created successfully!!!",
+        "Material has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(200)

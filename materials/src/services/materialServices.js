@@ -103,6 +103,35 @@ const getRestaurant = async (id = null, token = null) => {
   return restaurant;
 };
 
+/**
+ *
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addMaterialToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+/**
+ *
+ * @param {Object} query [query to find material in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyMaterial = async (query = {}) => {
+  const material = await Material.deleteOne(query);
+  return material;
+};
+
 module.exports = {
   createMaterial,
   findOneMaterial,
@@ -112,4 +141,6 @@ module.exports = {
   getUserAuthor,
   findMaterial,
   getRestaurant,
+  addMaterialToHistorical,
+  deleteTrustlyMaterial,
 };
