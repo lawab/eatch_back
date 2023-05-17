@@ -7,21 +7,25 @@
  * @returns {Promise<Array<Object>}
  */
 module.exports = async (materialServices, body, token) => {
-  let errorMessage = (field) => `Invalid ${field}`;
+  try {
+    let errorMessage = (field) => `Invalid ${field}`;
 
-  // if user want to update a restaurant product
-  if (body?.restaurant) {
-    // get restaurant in database
-    let restaurant = await materialServices.getRestaurant(
-      body?.restaurant,
-      token
-    );
+    // if user want to update a restaurant product
+    if (body?.restaurant) {
+      // get restaurant in database
+      let restaurant = await materialServices.getRestaurant(
+        body?.restaurant,
+        token
+      );
 
-    if (!restaurant?._id) {
-      throw new Error(errorMessage("restaurant"));
+      if (!restaurant?._id) {
+        throw new Error(errorMessage("restaurant"));
+      }
+      body["restaurant"] = restaurant; // update restaurant with value found in database
     }
-    body["restaurant"] = restaurant; // update restaurant with value found in database
-  }
 
-  return body;
+    return body;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };

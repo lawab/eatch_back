@@ -151,6 +151,10 @@ const updateMaterial = async (req, res) => {
       });
     }
 
+    console.log({ material });
+
+    let materailCopy = Object.assign({}, material._doc); // cppy documment before update it
+
     body["_creator"] = creator; //update creator who update the current material
 
     //  update foreign Fields
@@ -168,11 +172,44 @@ const updateMaterial = async (req, res) => {
     // update field in database
     let materialsaved = await material.save();
 
+    print({ materialsaved });
+
     if (materialsaved?._id) {
-      print({ materialsaved: materialsaved }, "ok");
-      return res
-        .status(200)
-        .json({ message: "Material has been updated successfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await materialServices.addMaterialToHistorical(
+            creator?._id,
+            {
+              materials: {
+                _id: materialsaved?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in materailCopy) {
+            if (Object.hasOwnProperty.call(materailCopy, field)) {
+              materialsaved[field] = materailCopy[field];
+            }
+          }
+          let materialRestored = await materialsaved.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ materialRestored });
+          return materialRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Material has been updated successfully!!!",
+        "Material has not been Updated successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(401).json({
         message: "Material has been not updated successfully!!!",
