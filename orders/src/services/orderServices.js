@@ -124,6 +124,35 @@ const getProducts = async (ids = [], token = null) => {
   );
   return products;
 };
+
+/**
+ *
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addOrderToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+/**
+ *
+ * @param {Object} query [query to find order in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyOrder = async (query = {}) => {
+  const order = await Order.deleteOne(query);
+  return order;
+};
 module.exports = {
   createOrder,
   findOneOrder,
@@ -135,4 +164,6 @@ module.exports = {
   getClient,
   getRestaurant,
   getProducts,
+  addOrderToHistorical,
+  deleteTrustlyOrder,
 };

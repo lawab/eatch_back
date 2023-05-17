@@ -5,6 +5,10 @@ const orderServices = require("../services/orderServices");
 const roles = require("../models/roles");
 const updateForeignFields = require("./updateForeignFields");
 const setForeignFieldsValue = require("./setForeignFieldsValue");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one order in database
 const createOrder = async (req, res) => {
@@ -25,18 +29,46 @@ const createOrder = async (req, res) => {
     body["image"] = req.file
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png";
+    body["_creator"] = body["client"]?._id; // set client as creator of current order
 
     let orderCreated = await orderServices.createOrder(body);
     print({ orderCreated }, "*");
 
     if (orderCreated?._id) {
-      return res
-        .status(200)
-        .json({ message: "order has been created successfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await orderServices.addOrderToHistorical(
+            body["client"]?._id,
+            {
+              orders: {
+                _id: orderCreated?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await orderServices.deleteTrustlyOrder({
+            _id: orderCreated?._id,
+          });
+          print({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Order has been created successfully!!!",
+        "Order has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
-      return res
-        .status(200)
-        .json({ message: "order has been not created successfully!!!" });
+      res
+        .status(401)
+        .json({ message: "Order has been not created successfully!!!" });
     }
   } catch (error) {
     print(error, "x");
