@@ -184,7 +184,7 @@ const updateOrder = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      message: "Erros occured during the update order!!!",
+      message: "Error(s) occured during the update order!!!",
     });
   }
 };
@@ -208,28 +208,70 @@ const deleteOrder = async (req, res) => {
       });
     }
 
-    // find and delete order
-    let orderDeleted = await orderServices.deleteOne(
-      {
-        _id: req.params?.id,
-        deletedAt: null,
-      },
-      { _creator: creator._id, deletedAt: Date.now() } //set user creator and the date of deletion,no drop order
-    );
+    // get ordder that should be delete
+    let order = await orderServices.findOrder({
+      _id: req.params?.id,
+      deletedAt: null,
+    });
 
-    // if order not exits or had already deleted
-    if (!orderDeleted?._id) {
+    if (!order) {
       return res.status(401).json({
         message:
           "you cannot delete order because it not exists or already deleted!!!",
       });
     }
+
+    /* copy values and fields from order found in database before updated it. 
+       it will use to restore order updated if connection with historical failed
+      */
+    let orderCopy = Object.assign({}, order._doc);
+
+    print({ orderCopy });
+
+    //update deleteAt and cretor fields from order
+
+    order.deletedAt = Date.now(); // set date of deletion
+    order._creator = creator?._id; // the current order who do this action
+
+    let orderDeleted = await order.save();
+    console.log({ orderDeleted });
     // order exits and had deleted successfully
     if (orderDeleted?.deletedAt) {
-      print({ orderDeleted: orderDeleted });
-      return res
-        .status(200)
-        .json({ message: "order has been delete sucessfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await orderServices.addOrderToHistorical(
+            creator?._id,
+            {
+              orders: {
+                _id: orderDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in orderCopy) {
+            if (Object.hasOwnProperty.call(orderCopy, field)) {
+              orderDeleted[field] = orderCopy[field];
+            }
+          }
+          let orderRestored = await orderDeleted.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ orderRestored });
+          return orderRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Order has been delete successfully!!!",
+        "Order has not been delete successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(500).json({ message: "deletion order failed" });
     }

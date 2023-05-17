@@ -314,7 +314,7 @@ const deleteProduct = async (req, res) => {
         response,
         res,
         "product has been delete successfully!!!",
-        "product has not been deleete successfully,please try again later,thanks!!!"
+        "product has not been delete successfully,please try again later,thanks!!!"
       );
     } else {
       return res.status(500).json({ message: "deletion of product failed" });
