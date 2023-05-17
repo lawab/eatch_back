@@ -153,7 +153,7 @@ const updateMaterial = async (req, res) => {
 
     console.log({ material });
 
-    let materailCopy = Object.assign({}, material._doc); // cppy documment before update it
+    let materialCopy = Object.assign({}, material._doc); // cppy documment before update it
 
     body["_creator"] = creator; //update creator who update the current material
 
@@ -191,9 +191,9 @@ const updateMaterial = async (req, res) => {
           return response;
         },
         async () => {
-          for (const field in materailCopy) {
-            if (Object.hasOwnProperty.call(materailCopy, field)) {
-              materialsaved[field] = materailCopy[field];
+          for (const field in materialCopy) {
+            if (Object.hasOwnProperty.call(materialCopy, field)) {
+              materialsaved[field] = materialCopy[field];
             }
           }
           let materialRestored = await materialsaved.save({
@@ -246,26 +246,67 @@ const deleteMaterial = async (req, res) => {
       });
     }
 
-    // find and delete Material
-    let MaterialDeleted = await materialServices.deleteOne(
-      {
-        _id: req.params?.id,
-        deletedAt: null,
-      },
-      { _creator: creator._id, deletedAt: Date.now() } //set user creator and the date of deletion,no drop Material
-    );
+    let material = await materialServices.findOneMaterial({
+      _id: req.params?.id,
+      deletedAt: null,
+    });
 
-    // if Material not exits or had already deleted
-    if (!MaterialDeleted) {
-      return res
-        .status(401)
-        .json({ message: "Material not exists or already deleted!!!" });
+    if (!material?._id) {
+      return res.status(401).json({
+        message:
+          "unable to update material beacuse it not exists or already deleted!!!",
+      });
     }
+
+    console.log({ material });
+
+    let materialCopy = Object.assign({}, material._doc); // cppy documment before update it
+
+    //update deleteAt and cretor fields from material
+
+    material.deletedAt = Date.now(); // set date of deletion
+    material._creator = creator; // the current material who do this action
+
+    let MaterialDeleted = await material.save();
+
+    print({ MaterialDeleted });
+
     if (MaterialDeleted.deletedAt) {
-      print({ MaterialDeleted: MaterialDeleted._id }, "s");
-      return res
-        .status(200)
-        .json({ message: "Material has been deleted sucessfully" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await materialServices.addMaterialToHistorical(
+            creator?._id,
+            {
+              materials: {
+                _id: MaterialDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in materialCopy) {
+            if (Object.hasOwnProperty.call(materialCopy, field)) {
+              MaterialDeleted[field] = materialCopy[field];
+            }
+          }
+          let materialRestored = await MaterialDeleted.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ materialRestored });
+          return materialRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Material has been delete successfully!!!",
+        "Material has not been delete successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(500).json({ message: "deletion of Material failed" });
     }

@@ -226,6 +226,7 @@ const deleteMenu = async (req, res) => {
 
     let menu = await menuServices.findOneMenu({
       _id: req.params?.id,
+      deletedAt: null,
     });
 
     if (!menu?._id) {
@@ -281,8 +282,8 @@ const deleteMenu = async (req, res) => {
       return closeRequest(
         response,
         res,
-        "Order has been delete successfully!!!",
-        "Order has not been delete successfully,please try again later,thanks!!!"
+        "Menu has been delete successfully!!!",
+        "Menu has not been delete successfully,please try again later,thanks!!!"
       );
     } else {
       return res.status(500).json({ message: "deletion of menu failed" });
