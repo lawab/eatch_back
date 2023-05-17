@@ -134,6 +134,10 @@ const updateMenu = async (req, res) => {
       });
     }
 
+    console.log({ menu });
+
+    let menuCopy = Object.assign({}, menu._doc); // cppy documment before update it
+
     body["_creator"] = creator; //update creator who update the current menu
 
     //  update foreign Fields
@@ -152,10 +156,41 @@ const updateMenu = async (req, res) => {
     let menusaved = await menu.save();
 
     if (menusaved?._id) {
-      print({ menusaved: menusaved }, "ok");
-      return res
-        .status(200)
-        .json({ message: "menu has been updated successfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await menuServices.addMenuToHistorical(
+            creator?._id,
+            {
+              menus: {
+                _id: menusaved?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in menuCopy) {
+            if (Object.hasOwnProperty.call(menuCopy, field)) {
+              menusaved[field] = menuCopy[field];
+            }
+          }
+          let menuRestored = await menusaved.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ menuRestored });
+          return menuRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Menu has been updated successfully!!!",
+        "Menu has not been Updated successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(401).json({
         message: "menu has been not updated successfully!!!",
