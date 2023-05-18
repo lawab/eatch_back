@@ -791,6 +791,11 @@ const logisticType = {
   devise: { type: String, default: "MAD" },
   quantity: { type: Number, default: 1 },
   deletedAt: { type: Date, default: null },
+  action: {
+    type: String,
+    required: true,
+    enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
+  },
 };
 
 // historical type

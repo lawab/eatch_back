@@ -67,7 +67,7 @@ const createLogistic = async (req, res) => {
 
     // create new filed with dynamically
 
-    let newElement = await Logistic.create(body);
+    let newElement = await logisticServices.createLogistic(body);
 
     print({ newElement }, "*");
 
@@ -260,29 +260,66 @@ const deleteLogistic = async (req, res) => {
       });
     }
 
-    // find and delete logistic
-    let logisticDeleted = await logisticServices.deleteOne(
-      {
-        _id: req.params?.id,
-        deletedAt: null,
-      },
-      { deletedAt: Date.now(), _creator: creator } //set date of deletion and client who delete logistic,no drop logistic
-    );
+    let logistic = await logisticServices.findLogistic({
+      _id: req.params?.id,
+      deletedAt: null,
+    });
 
-    // if logistic not exits or had already deleted
-    if (!logisticDeleted?._id) {
+    if (!logistic?._id) {
       return res.status(401).json({
         message:
           "unable to delete a logistic because it not exists or already be deleted!!!",
       });
     }
 
+    let logisticCopy = Object.assign({}, logistic._doc); // cppy documment before update it
+
+    print({ logisticCopy });
+
+    logistic.deletedAt = Date.now();
+    logistic._creator = creator;
+
+    // find and delete logistic
+    let logisticDeleted = await logistic.save();
+
+    print({ logisticDeleted });
     // logistic exits and had deleted successfully
     if (logisticDeleted?.deletedAt) {
-      print({ logisticDeleted });
-      return res
-        .status(200)
-        .json({ message: "logistic has been deleted sucessfully" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await logisticServices.addElementToHistorical(
+            creator?._id,
+            {
+              logistics: {
+                _id: logisticDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in logisticCopy) {
+            if (Object.hasOwnProperty.call(logisticCopy, field)) {
+              logisticDeleted[field] = logisticCopy[field];
+            }
+          }
+          let logisticRestored = await logisticDeleted.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ logisticRestored });
+          return logisticRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Logistic has been deleted successfully!!!",
+        "Logistic has not been deleted successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(500).json({ message: "deletion of logistic failed" });
     }
