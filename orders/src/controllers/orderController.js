@@ -188,6 +188,35 @@ const updateOrder = async (req, res) => {
     });
   }
 };
+//update remote order
+const updateOrderRemote = async (req, res) => {
+  try {
+    console.log(req.body);
+    let body = req.body?.data;
+    let orderUpdated = await orderServices.updateOrder(
+      {
+        _id: req.params?.id,
+      },
+      body
+    );
+
+    console.log({ orderUpdated });
+    return res.status(200).json(orderUpdated);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "error occured please try again!!!" });
+  }
+};
+
+const deleteOrderRemote = async (req, res) => {
+  let response = await orderServices.deleteTrustlyOrder({
+    _id: req.params?.id,
+  });
+
+  return res.status(200).json(response);
+};
 // delete one order in database
 const deleteOrder = async (req, res) => {
   try {
@@ -325,4 +354,6 @@ module.exports = {
   updateOrder,
   fetchOrder,
   fetchOrdersByRestaurant,
+  updateOrderRemote,
+  deleteOrderRemote,
 };

@@ -3,6 +3,11 @@ const invoiceServices = require("../services/invoiceServices");
 const roles = require("../models/roles");
 const getInvoicePrice = require("./getInvoicePrice");
 const orderStatus = require("../models/invoice/orderStatus");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
+const { default: mongoose } = require("mongoose");
 
 // create one Invoice
 const createInvoice = async (req, res) => {
@@ -64,45 +69,93 @@ const createInvoice = async (req, res) => {
       });
     }
 
-    if (
-      ![orderStatus.WAITED, orderStatus.TREATMENT, orderStatus.PAID].includes(
-        order.status
-      )
-    ) {
+    if (![orderStatus.WAITED, orderStatus.TREATMENT].includes(order.status)) {
       return res.status(401).json({
         message: "unable to create invoice because order had already paid!!!",
       });
     }
 
+    let orderCopy = Object.assign({}, order);
+
+    print({ orderCopy });
+
     //update status order since order microservice
-    let orderUpdated = await invoiceServices.updateOrder(
-      order?._id,
-      { status: orderStatus.DONE, _creator: creator?._id },
+
+    let orderUpdated = await invoiceServices.updateOrderRemote(
+      order._id,
+      {
+        status: orderStatus.DONE,
+        _creator: creator?._id,
+      },
       req.token
-    ); //update status from order
+    );
 
-    order["status"] = orderStatus.DONE; //set status order to done
+    if (!orderUpdated) {
+      return res.status(401).json({
+        message: "create invoice failed !!!",
+      });
+    }
 
-    print(orderUpdated);
+    print({ orderUpdated });
 
-    body["order"] = order; //set order value found in database
-    body["total"] = getInvoicePrice(order?.products); // set total frpice to current invoice
+    body["order"] = orderUpdated; //set order value found in database
+    body["total"] = getInvoicePrice(orderUpdated?.products); // set total frpice to current invoice
     body["image"] = req.file
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png"; //set image for current invoice
+
     let invoice = await invoiceServices.createInvoice(body);
 
     print({ invoice }, "*");
 
     if (invoice?._id) {
-      res.status(200).json(invoice);
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await invoiceServices.addInvoiceToHistorical(
+            creator._id,
+            {
+              invoices: {
+                _id: invoice?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await invoiceServices.deleteTrustlyInvoice({
+            _id: invoice?._id,
+          });
+
+          print({ elementDeleted });
+
+          // reset order because creation of invoice failed
+          let orderRestored = await invoiceServices.updateOrderRemote(
+            orderUpdated?._id,
+            orderCopy,
+            req.token
+          );
+          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ orderRestored });
+          return { orderRestored, elementDeleted };
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        invoice,
+        "Invoice has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(200)
         .json({ message: "Invoice has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    print(error.message, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Invoice!!!" });

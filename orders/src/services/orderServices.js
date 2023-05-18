@@ -149,7 +149,7 @@ const addOrderToHistorical = async (id = null, bodyUpdate = {}, token) => {
  * @param {Object} query [query to find order in documents list. Default value is {}]
  * @returns {Promise}
  */
-const deleteTrustlyOrder = async (query = {}) => {
+const deleteTrustlyOrder = async (query = null) => {
   const order = await Order.deleteOne(query);
   return order;
 };

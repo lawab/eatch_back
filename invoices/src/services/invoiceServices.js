@@ -110,16 +110,20 @@ const getOrder = async (id = null, token = null) => {
  * @returns {Promise<Object>}
  */
 const updateOrder = async (id = null, bodyUpdate = {}, token = null) => {
-  let { data: order } = await axios.put(
-    `${process.env.APP_URL_ORDER}/update/${id}`,
-    { ...bodyUpdate },
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return order;
+  try {
+    let { data: order } = await axios.put(
+      `${process.env.APP_URL_ORDER}/update/${id}`,
+      { ...bodyUpdate },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return order;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 /**
@@ -144,6 +148,48 @@ const getRestaurant = async (id = null, token = null) => {
   }
 };
 
+/**
+ *
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addInvoiceToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+/**
+ *
+ * @param {Object} query [query to find invoice in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyInvoice = async (query = {}) => {
+  const invoice = await Invoice.deleteOne(query);
+  return invoice;
+};
+
+const updateOrderRemote = async (id, bodyUpdated, token) => {
+  let { data: response } = await axios.put(
+    `${process.env.APP_URL_ORDER}/update/remote/${id}`,
+    { data: bodyUpdated },
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
 module.exports = {
   createInvoice,
   findOneInvoice,
@@ -155,4 +201,7 @@ module.exports = {
   getOrder,
   updateOrder,
   getRestaurant,
+  addInvoiceToHistorical,
+  deleteTrustlyInvoice,
+  updateOrderRemote,
 };
