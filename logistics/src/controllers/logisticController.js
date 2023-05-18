@@ -61,18 +61,11 @@ const createLogistic = async (req, res) => {
     // if field already exists,document must be found on database,or null in ortherwise
     if (element) {
       return res.status(401).json({
-        message:
-          "Logistic element name already exists, please take another name!!!",
+        message: "Logistic element  already exists, please create another!!!",
       });
     }
 
     // create new filed with dynamically
-
-    print({ dynamicTypeRequired });
-
-    logisticSchema.add(dynamicTypeRequired); // add dynamic field in default schema mongoose
-
-    let Logistic = mongoose.model("Logistic", logisticSchema); // create new model with new field added
 
     let newElement = await Logistic.create(body);
 
@@ -166,33 +159,71 @@ const updateLogistic = async (req, res) => {
       body["restaurant"] = restaurant; //set restaurant found in database
     }
 
-    let logisticFound = await logisticServices.findLogistic({
+    let logistic = await logisticServices.findLogistic({
       _id: req.params?.id,
     });
 
-    if (!logisticFound?._id) {
+    if (!logistic?._id) {
       return res.status(401).json({
         message: "unable to update logistic because it not exists!!!",
       });
     }
 
-    logisticSchema.add(dynamicTypeRequired); // add dynamic field in default schema mongoose
+    let logisticCopy = Object.assign({}, logistic._doc); // cppy documment before update it
 
-    let Logistic = mongoose.model("Logistic", logisticSchema); // create new model with new field added
+    print({ logisticCopy });
 
-    let logisticUpdated = await Logistic.updateOne(
-      { _id: logisticFound?._id },
-      {
-        ...body,
-      }
-    );
+    // update all valid fields before save it in database
+    for (let key in body) {
+      logistic[key] = body[key];
+    }
+
+    // update avatar if exists
+    logistic["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : logistic["image"];
+
+    // update field in database
+    let logisticUpdated = await logistic.save();
 
     print({ logisticUpdated }, "*");
 
-    if (logisticUpdated?.modifiedCount) {
-      res
-        .status(200)
-        .json({ message: "Logistic has been updated successfully!!" });
+    if (logisticUpdated?._id) {
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await logisticServices.addElementToHistorical(
+            creator?._id,
+            {
+              logistics: {
+                _id: logisticUpdated?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in logisticCopy) {
+            if (Object.hasOwnProperty.call(logisticCopy, field)) {
+              logisticUpdated[field] = logisticCopy[field];
+            }
+          }
+          let logisticRestored = await logisticUpdated.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ logisticRestored });
+          return logisticRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Logistic has been updated successfully!!!",
+        "Logistic has not been Updated successfully,please try again later,thanks!!!"
+      );
     } else {
       res.status(401).json({
         message: "Logistic has been not updated successfully!!",

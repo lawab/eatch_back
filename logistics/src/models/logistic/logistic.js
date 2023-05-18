@@ -10,12 +10,9 @@ const restaurantSchemaObject = {
   },
 };
 
-const dynamicTypeRequired = {
-  name: { type: String, unique: true },
-  price: { type: Number },
-  devise: { type: String, default: "MAD" },
-  quantity: { type: Number, default: 1 },
-};
+// const dynamicTypeRequired = {
+
+// };
 
 const logisticSchemaObject = {
   restaurant: {
@@ -27,12 +24,15 @@ const logisticSchemaObject = {
     type: mongoose.Types.ObjectId,
     required: true,
   },
+  name: { type: String, unique: true },
+  price: { type: Number },
+  devise: { type: String, default: "MAD" },
+  quantity: { type: Number, default: 1 },
   deletedAt: { type: Date, default: null },
 };
 
 const logisticSchema = new Schema(logisticSchemaObject, { timestamps: true });
 
 module.exports.fieldsRequired = Object.keys(logisticSchemaObject);
-module.exports.dynamicTypeRequired = dynamicTypeRequired;
 module.exports.logisticSchema = logisticSchema;
 module.exports.Logistic = mongoose.model("Logistic", logisticSchema);
