@@ -225,6 +225,7 @@ const deletePromotion = async (req, res) => {
 
     let promotion = await promotionServices.findOnePromotion({
       _id: req.params?.id,
+      deletedAt: null,
     });
 
     if (!promotion) {
