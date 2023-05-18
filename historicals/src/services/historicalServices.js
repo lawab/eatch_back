@@ -256,6 +256,28 @@ const getPromotion = async (id = null, token = null) => {
   }
 };
 
+/**
+ *
+ * @param {String} id [ObjectId to find logistic in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getLogistic = async (id = null, token = null) => {
+  try {
+    let { data: logistic } = await axios.get(
+      `${process.env.APP_URL_LOGISTIC}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return logistic;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   updateHistorical,
   findOneHIstorical,
@@ -273,4 +295,5 @@ module.exports = {
   getMenu,
   getInvoice,
   getPromotion,
+  getLogistic,
 };

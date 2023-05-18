@@ -786,12 +786,10 @@ const logisticType = {
     type: mongoose.Types.ObjectId,
     required: true,
   },
-  value: {
-    name: { type: String, unique: true },
-    price: { type: Number },
-    devise: { type: String, default: "MAD" },
-    quantity: { type: Number, default: 1 },
-  },
+  name: { type: String },
+  price: { type: Number },
+  devise: { type: String, default: "MAD" },
+  quantity: { type: Number, default: 1 },
   deletedAt: { type: Date, default: null },
 };
 

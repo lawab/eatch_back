@@ -82,7 +82,7 @@ const createMenu = async (req, res) => {
         response,
         res,
         "Menu has been created successfully!!!",
-        "Menu has  been not creadted successfully,please try again later,thanks!!!"
+        "Menu has  been not created successfully,please try again later,thanks!!!"
       );
     } else {
       res

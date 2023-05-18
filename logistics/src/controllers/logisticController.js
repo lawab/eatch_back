@@ -6,6 +6,10 @@ const print = require("../log/print");
 const logisticServices = require("../services/logisticServices");
 const roles = require("../models/roles");
 const { default: mongoose } = require("mongoose");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one logistic in database
 const createLogistic = async (req, res) => {
@@ -75,9 +79,36 @@ const createLogistic = async (req, res) => {
     print({ newElement }, "*");
 
     if (newElement?._id) {
-      res
-        .status(200)
-        .json({ message: "Logistic has been created successfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await logisticServices.addElementToHistorical(
+            creator._id,
+            {
+              logistics: {
+                _id: newElement?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await logisticServices.deleteTrustlyElement({
+            _id: newElement?._id,
+          });
+          print({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Logistic has been created successfully!!!",
+        "Logistic has  been not created successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(401)
