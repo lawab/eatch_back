@@ -4,6 +4,10 @@ const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
 const setValuesFromRequiredForeignFields = require("./setValuesFromRequiredForeignFields");
 const setUpdateValuesFromForeignFields = require("./setUpdateValuesFromForeignFields");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one promotion in database
 const createPromotion = async (req, res) => {
@@ -41,12 +45,39 @@ const createPromotion = async (req, res) => {
     // verify that document with [field] exists
     let newPromotion = await promotionServices.createPromotion(body);
 
+    print({ newPromotion });
     // if field already exists,document must be found on database,or null in ortherwise
     if (newPromotion?._id) {
-      print({ newPromotion });
-      return res.status(200).json({
-        message: "Promotion has been created successfully!!!",
-      });
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await promotionServices.addPromotionToHistorical(
+            creator._id,
+            {
+              promotions: {
+                _id: newPromotion?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await promotionServices.deleteTrustlyPromotion({
+            _id: newPromotion?._id,
+          });
+          print({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Promotion has been created successfully!!!",
+        "Promotion has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(401)

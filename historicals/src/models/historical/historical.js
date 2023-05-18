@@ -647,7 +647,22 @@ const promotionType = {
       client: { type: clientType, required: true },
       restaurant: {
         required: true,
-        type: restaurantType,
+        type: {
+          _id: { type: mongoose.Types.ObjectId, required: true },
+          restaurant_name: { type: String, require: true, maxlength: 50 },
+          infos: {
+            town: { type: String, require: true },
+            address: { type: String, require: true },
+            logo: {
+              type: String,
+              require: false,
+              default: "/datas/avatar.png",
+            },
+          },
+          _creator: {
+            type: mongoose.Types.ObjectId,
+          },
+        },
       },
       products: {
         required: true,
@@ -744,6 +759,11 @@ const promotionType = {
     type: mongoose.Types.ObjectId,
     required: true,
   },
+  action: {
+    type: String,
+    required: true,
+    enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
+  },
   deletedAt: { type: Date, default: null },
 };
 // historical type
@@ -770,7 +790,7 @@ const hIstoricalSchemaObject = {
     type: [{ type: invoiceType }],
   },
   promotions: {
-    type: [{ typr: promotionType }],
+    type: [{ type: promotionType }],
   },
   deletedAt: { type: Date, default: null },
 };

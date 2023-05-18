@@ -234,6 +234,28 @@ const getInvoice = async (id = null, token = null) => {
   }
 };
 
+/**
+ *
+ * @param {String} id [ObjectId to find promotion in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getPromotion = async (id = null, token = null) => {
+  try {
+    let { data: promotion } = await axios.get(
+      `${process.env.APP_URL_PROMOTION}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return promotion;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   updateHistorical,
   findOneHIstorical,
@@ -241,6 +263,7 @@ module.exports = {
   findHIstorical,
 
   // all methods to call all necessaires service and retrive data
+
   getUser,
   getClient,
   getRestaurant,
@@ -249,4 +272,5 @@ module.exports = {
   getOrder,
   getMenu,
   getInvoice,
+  getPromotion,
 };
