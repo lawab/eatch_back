@@ -638,6 +638,7 @@ const promotionType = {
   clients: { type: [{ type: clientType }] },
   end_date: { type: Date, required: false, default: null }, //must remove default value for production
   order: {
+    required: true,
     type: {
       order_title: {
         type: String,
@@ -740,7 +741,6 @@ const promotionType = {
       },
       deletedAt: { type: Date, default: null },
     },
-    required: true,
   },
   restaurant: {
     required: true,

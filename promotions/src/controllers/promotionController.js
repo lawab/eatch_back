@@ -76,7 +76,7 @@ const createPromotion = async (req, res) => {
         response,
         res,
         "Promotion has been created successfully!!!",
-        "Promotion has  been not creadted successfully,please try again later,thanks!!!"
+        "Promotion has  been not created successfully,please try again later,thanks!!!"
       );
     } else {
       res
@@ -122,21 +122,71 @@ const updatePromotion = async (req, res) => {
       body["image"] = req.file?.filename;
     }
 
+    let promotion = await promotionServices.findOnePromotion({
+      _id: req.params?.id,
+    });
+
+    if (!promotion) {
+      return res.status(401).json({
+        message:
+          "your cannot update promotion element because it not exists!!!",
+      });
+    }
+
+    let promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
+
+    print({ promotionCopy });
+
     body = await setUpdateValuesFromForeignFields(body, req.token);
 
-    let promotionUpdated = await Promotion.updateOne(
-      { _id: req.params?.id },
-      {
-        ...body,
+    // update promotion values
+
+    for (const field in body) {
+      if (Object.hasOwnProperty.call(body, field)) {
+        promotion[field] = body[field];
       }
-    );
+    }
 
-    print({ promotionUpdated }, "*");
+    let promotionUpdated = await promotion.save();
 
-    if (promotionUpdated?.modifiedCount) {
-      res
-        .status(200)
-        .json({ message: "Promotion has been updated successfully!!" });
+    print({ promotionUpdated }, "~");
+
+    if (promotionUpdated?._id) {
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await promotionServices.addPromotionToHistorical(
+            creator._id,
+            {
+              promotions: {
+                _id: promotionUpdated?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          for (const field in promotionCopy) {
+            if (Object.hasOwnProperty.call(promotionCopy, field)) {
+              promotionUpdated[field] = promotionCopy[field];
+            }
+          }
+          let promotionRestored = await promotionUpdated.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          print({ promotionRestored });
+          return promotionRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Promotion has been updated successfully!!!",
+        "Promotion has been not updated successfully,please try again later,thanks!!!"
+      );
     } else {
       res.status(401).json({
         message: "Promotion has been not updated successfully!!",
