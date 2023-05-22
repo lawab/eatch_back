@@ -106,10 +106,10 @@ const getRestaurant = async (id = null, token = null) => {
  *
  * @param {Number} id [id to find categories in database from eatch_category microservice]
  * @param {String} token [token to valid the session of user]
- * @returns {Promise<[Object]>} [return the current categories send by eatch_category microservice]
+ * @returns {Promise<[Object]>} [return the current category send by eatch_category microservice]
  */
 const getCategory = async (id = null, token = null) => {
-  let { data: categories } = await axios.get(
+  let { data: category } = await axios.get(
     `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
     {
       headers: {
@@ -117,7 +117,7 @@ const getCategory = async (id = null, token = null) => {
       },
     }
   );
-  return categories;
+  return category;
 };
 /**
  *
@@ -166,6 +166,22 @@ const deleteTrustlyProduct = async (query = {}) => {
   return product;
 };
 
+/**
+ *
+ * @param {String} token [token to valid the session of user]
+ * @returns {Promise<[Object]>} [return the current categories send by eatch_category microservice]
+ */
+const getCategories = async (token = null) => {
+  let { data: categories } = await axios.get(
+    `${process.env.APP_URL_CATEGORY}/fetch/all`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return categories;
+};
 module.exports = {
   createProduct,
   findOneProduct,
@@ -179,4 +195,5 @@ module.exports = {
   getMaterials,
   addProductToHistorical,
   deleteTrustlyProduct,
+  getCategories,
 };

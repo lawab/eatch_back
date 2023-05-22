@@ -2,21 +2,15 @@ const fs = require("fs");
 const path = require("path");
 /**
  * class to manage files
- * @author <uchokomeny@gmail.com>
  */
 module.exports = class File {
   dest = "";
   fs = null;
   constructor(dest = "") {
-    this.dest = dest;
+    this.dest = dest || path.join(__dirname, "..", "data");
     this.fs = fs;
   }
 
-  /**
-   *
-   * @param {String} filename [Filename that we want de create a readStream ]
-   * @returns
-   */
   createReadStream(filename = "") {
     try {
       let stream = this.fs.createReadStream(path.join(this.dest, filename));
@@ -26,17 +20,20 @@ module.exports = class File {
     }
   }
 
-  /**
-   *
-   * @param {String} filename [Filename that we want de create a writeStream ]
-   * @returns
-   */
   createWriteStream(filename = "") {
     try {
       let stream = this.fs.createWriteStream(path.join(this.dest, filename));
       return stream;
     } catch (error) {
-      reject(error);
+      throw new Error(error.message);
+    }
+  }
+
+  createFile(filename = "") {
+    try {
+      this.createWriteStream(filename);
+    } catch (error) {
+      throw new Error(error.message);
     }
   }
   /**

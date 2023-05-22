@@ -151,7 +151,7 @@ const productType = {
     required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
-      category_name: { type: String, maxlength: 50 },
+      title: { type: String, maxlength: 50 },
     },
   },
   price: {
@@ -301,7 +301,7 @@ const OrderType = {
           category: {
             type: {
               _id: { type: mongoose.Types.ObjectId, required: true },
-              category_name: { type: String, maxlength: 50 },
+              title: { type: String, maxlength: 50 },
             },
             required: true,
           },
@@ -413,7 +413,7 @@ const menuType = {
           category: {
             type: {
               _id: { type: mongoose.Types.ObjectId, required: true },
-              category_name: { type: String, maxlength: 50 },
+              title: { type: String, maxlength: 50 },
             },
             required: true,
           },
@@ -552,7 +552,7 @@ const invoiceType = {
               category: {
                 type: {
                   _id: { type: mongoose.Types.ObjectId, required: true },
-                  category_name: { type: String, maxlength: 50 },
+                  title: { type: String, maxlength: 50 },
                 },
                 required: true,
               },
@@ -697,7 +697,7 @@ const promotionType = {
               category: {
                 type: {
                   _id: { type: mongoose.Types.ObjectId, required: true },
-                  category_name: { type: String, maxlength: 50 },
+                  title: { type: String, maxlength: 50 },
                 },
                 required: true,
               },

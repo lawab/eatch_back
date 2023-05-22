@@ -34,7 +34,7 @@ const restaurantSchemaObject = {
 
 const categorySchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  category_name: { type: String, maxlength: 50 },
+  title: { type: String, maxlength: 50 },
 };
 
 // Product schema Object

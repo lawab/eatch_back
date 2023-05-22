@@ -4,7 +4,7 @@
   "type": "commonjs",
   "description": "",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon --ignore src/data server.js",
     "server": "json-server -w --port=4000 --id _id --routes routes.json data.json"
   },
   "author": "",
