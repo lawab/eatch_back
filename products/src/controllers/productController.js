@@ -12,7 +12,10 @@ const {
 } = require("../services/historicalFunctions");
 const File = require("../services/File");
 const path = require("path");
-const generateJsonFile = require("../services/generateJsonFile");
+const {
+  deleteProductFromJsonFile,
+  addProductFromJsonFile,
+} = require("../services/generateJsonFile");
 
 // create one product in database
 const createProduct = async (req, res) => {
@@ -73,7 +76,10 @@ const createProduct = async (req, res) => {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
-          let content = await generateJsonFile(productServices, newproduct);
+          let content = await addProductFromJsonFile(
+            productServices,
+            newproduct
+          );
 
           console.log({ content: JSON.parse(content) });
 
@@ -187,6 +193,12 @@ const updateProduct = async (req, res) => {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
+          let content = await addProductFromJsonFile(
+            productServices,
+            productUpdated
+          );
+
+          console.log({ content: JSON.parse(content) });
           let response = await productServices.addProductToHistorical(
             creator?._id,
             {
@@ -290,6 +302,13 @@ const deleteProduct = async (req, res) => {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
+          let content = await deleteProductFromJsonFile(
+            productServices,
+            productDeleted
+          );
+
+          console.log({ content: JSON.parse(content) });
+
           let response = await productServices.addProductToHistorical(
             creator?._id,
             {
