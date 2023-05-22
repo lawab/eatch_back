@@ -82,5 +82,12 @@ const UserSchema = new Schema(UserSchemaObject, {
   timestamps: true,
 });
 
+UserSchema.pre("save", function (next) {
+  if (this.firstName && this.lastName) {
+    this.username = [this.firstName, this.lastName].join(" ");
+  }
+  next();
+});
+
 module.exports.default = mongoose.model("User", UserSchema);
 module.exports.fieldsRequired = UserSchemaObject;

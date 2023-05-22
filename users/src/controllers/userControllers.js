@@ -59,9 +59,6 @@ const createUser = async (req, res) => {
       process.env.PASS_SEC
     ).toString();
 
-    // set username
-    body["username"] = [body?.firstName, body?.lastName].join(" ");
-
     // set creator
     body["_creator"] = creator;
 
@@ -355,7 +352,7 @@ const deleteUser = async (req, res) => {
   try {
     let body = JSON.parse(req.body);
 
-    console.log({body})
+    console.log({ body });
 
     console.log({ body });
 
