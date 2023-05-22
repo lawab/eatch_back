@@ -16,7 +16,8 @@ const {
 //Create user in Data Base
 const createUser = async (req, res) => {
   try {
-    let body = req.body;
+    // let body = req.body;
+    let body = JSON.parse(req.headers?.body);
 
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
@@ -227,7 +228,7 @@ const UpdateRole = async (req, res) => {
 // Update user in database
 const UpdateUser = async (req, res) => {
   try {
-    let body = req.body;
+    let body = JSON.parse(req.body);
 
     // get author that update current user
     let creator = await userService.findUser({
@@ -352,7 +353,11 @@ const UpdateUser = async (req, res) => {
 //Delete user in database
 const deleteUser = async (req, res) => {
   try {
-    let body = req.body;
+    let body = JSON.parse(req.body);
+
+    console.log({body})
+
+    console.log({ body });
 
     let creator = await userService.findUser({
       _id: body?._creator,
