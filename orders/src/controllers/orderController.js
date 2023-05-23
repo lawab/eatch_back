@@ -92,22 +92,6 @@ const updateOrder = async (req, res) => {
       });
     }
 
-    // get the author who update order
-    let creator = await orderServices.getUserAuthor(body?._creator, req.token);
-
-    if (!creator?._id) {
-      return res.status(401).json({
-        message: "you must authenticated to update current order!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you don't have authorization to update current order,please see your administrator",
-      });
-    }
-
     // get ordder that should be update
     let order = await orderServices.findOrder({
       _id: req.params?.id,
@@ -122,8 +106,6 @@ const updateOrder = async (req, res) => {
     console.log({ order });
 
     let orderCopy = Object.assign({}, order._doc); // cppy documment before update it
-
-    body["_creator"] = creator; // set user that make update in database
 
     body = await updateForeignFields(orderServices, body, req.token);
 
