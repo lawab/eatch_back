@@ -190,6 +190,32 @@ const updateOrderRemote = async (id, bodyUpdated, token) => {
   return response;
 };
 
+const decrementQuantityFromRemoteProducts = async (products = [], token) => {
+  let { data: response } = await axios.put(
+    `${process.env.APP_URL_PRODUCTS}/decrement`,
+    { products },
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+const incrementQuantityFromRemoteProducts = async (products = [], token) => {
+  let { data: response } = await axios.put(
+    `${process.env.APP_URL_PRODUCTS}/increment`,
+    { products },
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
 module.exports = {
   createInvoice,
   findOneInvoice,
@@ -204,4 +230,6 @@ module.exports = {
   addInvoiceToHistorical,
   deleteTrustlyInvoice,
   updateOrderRemote,
+  decrementQuantityFromRemoteProducts,
+  incrementQuantityFromRemoteProducts,
 };

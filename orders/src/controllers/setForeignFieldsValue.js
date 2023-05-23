@@ -46,6 +46,8 @@ module.exports = async (orderServices, body, token) => {
     // get list of products
     let products = await orderServices.getProducts(productsIds, token);
 
+    print({ products });
+
     // if products not exists in database
     if (!products?.length || products?.length !== body?.products?.length) {
       throw new Error(errorMessage("products"));
@@ -55,6 +57,7 @@ module.exports = async (orderServices, body, token) => {
 
     return body;
   } catch (error) {
+    print({ error }, "x");
     throw new Error(error.message);
   }
 };

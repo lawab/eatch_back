@@ -6,6 +6,8 @@ const {
   updateProduct,
   fetchProducts,
   fetchProductsByRestaurant,
+  incrementQuantityFromProducts,
+  decrementQuantityFromProducts,
 } = require("../controllers/productController");
 const uploadFileService = require("../services/uploadFile");
 const { authmiddleware } = require("../middlewares/authmiddleware");
@@ -47,6 +49,12 @@ productRouter.put(
   upload.single("file"),
   updateProduct
 );
+
+//increment quantity from product
+productRouter.put("/increment", authmiddleware, incrementQuantityFromProducts);
+
+//decrement quantity from product
+productRouter.put("/decrement", authmiddleware, decrementQuantityFromProducts);
 
 //Export route to be used on another place
 module.exports = productRouter;

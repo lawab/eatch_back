@@ -83,6 +83,7 @@ const UserSchema = new Schema(UserSchemaObject, {
 });
 
 UserSchema.pre("save", function (next) {
+  console.log("pre save");
   if (this.firstName && this.lastName) {
     this.username = [this.firstName, this.lastName].join(" ");
   }

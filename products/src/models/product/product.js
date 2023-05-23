@@ -72,6 +72,7 @@ const productSchemaObject = {
     type: Number,
     required: true,
     default: 0,
+    min: 0,
   },
 
   pusharePrice: {
@@ -101,7 +102,7 @@ const productSchemaObject = {
 
   image: {
     type: String,
-    default: "/data/uploads/mcf.png",
+    default: "/datas/avatar.png",
   },
   liked: {
     type: Number,

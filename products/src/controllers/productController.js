@@ -396,6 +396,66 @@ const fetchProductsByRestaurant = async (req, res) => {
   }
 };
 
+const incrementQuantityFromProducts = async (req, res) => {
+  try {
+    let products = req.body.products;
+    let productsUpdated = [];
+
+    for (let index = 0; index < products.length; index++) {
+      let pdUpdated = await productServices.updateProduct(
+        {
+          _id: products[index]._id,
+        },
+        {
+          $inc: { quantity: 1 },
+        }
+      );
+      print({ pdUpdated });
+      productsUpdated.push(pdUpdated);
+    }
+
+    if (productsUpdated.length === products.length) {
+      res.status(200).json(productsUpdated);
+    } else {
+      res.status(401).json({ message: "unable to updated products" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during get request!!!" });
+  }
+};
+
+const decrementQuantityFromProducts = async (req, res) => {
+  try {
+    let products = req.body.products;
+    let productsUpdated = [];
+
+    for (let index = 0; index < products.length; index++) {
+      let pdUpdated = await productServices.updateProduct(
+        {
+          _id: products[index]._id,
+        },
+        {
+          $inc: { quantity: -1 },
+        }
+      );
+      print({ pdUpdated });
+      productsUpdated.push(pdUpdated);
+    }
+
+    print({ productsUpdated, products });
+
+    if (productsUpdated.length === products.length) {
+      res.status(200).json(productsUpdated);
+    } else {
+      res.status(401).json({ message: "unable to updated products" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during get request!!!" });
+  }
+};
+
 module.exports = {
   createProduct,
   deleteProduct,
@@ -403,4 +463,6 @@ module.exports = {
   updateProduct,
   fetchProduct,
   fetchProductsByRestaurant,
+  incrementQuantityFromProducts,
+  decrementQuantityFromProducts,
 };

@@ -67,6 +67,9 @@ const createUser = async (req, res) => {
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png";
 
+    //set username
+    body["username"] = [body["firstName"], body["lastName"]].join(" ");
+
     print({ newUser: body, creator: creator?._id }, "*");
     // save new user in database
     let newuser = await userService.createUser(body);
@@ -225,7 +228,7 @@ const UpdateRole = async (req, res) => {
 // Update user in database
 const UpdateUser = async (req, res) => {
   try {
-    let body = JSON.parse(req.body);
+    let body = JSON.parse(req.headers?.body);
 
     // get author that update current user
     let creator = await userService.findUser({
@@ -350,9 +353,7 @@ const UpdateUser = async (req, res) => {
 //Delete user in database
 const deleteUser = async (req, res) => {
   try {
-    let body = req.body;
-    
-    console.log({ body });
+    let body = JSON.parse(req.headers?.body);
 
     console.log({ body });
 

@@ -8,6 +8,7 @@ const authmiddleware = (req, res, next) => {
 
   if (req.headers?.body) {
     req.body = req.headers?.body;
+    console.log({ body: req.body });
   }
   if (!token) {
     return res.status(401).json({ message: "user is not authenticated" });

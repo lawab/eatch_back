@@ -63,15 +63,22 @@ const createInvoice = async (req, res) => {
     let order = await invoiceServices.getOrder(idOrder, req.token);
 
     print({ order }, "*");
-    if (!order?._id) {
+    if (!order?._id || order.deletedAt) {
       return res.status(401).json({
-        message: "unable to create invoice because order not exists!!!",
+        message:
+          "unable to create invoice because order not exists or has been deleted!!!",
       });
     }
 
-    if (order.status === orderStatus.DONE) {
+    // if order has already paid or body content invalid status or body status is not send with done
+    if (
+      order.status === orderStatus.DONE ||
+      !Object.keys(orderStatus).includes(body?.status) ||
+      body?.status !== orderStatus.DONE
+    ) {
       return res.status(401).json({
-        message: "unable to create invoice because order had already paid!!!",
+        message:
+          "unable to create invoice because order had already paid or has invalid status!!!",
       });
     }
 
@@ -96,10 +103,42 @@ const createInvoice = async (req, res) => {
       });
     }
 
-    print({ orderUpdated });
+    let products = orderUpdated.products?.map((pd) => ({
+      _id: pd._id,
+      // quantity: pd.quantity,
+    })); // get list of products to set decrement quantity value
+
+    print({ products, token: req.token });
+
+    // decrement each quantity from products
+    let productsUpdated =
+      await invoiceServices.decrementQuantityFromRemoteProducts(
+        products,
+        req.token
+      );
+
+    print({ orderUpdated, productsUpdated });
+
+    // if decrementation failed
+    if (!productsUpdated) {
+      // reset order because products have not updated successfully
+      let orderRestored = await invoiceServices.updateOrderRemote(
+        orderUpdated?._id,
+        orderCopy,
+        req.token
+      );
+      let productsRestored =
+        await invoiceServices.incrementQuantityFromRemoteProducts(
+          products,
+          req.token
+        );
+      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      print({ orderRestored, productsRestored });
+      throw new Error("unable to update remote products");
+    }
 
     body["order"] = orderUpdated; //set order value found in database
-    body["total"] = getInvoicePrice(orderUpdated?.products); // set total frpice to current invoice
+    body["total"] = getInvoicePrice(orderUpdated?.products); // set total price to current invoice
     body["image"] = req.file
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png"; //set image for current invoice
@@ -155,7 +194,7 @@ const createInvoice = async (req, res) => {
         .json({ message: "Invoice has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error.message, "x");
+    print(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Invoice!!!" });
