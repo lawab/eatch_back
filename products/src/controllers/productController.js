@@ -10,12 +10,7 @@ const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
-const File = require("../services/File");
-const path = require("path");
-const {
-  deleteProductFromJsonFile,
-  addProductFromJsonFile,
-} = require("../services/generateJsonFile");
+const { addProductFromJsonFile } = require("../services/generateJsonFile");
 
 // create one product in database
 const createProduct = async (req, res) => {
@@ -302,12 +297,16 @@ const deleteProduct = async (req, res) => {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
-          let content = await deleteProductFromJsonFile(
+          let productDoc = productDeleted?._doc;
+          let content = await addProductFromJsonFile(
             productServices,
             productDeleted
           );
 
-          console.log({ content: JSON.parse(content) });
+          console.log({
+            productDeleted: productDoc,
+            content: JSON.parse(content),
+          });
 
           let response = await productServices.addProductToHistorical(
             creator?._id,

@@ -1,1 +1,124 @@
-[{"_id":"6433e8a9bd4f93d742bb0ee7","title":"First category","products":[{"_id":"643815987616a879d6789447","price":50,"_creator":"6433e8a9bd4f93d742bb0ee8","productName":"bugger king","quantity":2,"promotion":false,"devise":"MAD","image":"/datas/avatar.png","liked":0,"likedPersonCount":0,"deletedAt":null,"comments":[],"createdAt":"2023-04-13T14:45:45.005Z","updatedAt":"2023-04-13T16:01:19.651Z","__v":0}]},{"_id":"6433e8a9bd4f93d742bb0ee4","title":"Second category","products":[{"_id":"64382842810f3614b638e903","price":30,"_creator":"6433e8a9bd4f93d742bb0ee8","productName":"bugger king","quantity":2,"promotion":false,"devise":"MAD","image":"/datas/avatar.png","liked":0,"likedPersonCount":0,"deletedAt":null,"comments":[],"createdAt":"2023-04-13T14:45:45.005Z","updatedAt":"2023-04-13T16:01:19.651Z","__v":0}]},{"_id":"6433e8a9bd4f93d742bb0ee6","title":"third category","products":[{"_id":"64382842810f3614b638e903","price":25,"_creator":"6433e8a9bd4f93d742bb0ee8","productName":"bugger king","quantity":2,"promotion":true,"devise":"MAD","image":"/datas/avatar.png","liked":0,"likedPersonCount":0,"deletedAt":null,"comments":[],"createdAt":"2023-04-13T14:45:45.005Z","updatedAt":"2023-04-13T16:01:19.651Z","__v":0},{"_id":"64382842810f3614b638e903","price":90,"_creator":"6433e8a9bd4f93d742bb0ee8","productName":"Tacos the morroco","quantity":2,"promotion":false,"devise":"MAD","image":"/datas/avatar.png","liked":0,"likedPersonCount":0,"deletedAt":"2023-05-22T18:23:37.440Z","comments":[],"createdAt":"2023-04-13T16:05:22.272Z","updatedAt":"2023-04-13T16:01:19.651Z"}]}]
+[
+  {
+    "_id": "6433e8a9bd4f93d742bb0ee7",
+    "title": "First category",
+    "products": [
+      {
+        "_id": "643815987616a879d6789447",
+        "category": {
+          "_id": "6433e8a9bd4f93d742bb0ee5",
+          "title": "First category"
+        },
+        "price": 50,
+        "_creator": "6433e8a9bd4f93d742bb0ee8",
+        "productName": "bugger king",
+        "quantity": 2,
+        "promotion": false,
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "liked": 0,
+        "likedPersonCount": 0,
+        "deletedAt": null,
+        "comments": [],
+        "createdAt": "2023-04-13T14:45:45.005Z",
+        "updatedAt": "2023-04-13T16:01:19.651Z",
+        "__v": 0
+      }
+    ]
+  },
+  {
+    "_id": "6433e8a9bd4f93d742bb0ee4",
+    "title": "Second category",
+    "products": [
+      {
+        "_id": "64382842810f3614b638e903",
+        "price": 30,
+        "category": {
+          "_id": "6433e8a9bd4f93d742bb0ee8",
+          "title": "Second category"
+        },
+        "_creator": "6433e8a9bd4f93d742bb0ee8",
+        "productName": "bugger king",
+        "quantity": 2,
+        "promotion": false,
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "liked": 0,
+        "likedPersonCount": 0,
+        "deletedAt": null,
+        "comments": [],
+        "createdAt": "2023-04-13T14:45:45.005Z",
+        "updatedAt": "2023-04-13T16:01:19.651Z",
+        "__v": 0
+      }
+    ]
+  },
+  {
+    "_id": "6433e8a9bd4f93d742bb0ee6",
+    "title": "third category",
+    "products": [
+      {
+        "_id": "64382842810f3614b638e903",
+        "price": 25,
+        "category": {
+          "_id": "6433e8a9bd4f93d742bb0ee6",
+          "title": "third category"
+        },
+        "_creator": "6433e8a9bd4f93d742bb0ee8",
+        "productName": "bugger king",
+        "quantity": 2,
+        "promotion": true,
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "liked": 0,
+        "likedPersonCount": 0,
+        "deletedAt": null,
+        "comments": [],
+        "createdAt": "2023-04-13T14:45:45.005Z",
+        "updatedAt": "2023-04-13T16:01:19.651Z",
+        "__v": 0
+      },
+      {
+        "_id": "64382842810f3614b638e903",
+        "category": {
+          "_id": "6433e8a9bd4f93d742bb0ee6",
+          "title": "third category"
+        },
+        "price": 90,
+        "_creator": "6433e8a9bd4f93d742bb0ee8",
+        "productName": "Tacos the morroco",
+        "quantity": 2,
+        "promotion": false,
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "liked": 0,
+        "likedPersonCount": 0,
+        "deletedAt": "2023-05-22T18:23:37.440Z",
+        "comments": [],
+        "createdAt": "2023-04-13T16:05:22.272Z",
+        "updatedAt": "2023-04-13T16:01:19.651Z"
+      },
+      {
+        "_id": "64382842810f3614b638e903",
+        "category": {
+          "_id": "6433e8a9bd4f93d742bb0ee6",
+          "title": "third category"
+        },
+        "price": 90,
+        "_creator": "6433e8a9bd4f93d742bb0ee8",
+        "productName": "Tacos the morroco",
+        "quantity": 2,
+        "promotion": false,
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "liked": 0,
+        "likedPersonCount": 0,
+        "deletedAt": "2023-05-23T11:04:25.688Z",
+        "comments": [],
+        "createdAt": "2023-04-13T16:05:22.272Z",
+        "updatedAt": "2023-05-23T11:04:25.760Z",
+        "__v": 1
+      }
+    ]
+  }
+]
