@@ -350,8 +350,8 @@ const UpdateUser = async (req, res) => {
 //Delete user in database
 const deleteUser = async (req, res) => {
   try {
-    let body = JSON.parse(req.body);
-
+    let body = req.body;
+    
     console.log({ body });
 
     console.log({ body });

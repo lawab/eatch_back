@@ -69,7 +69,7 @@ const createInvoice = async (req, res) => {
       });
     }
 
-    if (![orderStatus.WAITED, orderStatus.TREATMENT].includes(order.status)) {
+    if (order.status === orderStatus.DONE) {
       return res.status(401).json({
         message: "unable to create invoice because order had already paid!!!",
       });
