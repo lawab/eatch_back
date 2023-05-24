@@ -96,11 +96,6 @@ const OrderschemaObject = {
       },
     },
   },
-  _creator: {
-    type: mongoose.Types.ObjectId,
-    required: false,
-    default: null,
-  },
   products: {
     required: true,
     type: [{ type: productType }],

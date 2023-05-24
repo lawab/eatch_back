@@ -10,38 +10,6 @@ const updateHistorical = async (req, res) => {
   try {
     let body = req.body;
 
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
-
-    // get author since microservice users
-    let creator = await historicalServices.getUser(
-      req.params?._creator,
-      req.token
-    );
-
-    print({ creator });
-
-    // if creator not exists in database
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "invalid data send you must authenticated to create a new historique",
-      });
-    }
-
-    // if user has authorization to create new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you cannot create the invoice because you don't have authorization,please see your administrator,thanks!!!",
-      });
-    }
-
     // save all value into database
     let historical = await historicalServices.findHIstorical({
       _id: { $exists: true },

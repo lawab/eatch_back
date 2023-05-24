@@ -260,10 +260,6 @@ const OrderType = {
       },
     },
   },
-  _creator: {
-    required: true,
-    type: mongoose.Types.ObjectId,
-  },
   action: {
     type: String,
     required: true,

@@ -14,6 +14,7 @@ const restaurantSchemaObject = {
 const UserSchemaObject = {
   restaurant: {
     type: restaurantSchemaObject,
+    required:true
   },
   firstName: {
     required: true,
@@ -28,9 +29,7 @@ const UserSchemaObject = {
   email: {
     type: String,
     unique: true,
-    required: function () {
-      return validator.isEmail(this.email);
-    },
+    required: true,
     validate: {
       validator: function (email) {
         return validator.isEmail(this.email);

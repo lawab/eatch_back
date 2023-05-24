@@ -51,7 +51,6 @@ const productSchemaObject = {
     type: restaurantSchemaObject,
   },
   category: {
-    required: true,
     type: categorySchemaObject,
   },
   price: {
@@ -66,11 +65,15 @@ const productSchemaObject = {
   productName: {
     type: String,
     maxlength: 50,
-    required: true,
   },
   quantity: {
     type: Number,
     required: true,
+    validate: {
+      validator(v) {
+        return v >= 0;
+      },
+    },
     default: 0,
     min: 0,
   },

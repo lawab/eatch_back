@@ -1,58 +1,52 @@
-const { fieldsRequired } = require("../models/order/order");
-const { fieldsValidator } = require("../models/order/validators");
 const print = require("../log/print");
 const orderServices = require("../services/orderServices");
 const roles = require("../models/roles");
-const updateForeignFields = require("./updateForeignFields");
-const setForeignFieldsValue = require("./setForeignFieldsValue");
+const updateOrderValues = require("../methods/updateValues");
+const setOrderValues = require("../methods/setOrderValues");
 const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
 
+const updateHistorical = async (addElementmethod, errorHandler) => {
+  try {
+    return await addElementmethod();
+  } catch (error) {
+    print(error.message);
+    return await errorHandler();
+  }
+};
+
 // create one order in database
 const createOrder = async (req, res) => {
   try {
-    let body = req.body;
+    let bodyContent = req.body;
 
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
-
-    body = await setForeignFieldsValue(orderServices, body, req.token);
-
-    // add image from order
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
-    body["_creator"] = body["client"]?._id; // set client as creator of current order
+    // set all values required
+    body = await setOrderValues(orderServices, bodyContent, req);
 
     let orderCreated = await orderServices.createOrder(body);
+
     print({ orderCreated }, "*");
 
     if (orderCreated?._id) {
-      let response = await addElementToHistorical(
+      let response = await updateHistorical(
         async () => {
-          let addResponse = await orderServices.addOrderToHistorical(
-            body["client"]?._id,
-            {
-              orders: {
-                _id: orderCreated?._id,
-                action: "CREATED",
-              },
+          let bodyAction = {
+            orders: {
+              _id: orderCreated._id,
+              action: "CREATED",
             },
+          };
+          return await orderServices.addOrderToHistorical(
+            orderCreated._id,
+            bodyAction,
             req.token
           );
-
-          return addResponse;
         },
         async () => {
           let elementDeleted = await orderServices.deleteTrustlyOrder({
-            _id: orderCreated?._id,
+            _id: orderCreated._id,
           });
           print({ elementDeleted });
           return elementDeleted;
@@ -84,15 +78,7 @@ const updateOrder = async (req, res) => {
     // get body request
     let body = req.body;
 
-    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    if (!validate) {
-      return res.status(401).json({
-        message: "invalid data send!!!",
-      });
-    }
-
-    // get ordder that should be update
+    // get order that should be update
     let order = await orderServices.findOrder({
       _id: req.params?.id,
     });
@@ -105,37 +91,34 @@ const updateOrder = async (req, res) => {
 
     console.log({ order });
 
-    let orderCopy = Object.assign({}, order._doc); // cppy documment before update it
+    // copy documment before update it
+    let orderCopy = Object.assign({}, order._doc);
 
-    body = await updateForeignFields(orderServices, body, req.token);
+    // update products only because it is a user that update his order
+    body = await updateOrderValues(orderServices, body, req);
 
-    // update all valid fields before save it in database
-    for (let key in body) {
-      order[key] = body[key];
-    }
+    // update products in order model found in database
+    order["products"] = body["products"];
 
-    // update avatar if exists
-    order["image"] = req.file ? "/datas/" + req.file?.filename : order["image"];
     // update order in database
     let orderUpdated = await order.save({ validateModifiedOnly: true });
 
     print({ orderUpdated });
 
     if (orderUpdated?._id) {
-      let response = await addElementToHistorical(
+      let response = await updateHistorical(
         async () => {
-          let response = await orderServices.addOrderToHistorical(
-            creator?._id,
-            {
-              orders: {
-                _id: orderUpdated?._id,
-                action: "UPDATED",
-              },
+          let bodyAction = {
+            orders: {
+              _id: orderUpdated._id,
+              action: "UPDATED",
             },
+          };
+          return await orderServices.addOrderToHistorical(
+            orderUpdated._id,
+            bodyAction,
             req.token
           );
-
-          return response;
         },
         async () => {
           for (const field in orderCopy) {
@@ -143,10 +126,14 @@ const updateOrder = async (req, res) => {
               orderUpdated[field] = orderCopy[field];
             }
           }
+          /*
+            restore Object in database,not update timestamps 
+            because it is restoration from olds values fields in database
+          */
           let orderRestored = await orderUpdated.save({
             validateModifiedOnly: true,
             timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          });
           print({ orderRestored });
           return orderRestored;
         }
@@ -164,7 +151,7 @@ const updateOrder = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    print(error.message);
     res.status(500).json({
       message: "Error(s) occured during the update order!!!",
     });

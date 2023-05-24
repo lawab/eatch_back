@@ -20,7 +20,7 @@ module.exports = async (historicalservices, body = {}, token) => {
     let keyMethod = `get${keyService}`;
     let method = historicalservices[keyMethod];
 
-    print({ value, method });
+    print({ value, method, key, body });
 
     let valueFound = await method(value?._id, token);
 

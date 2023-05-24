@@ -3,41 +3,44 @@ const print = require("../log/print");
 
 /**
  *
- * @param {Object} res [Object Response from express to send response to client if necessary]
  * @param {Object} orderServices [product microservice to manage product in database]
  * @param {Object} body [Body Object from express]
- * @param {String} token [token to authenticate user session]
+ * @param {Object} req [req Object from express]
  * @returns {Promise<Array<Object>}
  */
-module.exports = async (orderServices, body, token) => {
+module.exports = async (orderServices, body, req) => {
   try {
     let errorMessage = (field) => `invalid ${field}`;
+    let token = req.token;
 
-    // verify restaurant in database
+    // find restaurant in database
     let restaurant = await orderServices.getRestaurant(body?.restaurant, token);
 
     if (!restaurant?._id) {
       throw new Error(errorMessage("restaurant"));
     }
-    body["restaurant"] = restaurant; // update restaurant with value found in database
 
-    // verify the existing of category in database if it's in body request before update it in database
+    // update restaurant with value found in database
+    body["restaurant"] = restaurant;
+
+    // find client in database
     let client = await orderServices.getClient(body?.client, token);
     print({ client });
 
-    // if client not exists in database
+    // if client not exists in database, generate random _id for client
     if (!client?._id) {
       body["client"] = {
-        _id: mongoose.Types.ObjectId(), // generate random _id for client
+        _id: mongoose.Types.ObjectId(),
       };
     }
-    //if client found in database
+
+    //if client found in database, set client found in database
     if (client?._id) {
-      body["client"] = client; // update client field with client found in database
+      body["client"] = client;
     }
 
     // set ids list from products
-    let productsIds = body?.products;
+    let productsIds = body?.products?.map((product) => product._id);
 
     if (!productsIds?.length) {
       throw new Error(errorMessage("products"));
@@ -48,12 +51,20 @@ module.exports = async (orderServices, body, token) => {
 
     print({ products });
 
-    // if products not exists in database
+    body["products"] = products.map((product) => {
+      let productFound = body.products.find((p) => p._id === product._id);
+      return { ...product, quantity: productFound.quantity };
+    });
+
+    // verify that products has been set successfully
     if (!products?.length || products?.length !== body?.products?.length) {
       throw new Error(errorMessage("products"));
     }
 
-    body["products"] = products;
+    // add image from order
+    body["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : "/datas/avatar.png";
 
     return body;
   } catch (error) {

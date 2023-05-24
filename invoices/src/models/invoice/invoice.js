@@ -40,6 +40,12 @@ const productType = {
     type: Number,
     required: true,
     default: 0,
+    validate: {
+      validator(v) {
+        return v >= 0;
+      },
+    },
+    min: 0,
   },
   price: {
     type: Number,

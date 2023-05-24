@@ -11,6 +11,10 @@ const { default: mongoose } = require("mongoose");
 
 // create one Invoice
 const createInvoice = async (req, res) => {
+  // global variable to do fallback if error occured during execution
+  let orderUpdated = {};
+  let orderCopy = {};
+
   try {
     let idOrder = req.params?.id;
     let body = req.body;
@@ -82,13 +86,13 @@ const createInvoice = async (req, res) => {
       });
     }
 
-    let orderCopy = Object.assign({}, order);
+    orderCopy = Object.assign({}, order);
 
     print({ orderCopy });
 
     //update status order since order microservice
 
-    let orderUpdated = await invoiceServices.updateOrderRemote(
+    orderUpdated = await invoiceServices.updateOrderRemote(
       order._id,
       {
         status: orderStatus.DONE,
@@ -170,15 +174,8 @@ const createInvoice = async (req, res) => {
 
           print({ elementDeleted });
 
-          // reset order because creation of invoice failed
-          let orderRestored = await invoiceServices.updateOrderRemote(
-            orderUpdated?._id,
-            orderCopy,
-            req.token
-          );
-          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ orderRestored });
-          return { orderRestored, elementDeleted };
+          // reset order because creation of invoice failed or orther error occured
+          return await resetOrder(orderUpdated, orderCopy, req);
         }
       );
 
@@ -194,7 +191,10 @@ const createInvoice = async (req, res) => {
         .json({ message: "Invoice has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    if (orderUpdated?._id) {
+      await resetOrder(orderUpdated, orderCopy, req);
+    }
+    print(error.message, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Invoice!!!" });
@@ -236,7 +236,16 @@ const fetchInvoicesByRestaurant = async (req, res) => {
     res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
-
+async function resetOrder(orderUpdated, orderCopy, req) {
+  let orderRestored = await invoiceServices.updateOrderRemote(
+    orderUpdated?._id,
+    orderCopy,
+    req.token
+  );
+  // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+  print({ orderRestored });
+  return orderRestored;
+}
 module.exports = {
   createInvoice,
   fetchInvoices,

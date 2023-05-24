@@ -398,21 +398,14 @@ const fetchProductsByRestaurant = async (req, res) => {
 
 const incrementQuantityFromProducts = async (req, res) => {
   try {
-    let products = req.body.products;
-    let productsUpdated = [];
+    let productsIndexes = req.body.products?.map((pd) => pd._id);
 
-    for (let index = 0; index < products.length; index++) {
-      let pdUpdated = await productServices.updateProduct(
-        {
-          _id: products[index]._id,
-        },
-        {
-          $inc: { quantity: 1 },
-        }
-      );
-      print({ pdUpdated });
-      productsUpdated.push(pdUpdated);
-    }
+    let productsUpdated = await incrementOrDecrementProductQuantity(
+      productsIndexes,
+      1
+    );
+
+    print({ productsUpdated, productsIndexes });
 
     if (productsUpdated.length === products.length) {
       res.status(200).json(productsUpdated);
@@ -427,34 +420,58 @@ const incrementQuantityFromProducts = async (req, res) => {
 
 const decrementQuantityFromProducts = async (req, res) => {
   try {
-    let products = req.body.products;
-    let productsUpdated = [];
+    let productsIndexes = req.body.products?.map((pd) => pd._id);
 
-    for (let index = 0; index < products.length; index++) {
-      let pdUpdated = await productServices.updateProduct(
-        {
-          _id: products[index]._id,
-        },
-        {
-          $inc: { quantity: -1 },
-        }
-      );
-      print({ pdUpdated });
-      productsUpdated.push(pdUpdated);
+    let productsValided = await productServices.findProducts({
+      _id: { $in: productsIndexes },
+    });
+
+    print({ productsValided });
+
+    // validaton of quantities from all product before save it in database
+    for (let index = 0; index < productsValided.length; index++) {
+      const element = productsValided[index];
+      if (element.quantity - 1 < 0) {
+        throw new Error(
+          "unable to make invoice because some quantity(ies) of products are so less of 0"
+        );
+      }
     }
 
-    print({ productsUpdated, products });
+    let productsUpdated = await incrementOrDecrementProductQuantity(
+      productsIndexes,
+      -1
+    );
 
-    if (productsUpdated.length === products.length) {
+    print({ productsUpdated, productsIndexes });
+
+    if (productsUpdated.length === productsIndexes.length) {
       res.status(200).json(productsUpdated);
     } else {
       res.status(401).json({ message: "unable to updated products" });
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: "Error occured during get request!!!" });
+    res.status(500).json({ message: error.message });
   }
 };
+
+async function incrementOrDecrementProductQuantity(productsIndexes, value) {
+  let productsValues = [];
+  for (let index = 0; index < productsIndexes.length; index++) {
+    let productDb = await productServices.findOneProduct({
+      _id: productsIndexes[index],
+    });
+
+    productDb.quantity = productDb.quantity + value;
+
+    let pdUpdated = await productDb.save();
+
+    productsValues.push(pdUpdated);
+  }
+
+  return productsValues;
+}
 
 module.exports = {
   createProduct,

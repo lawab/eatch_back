@@ -23,6 +23,18 @@ const getCategories = async () =>{
     });
 };
 
+//Get all categories
+const getCategoriesByRestaurantId = async (restaurant) =>{
+
+    const categories = await Category.find({restaurant:restaurant})
+    .then((err, data) =>{
+        return data;
+    })
+    .catch((err) =>{
+        return err;
+    });
+};
+
 //Edit category by Id
 const updateCategoryById = async (categoryId, categoryBody) =>{
 
@@ -57,5 +69,6 @@ module.exports ={
     getCategories,
     updateCategoryById,
     getCategoryById,
-    getAllCategory
+    getAllCategory,
+    getCategoriesByRestaurantId
 }

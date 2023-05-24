@@ -10,7 +10,7 @@ const upload = uploadFileService.uploadMiddleFile();
 
 
 //************CREATE CATEGORY********************
-categoryRouter.post('/create', auth.authmiddleware, upload.single('image'), controller.createCategory);
+categoryRouter.post('/create', auth.authmiddleware, upload.single('file'), controller.createCategory);
 //**************************************** *//  
 
 //************UPDATE CATEGORY********************

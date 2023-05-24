@@ -6,10 +6,13 @@ const print = require("../log/print");
  * @param {Function} errorHanhler [callback which will executed if saved into historical failled]
  * @returns {Promise<Object>} [the response send by historical service]
  */
-const addElementToHistorical = async (addElementToHistorical, errorHanhler) => {
+const addElementToHistorical = async (
+  addElementToHistoricalCallback,
+  errorHanhler
+) => {
   try {
     // add new user create in historical
-    let response = await addElementToHistorical();
+    let response = await addElementToHistoricalCallback();
 
     if (response.status !== 200) {
       await errorHanhler();
