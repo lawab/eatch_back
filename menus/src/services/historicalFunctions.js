@@ -10,7 +10,6 @@ const addElementToHistorical = async (addElementToHistorical, errorHanhler) => {
   try {
     // add new user create in historical
     let response = await addElementToHistorical();
-    console.log({ response });
     if (response.status !== 200) {
       await errorHanhler();
     }

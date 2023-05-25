@@ -12,55 +12,24 @@ const {
 
 // create one Menu
 const createMenu = async (req, res) => {
+  let menu = null;
   try {
     let body = req.body;
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
 
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
+    let bodyUpdated = await setForeignFields(body, req, req.token);
 
-    // get creator since microservice users
-    let creator = await menuServices.getUserAuthor(body?._creator, req.token);
-
-    print({ creator: creator?._id }, "*");
-
-    if (!creator?._id) {
-      return res.status(401).json({
-        message: "invalid data send,you must authenticated to create a menu!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you have not authorization to create menu,please see you administrator",
-      });
-    }
-
-    body["_creator"] = creator; //set creator value found in database
-
-    body = await setForeignFields(menuServices, body, req.token);
-
-    // set user avatar
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
-
-    let menu = await menuServices.createMenu(body);
+    menu = await menuServices.createMenu(bodyUpdated);
 
     print({ menucreated: menu }, "*");
 
-    if (menu?._id) {
+    if (menu) {
       let response = await addElementToHistorical(
         async () => {
           let addResponse = await menuServices.addMenuToHistorical(
-            creator._id,
+            menu._creator._id,
             {
               menus: {
-                _id: menu?._id,
+                _id: menu._id,
                 action: "CREATED",
               },
             },
@@ -71,7 +40,7 @@ const createMenu = async (req, res) => {
         },
         async () => {
           let elementDeleted = await menuServices.deleteTrustlyMenu({
-            _id: menu?._id,
+            _id: menu._id,
           });
           print({ elementDeleted });
           return elementDeleted;
@@ -90,7 +59,15 @@ const createMenu = async (req, res) => {
         .json({ message: "Menu has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    if (menu) {
+      let elementDeleted = await menuServices.deleteTrustlyMenu({
+        _id: menu._id,
+      });
+      print({ elementDeleted });
+    }
+
+    console.log({ error });
+
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Menu!!!" });

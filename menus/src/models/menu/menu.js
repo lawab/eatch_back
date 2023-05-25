@@ -37,8 +37,10 @@ const productType = {
     required: true,
   },
   category: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
-    title: { type: String },
+    type: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      title: { type: String },
+    },
     required: true,
   },
   promotion: {

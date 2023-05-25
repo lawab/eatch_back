@@ -357,6 +357,20 @@ const fetchProductsByRestaurant = async (req, res) => {
   }
 };
 
+// fetch products by restaurant in database
+const fetchProductsByRestaurantAndCategory = async (req, res) => {
+  try {
+    let products = await productServices.findProducts({
+      "restaurant._id": req.params?.restaurantId,
+      "category._id": req.params?.categoryId,
+    });
+    res.status(200).json(products);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during get request!!!" });
+  }
+};
+
 const incrementQuantityFromProducts = async (req, res) => {
   try {
     let productsIndexes = req.body.products?.map((pd) => pd._id);
@@ -443,4 +457,5 @@ module.exports = {
   fetchProductsByRestaurant,
   incrementQuantityFromProducts,
   decrementQuantityFromProducts,
+  fetchProductsByRestaurantAndCategory,
 };
