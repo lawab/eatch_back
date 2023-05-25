@@ -4,37 +4,35 @@ const Schema = mongoose.Schema;
 // Custum schema Object from foreign fields in product model
 const materialSchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  mp_name: { required: true, type: String, maxlength: 50 },
-  quantity: { type: Number, default: 0, required: true },
+  mp_name: { type: String, maxlength: 50 },
+  quantity: { type: Number, default: 0 },
   lifetime: {
-    required: true,
     type: Date,
   },
 };
 const commentSchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   client: {
-    type: {
-      firstName: { type: String, maxlength: 50 },
-      lastName: { type: String, maxlength: 50 },
-      phone_number: String,
-    },
+    firstName: String,
+    lastName: String,
+    phone_number: String,
   },
 };
 
 const restaurantSchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: String,
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
-    logo: { type: String, default: "/datas/avatar.png" },
+    town: String,
+    address: String,
+    logo: String,
   },
 };
 
 const categorySchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  title: { type: String, maxlength: 50 },
+  title: String,
+  image: String,
 };
 
 // Product schema Object
@@ -64,6 +62,7 @@ const productSchemaObject = {
 
   productName: {
     type: String,
+    required: true,
     maxlength: 50,
   },
   quantity: {
