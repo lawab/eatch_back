@@ -13,6 +13,7 @@ const {
   closeRequest,
 } = require("../services/historicalFunctions");
 const setUserValues = require("../methods/setUserValues");
+const updateUserValues = require("../methods/updateUserValues");
 
 //Create user in Data Base
 const createUser = async (req, res) => {
@@ -73,7 +74,7 @@ const createUser = async (req, res) => {
         .json({ message: "Created User failed,please try again!!!" });
     }
   } catch (err) {
-    print({err})
+    print({ err });
     if (newuser) {
       let elementDeleted = await userService.deleteTrustlyUser({
         _id: newuser._id,
@@ -196,36 +197,17 @@ const UpdateRole = async (req, res) => {
 
 // Update user in database
 const UpdateUser = async (req, res) => {
+  let bodyCopy = null;
+  let userUpdated = null;
+
   try {
-    let body = JSON.parse(req.headers?.body);
+    // let body = JSON.parse(req.headers?.body);
+    let body = req.body;
 
-    // get author that update current user
-    let creator = await userService.findUser({
-      _id: body._creator,
-    });
+    let bodyUpdate = await updateUserValues(body, req);
 
-    if (!creator?._id) {
-      return res
-        .status(401)
-        .json({ message: "you must authenticated to update current user!!!" });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "your cannot update user because you don't have an authorization,please see your administrator!!!",
-      });
-    }
-
-    // find user that author want to update
+    // find user in database
     let user = await userService.findUser({ _id: req.params?.id });
-
-    /* copy values and fields from user found in database before updated it. 
-       it will use to restore user updated if connection with historical failed
-    */
-    let bodyCopy = Object.assign({}, user._doc);
-
-    print({ userCopy: bodyCopy });
 
     if (!user?._id) {
       return res
@@ -233,61 +215,33 @@ const UpdateUser = async (req, res) => {
         .json({ message: "unable to update user beacuse it not exists!!!" });
     }
 
-    // fetch restaurant if exists in body request object since microservice restaurant
-
-    if (body?.restaurant) {
-      let restaurant = await userService.getRestaurant(
-        body?.restaurant,
-        req.token
-      );
-
-      print({ restaurant });
-
-      if (!restaurant?._id) {
-        throw new Error("invalid data send");
-      }
-
-      // update some fields in body request (restaurant and creator field)
-      body["restaurant"] = restaurant;
-    }
-
-    // set user that make update in database
-    body["_creator"] = creator?._id;
-
-    // get valid keys
-    let keysvalided = Object.keys(fieldsRequired);
+    /* make copy fromoriginal user */
+    bodyCopy = Object.assign({}, user._doc);
 
     // update all valid fields before save it in database
-    for (let key in body) {
-      if (keysvalided.includes(key)) {
-        user[key] = body[key];
-      }
+    for (let key in bodyUpdate) {
+      user[key] = bodyUpdate[key];
     }
 
-    // update avatar if exists
-    user["avatar"] = req.file ? "/datas/" + req.file?.filename : user["avatar"];
-
     // update user in database
-    let userUpdated = await user.save();
+    userUpdated = await user.save();
 
     print({ userUpdated });
 
-    if (userUpdated?._id) {
+    if (userUpdated) {
       // add new user create in historical
       let response = await addElementToHistorical(
         async () => {
-          let response = await userService.addUserToHistorical(
-            creator?._id,
+          return await userService.addToHistorical(
+            userUpdated._creator._id,
             {
               users: {
-                _id: userUpdated?._id,
+                _id: userUpdated._id,
                 action: "UPDATED",
               },
             },
             req.token
           );
-
-          return response;
         },
         async () => {
           for (const field in bodyCopy) {
@@ -295,25 +249,41 @@ const UpdateUser = async (req, res) => {
               userUpdated[field] = bodyCopy[field];
             }
           }
-          let userRestored = await userUpdated.save({ timestamps: false }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+
+          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          let userRestored = await userUpdated.save({ timestamps: false });
           print({ userRestored });
           return userRestored;
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "User has been updated successfully!!!",
-        "User has not been Updated successfully,please try again later,thanks!!!"
-      );
+      if (response?.status === 200) {
+        print({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "User has been updated successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message: "Update user failed,please try again!!!",
+        });
+      }
     } else {
       res.status(401).json({
-        message: "User has been not updated successfully!!",
+        message: "Update user failed,please try again!!!",
       });
     }
   } catch (error) {
-    print({ error: error }, "x");
+    if (userUpdated && bodyCopy) {
+      for (const field in bodyCopy) {
+        if (Object.hasOwnProperty.call(bodyCopy, field)) {
+          userUpdated[field] = bodyCopy[field];
+        }
+      }
+      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      let userRestored = await userUpdated.save({ timestamps: false });
+      print({ userRestored });
+    }
+    print({ error }, "x");
     // if error occured,remove user created if exists in database
     res.status(500).json({ message: "Error occured during delete request!!" });
   }
