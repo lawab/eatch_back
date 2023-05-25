@@ -98,6 +98,7 @@ const getCategory = async (req, res) => {
     const category = await categoryService.getCategoryById(
       req.params.categoryId
     );
+    console.log({ categoryFound: category });
     res.status(200).json(category);
   } catch (err) {
     console.log(err);
@@ -124,6 +125,20 @@ const getCategoriesByRestaurant = async (req, res) => {
     const categories = await categoryService.getCategoriesByRestaurantId(
       restaurant
     );
+    res.status(200).json(categories);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Categories not exist in DB!!!" });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  const body = JSON.parse(req.headers?.body);
+
+  const categoryId = req.body;
+
+  try {
+    const category = await categoryService.getCategoryById({});
     res.status(200).json(categories);
   } catch (err) {
     console.log(err);

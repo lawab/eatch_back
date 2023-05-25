@@ -333,12 +333,19 @@ const fetchMaterial = async (req, res) => {
 const fetchMaterials = async (req, res) => {
   try {
     print({ ids: req.params?.ids });
+    let materials = [];
     if (req.params?.ids) {
       let ids = JSON.parse(req.params?.ids);
-      let Materials = await materialServices.findMaterials({
-        _id: { $in: ids },
-      });
-      res.status(200).json(Materials);
+
+      for (let index = 0; index < ids.length; index++) {
+        const id = ids[index];
+        let material = await materialServices.findMaterial({
+          _id: id,
+        });
+        materials.push(material);
+      }
+
+      res.status(200).json(materials);
     } else {
       let Materials = await materialServices.findMaterials();
       res.status(200).json(Materials);

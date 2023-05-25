@@ -1,6 +1,3 @@
-const { fieldsRequired } = require("../models/product/product");
-const { fieldsValidator } = require("../models/product/validators");
-
 const productServices = require("../services/productServices");
 const roles = require("../models/roles");
 const updateForeignFields = require("./updateForeignFields");
@@ -11,12 +8,15 @@ const {
 } = require("../services/historicalFunctions");
 const { addProductFromJsonFile } = require("../services/generateJsonFile");
 const setProductValues = require("../methods/setProductValues");
+const category = require("../../../categories/src/models/category");
 
 // create one product in database
 const createProduct = async (req, res) => {
   let newproduct = null;
   try {
-    let body = req.body;
+    let body = JSON.parse(req.headers?.body);
+
+    console.log({ body });
 
     let bodyUpdate = await setProductValues(body, req, req.token);
 
@@ -327,11 +327,16 @@ const fetchProduct = async (req, res) => {
 // get products in database
 const fetchProducts = async (req, res) => {
   try {
+    let products = [];
     let ids = req.params?.ids ? JSON.parse(req.params?.ids) : [];
     if (ids.length) {
-      let products = await productServices.findProducts({
-        _id: { $in: ids },
-      });
+      for (let index = 0; index < ids.length; index++) {
+        const id = ids[index];
+        let product = await productServices.findOneProduct({
+          _id: id,
+        });
+        products.push(product);
+      }
       print({ products }, "~");
       res.status(200).json(products);
     } else {
@@ -360,11 +365,28 @@ const fetchProductsByRestaurant = async (req, res) => {
 // fetch products by restaurant in database
 const fetchProductsByRestaurantAndCategory = async (req, res) => {
   try {
-    let products = await productServices.findProducts({
-      "restaurant._id": req.params?.restaurantId,
-      "category._id": req.params?.categoryId,
-    });
-    res.status(200).json(products);
+    let restaurantId = req.params?.restaurantId;
+    let categories = await productServices.getProductsByCategories();
+
+    let newCategories = categories
+      .filter((category) => {
+        let product = category.products[0];
+        // console.log({
+        //   idrestaurant: product.restaurant._id.valueOf(),
+        //   restaurantId,
+        // });
+        return product.restaurant._id.valueOf() === restaurantId;
+      })
+      .map((category) => {
+        let product = category.products[0];
+        return {
+          id: product.category._id,
+          title: category._id,
+          products: category.products,
+        };
+      });
+    console.log(newCategories);
+    res.status(200).json(newCategories);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Error occured during get request!!!" });

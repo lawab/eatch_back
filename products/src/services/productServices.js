@@ -110,6 +110,9 @@ const getRestaurant = async (id = null, token = null) => {
  * @returns {Promise<[Object]>} [return the current category send by eatch_category microservice]
  */
 const getCategory = async (id = null, token = null) => {
+  console.log("test", id, {
+    url: `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
+  });
   let { data: category } = await axios.get(
     `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
     {
@@ -198,6 +201,22 @@ const getProductsByCategories = () => {
   return products;
 };
 
+// const getProductsByCategoriesAndRestaurant = (restaurantId) => {
+//   let products = Product.aggregate([
+
+//     {
+//       $group: {
+//         _id: "$category.title",
+//         products: { $push: "$$ROOT" },
+//       },
+//     },
+//   ]);
+
+//   console.log({ products: products._pipeline });
+
+//   return products;
+// };
+
 module.exports = {
   createProduct,
   findOneProduct,
@@ -213,4 +232,5 @@ module.exports = {
   deleteTrustlyProduct,
   getCategories,
   getProductsByCategories,
+  // getProductsByCategoriesAndRestaurant,
 };
