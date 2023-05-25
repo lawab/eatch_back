@@ -49,6 +49,7 @@ const productSchemaObject = {
     type: restaurantSchemaObject,
   },
   category: {
+    required: true,
     type: categorySchemaObject,
   },
   price: {

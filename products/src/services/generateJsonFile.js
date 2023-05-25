@@ -6,49 +6,30 @@ const File = require("./File");
  * @param {Object} newproduct [new product created successfully ]
  * @returns {Promise<String>}
  */
-const addProductFromJsonFile = async (productServices, newproduct) => {
+const addProductFromJsonFile = async (productServices, _ = null) => {
   try {
     const FILENAME = "categories.json";
     // get all catégories in database
-    let categories = (await productServices.getCategories()) || [];
+    let categories = (await productServices.getProductsByCategories()) || [];
+
+    print({ categories, products: categories[0].products });
 
     // find index category in list of categories
-    let categoryIndex = categories.findIndex(
-      (category) => category?.title === newproduct.category?.title
+    let newCategories = categories.map((category) => {
+      return {
+        title: category._id,
+        products: category.products,
+      };
+    });
+
+    let file = new File();
+
+    let content = await file.writeToFile(
+      FILENAME,
+      JSON.stringify(newCategories)
     );
 
-    let file = new File(); // create instance of new File
-
-    // if category exists
-    if (categoryIndex !== -1) {
-      const productsCategory = categories[categoryIndex]["products"];
-
-      print({ productsCategoryAfter: productsCategory });
-
-      //update products of category
-      const newProductsCategory = [...productsCategory, newproduct];
-
-      print({
-        newProductsCategory: newProductsCategory,
-        categoryIndex,
-      });
-
-      categories[categoryIndex]["products"] = newProductsCategory;
-
-      // update categories.json file
-      let content = await file.writeToFile(
-        FILENAME,
-        JSON.stringify(categories)
-      );
-
-      print({ contentFileUpdated: JSON.parse(content)[categoryIndex] });
-
-      return content;
-    } else {
-      throw new Error(
-        "Unable to generate JSON file because product not belong to category"
-      );
-    }
+    return content;
   } catch (error) {
     throw new Error(error.message);
   }

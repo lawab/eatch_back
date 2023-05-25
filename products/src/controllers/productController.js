@@ -3,7 +3,6 @@ const { fieldsValidator } = require("../models/product/validators");
 
 const productServices = require("../services/productServices");
 const roles = require("../models/roles");
-const setForeignFieldsRequired = require("./setForeignFieldsRequired");
 const updateForeignFields = require("./updateForeignFields");
 const print = require("../log/print");
 const {
@@ -11,63 +10,21 @@ const {
   closeRequest,
 } = require("../services/historicalFunctions");
 const { addProductFromJsonFile } = require("../services/generateJsonFile");
+const setProductValues = require("../methods/setProductValues");
 
 // create one product in database
 const createProduct = async (req, res) => {
+  let newproduct = null;
   try {
     let body = req.body;
-    const message = "invalid data!!!";
 
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
+    let bodyUpdate = await setProductValues(body, req, req.token);
 
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message });
-    }
-
-    // get creator since microservice users
-    let creator = await productServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-
-    print({ creator: creator?._id });
-
-    if (!creator?._id) {
-      return res.status(401).json({ message });
-    }
-
-    // if product has authorization to create new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message: "you cannot create the product please see you admin,thanks!!!",
-      });
-    }
-
-    // product has authorization
-
-    // set restaurant,category and materials fields required
-    body = await setForeignFieldsRequired(
-      {
-        restaurant_id: body?.restaurant,
-        category_id: body?.category,
-        materila_ids: body?.materials,
-      },
-      req.token,
-      body
-    );
-
-    // add image from product
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
-
-    let newproduct = await productServices.createProduct(body);
+    newproduct = await productServices.createProduct(bodyUpdate);
 
     print({ newproduct });
 
-    if (newproduct?._id) {
+    if (newproduct) {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
@@ -78,18 +35,16 @@ const createProduct = async (req, res) => {
 
           console.log({ content: JSON.parse(content) });
 
-          let addResponse = await productServices.addProductToHistorical(
-            creator?._id,
+          return await productServices.addProductToHistorical(
+            newproduct._creator._id,
             {
               products: {
-                _id: newproduct?._id,
+                _id: newproduct._id,
                 action: "CREATED",
               },
             },
             req.token
           );
-
-          return addResponse;
         },
         async () => {
           let elementDeleted = await productServices.deleteTrustlyProduct({
@@ -100,19 +55,30 @@ const createProduct = async (req, res) => {
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Product has been created successfully!!!",
-        "Product has  been not creadted successfully,please try again later,thanks!!!"
-      );
+      if (response?.status === 200) {
+        print({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "Product has been created successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message:
+            "Product has  been not creadted successfully,please try again later,thanks!!!",
+        });
+      }
     } else {
       res
         .status(401)
         .json({ message: "product has been not created successfully!!!" });
     }
   } catch (error) {
-    console.log(error);
+    print({ error });
+    if (newproduct) {
+      await productServices.deleteTrustlyProduct({
+        _id: newproduct._id,
+      });
+    }
+
     return res
       .status(500)
       .json({ message: "Error occured during a creation of product!!!" });

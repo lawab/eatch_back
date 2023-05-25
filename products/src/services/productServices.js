@@ -74,6 +74,7 @@ const updateProduct = async (query = null, bodyUpdate = {}) => {
  * @returns {Promise} [return the current author send by eatch_users microservice]
  */
 const getUserAuthor = async (id = null, token = null) => {
+  console.log({ id });
   let { data: creator } = await axios.get(
     `${process.env.APP_URL_USER}/fetch/one/${id}`,
     {
@@ -119,6 +120,7 @@ const getCategory = async (id = null, token = null) => {
   );
   return category;
 };
+
 /**
  *
  * @param {Array<String>} ids [list of ObjectID from materials will fetch in eatch_materials microservice]
@@ -182,6 +184,20 @@ const getCategories = async (token = null) => {
   );
   return categories;
 };
+
+const getProductsByCategories = () => {
+  let products = Product.aggregate([
+    {
+      $group: {
+        _id: "$category.title",
+        products: { $push: "$$ROOT" },
+      },
+    },
+  ]);
+
+  return products;
+};
+
 module.exports = {
   createProduct,
   findOneProduct,
@@ -196,4 +212,5 @@ module.exports = {
   addProductToHistorical,
   deleteTrustlyProduct,
   getCategories,
+  getProductsByCategories,
 };
