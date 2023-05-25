@@ -230,6 +230,15 @@ const deleteProduct = async (req, res) => {
       });
     }
 
+    // fetch restaurant since microservice restaurant
+    let restaurant = await productServices.getRestaurant(
+      body?.restaurant,
+      token
+    );
+
+    if (!restaurant?._id) {
+      throw new Error("restaurant not found!!");
+    }
     /* copy values and fields from product found in database before updated it. 
        it will use to restore product updated if connection with historical failed
       */

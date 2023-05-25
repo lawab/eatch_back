@@ -37,7 +37,7 @@ const getCategoriesByRestaurantId = async (restaurant) => {
 const updateCategoryById = async (categoryId, categoryBody) => {
   const category = await Category.findByIdAndUpdate(
     categoryId,
-    { $set: categoryBody },
+    { $set: { ...categoryBody } },
     { new: true }
   );
   return category;

@@ -31,6 +31,18 @@ module.exports = async (body, req, token) => {
 
     body["_creator"] = creator; // set user that make update in database
 
+    // fetch restaurant since microservice restaurant
+    let restaurant = await productServices.getRestaurant(
+      body?.restaurant,
+      token
+    );
+
+    if (restaurant?._id) {
+      body["restaurant"] = restaurant;
+    } else {
+      throw new Error("restaurant not found!!");
+    }
+
     // if user want to update a category product
     if (body?.category) {
       // verify category in database

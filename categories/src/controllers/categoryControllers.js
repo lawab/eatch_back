@@ -63,16 +63,28 @@ const createCategory = async (req, res) => {
 
 //Update Category in Data Base
 const updateCategory = async (req, res) => {
-  const body = req.headers.body;
-  const newCategory = new category({
+  const body = JSON.parse(req.headers.body);
+
+  const user = await api_consumer.getUserById(body.user_id, req.token);
+
+  const newCategory = {
     title: body.title,
-    image: req.file ? "/data/uploads/" + req.file.filename : body.image,
-  });
+    _creator: user._id,
+  };
+
+  if (req.file) {
+    newCategory["image"] = "/data/uploads/" + req.file.filename;
+  }
+  // const newCategory = new category({
+  //   title: body.title,
+  //   image: req.file ? "/data/uploads/" + req.file.filename : body.image,
+  // });
   try {
     const category = await categoryService.updateCategoryById(
       req.params.categoryId,
       newCategory
     );
+    console.log({ category });
     res.status(200).json({ message: "Category updatedted successfuly!!!" });
   } catch (err) {
     console.log(err);
