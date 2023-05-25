@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { isEmail } = require("validator");
 
-const restaurantSchemaObject = {
+const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant_name: { type: String },
   infos: {
@@ -74,7 +74,7 @@ const userSchemaObject = {
 const menuSchemaObject = {
   restaurant: {
     required: true,
-    type: restaurantSchemaObject,
+    type: restaurantType,
   },
   products: {
     required: true,
