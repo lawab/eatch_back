@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const Role = require("../roles");
 const validator = require("validator");
 const Schema = mongoose.Schema;
-const restaurantSchemaObject = {
+
+const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant_name: { type: String, required: true },
   infos: {
@@ -11,10 +12,13 @@ const restaurantSchemaObject = {
     logo: { type: String, default: "/datas/avatar.png" },
   },
 };
+
 const UserSchemaObject = {
   restaurant: {
-    type: restaurantSchemaObject,
-    required:true
+    type: restaurantType,
+    required: function () {
+      return this.role === Role.SUPER_ADMIN ? false : true;
+    },
   },
   firstName: {
     required: true,
@@ -77,6 +81,7 @@ const UserSchemaObject = {
 
   deletedAt: { type: Date, default: null },
 };
+
 const UserSchema = new Schema(UserSchemaObject, {
   timestamps: true,
 });

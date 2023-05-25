@@ -12,108 +12,77 @@ const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
+const setUserValues = require("../methods/setUserValues");
 
 //Create user in Data Base
 const createUser = async (req, res) => {
+  let newuser = null;
   try {
-    // let body = req.body;
-    let body = JSON.parse(req.headers?.body);
+    let body = req.body;
+    // let body = JSON.parse(req.headers?.body);
 
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
-    console.log({ user, email: body?.email });
+
     if (user) {
       return res.status(401).json({ message: "User already exists!!!" });
     }
 
-    // fetch user creator inside of database
-    let creator = await userService.findUser({
-      _id: body?._creator,
-    });
+    // set values required
+    let bodyUpdate = await setUserValues(body, req, req.token);
 
-    if (!creator) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "your cannot create user because you don't have an authorization!!!",
-      });
-    }
-
-    if (body?.restaurant) {
-      // fetch restaurant since microservice restaurant
-      let restaurant = await userService.getRestaurant(
-        body?.restaurant,
-        req.token
-      );
-      if (restaurant?._id) {
-        body["restaurant"] = restaurant;
-      }
-    }
-    // set password encrypt
-
-    body["password"] = cryptoJS.AES.encrypt(
-      body?.password,
-      process.env.PASS_SEC
-    ).toString();
-
-    // set creator
-    body["_creator"] = creator;
-
-    // set user avatar
-    body["avatar"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
-
-    //set username
-    body["username"] = [body["firstName"], body["lastName"]].join(" ");
-
-    print({ newUser: body, creator: creator?._id }, "*");
     // save new user in database
-    let newuser = await userService.createUser(body);
+    newuser = await userService.createUser(bodyUpdate);
 
-    if (newuser?._id) {
+    if (newuser) {
       // add new user create in historical
       let response = await addElementToHistorical(
         async () => {
-          let addResponse = await userService.addUserToHistorical(
-            creator?._id,
+          return await userService.addToHistorical(
+            newuser._creator._id,
             {
               users: {
-                _id: newuser?._id,
+                _id: newuser._id,
                 action: "CREATED",
               },
             },
             req.token
           );
-
-          return addResponse;
         },
         async () => {
           let elementDeleted = await userService.deleteTrustlyUser({
-            _id: newuser?._id,
+            _id: newuser._id,
           });
-          return elementDeleted;
+          print({ elementDeleted });
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "User has been created successfully!!!",
-        "User has  been not creadted successfully,please try again later,thanks!!!"
-      );
+      if (response?.status === 200) {
+        print({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "User has been created successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message: "Created User failed,please try again!!!",
+        });
+      }
     } else {
       res
         .status(401)
-        .json({ message: "User has been not created successfully!!!" });
+        .json({ message: "Created User failed,please try again!!!" });
     }
   } catch (err) {
-    print({ error: err.message }, "x");
-
-    res.status(500).json({ message: "Error encounterd creating user!!!" });
+    print({err})
+    if (newuser) {
+      let elementDeleted = await userService.deleteTrustlyUser({
+        _id: newuser._id,
+      });
+      print({ elementDeleted });
+    }
+    res
+      .status(500)
+      .json({ message: "Error occured during creation of user!!!" });
   }
 };
 

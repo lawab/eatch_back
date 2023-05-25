@@ -84,7 +84,7 @@ const getRestaurant = async (id = null, token = null) => {
  * @param {Object} bodyUpdate [body to update historical]
  * @returns {Promise<Object>}
  */
-const addUserToHistorical = async (id = null, bodyUpdate = {}, token) => {
+const addToHistorical = async (id = null, bodyUpdate = {}, token) => {
   let response = await axios.put(
     `${process.env.APP_URL_HISTORICAL}/update/${id}`,
     bodyUpdate,
@@ -104,6 +104,6 @@ module.exports = {
   UpdateUser,
   findUsers,
   getRestaurant,
-  addUserToHistorical,
+  addToHistorical,
   deleteTrustlyUser,
 };
