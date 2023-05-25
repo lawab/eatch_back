@@ -196,6 +196,9 @@ const updateProduct = async (req, res) => {
 
 // delete one product in database
 const deleteProduct = async (req, res) => {
+  let productCopy = null;
+  let productDeleted = null;
+
   try {
     let body = req.body;
     // check if creator has authorization
@@ -203,14 +206,12 @@ const deleteProduct = async (req, res) => {
       body?._creator,
       req.token
     );
-    if (!creator?._id) {
-      return res.status(401).json({
-        message: "invalid data send!!!",
-      });
-    }
 
     // if product has authorization to update new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message: "you cannot create the product please see you admin,thanks!!!",
       });
@@ -222,7 +223,7 @@ const deleteProduct = async (req, res) => {
       deletedAt: null,
     });
 
-    if (!product?._id) {
+    if (!product) {
       return res.status(401).json({
         message:
           "unable to delete product because he not exists or already deleted in database!!!",
@@ -232,7 +233,7 @@ const deleteProduct = async (req, res) => {
     /* copy values and fields from product found in database before updated it. 
        it will use to restore product updated if connection with historical failed
       */
-    let productCopy = Object.assign({}, product._doc);
+    productCopy = Object.assign({}, product._doc);
 
     print({ productCopy });
 
@@ -241,7 +242,7 @@ const deleteProduct = async (req, res) => {
     product.deletedAt = Date.now(); // set date of deletion
     product._creator = creator?._id; // the current product who do this action
 
-    let productDeleted = await product.save();
+    productDeleted = await product.save();
 
     print({ productDeleted });
 
@@ -250,17 +251,6 @@ const deleteProduct = async (req, res) => {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
-          let productDoc = productDeleted?._doc;
-          let content = await addProductFromJsonFile(
-            productServices,
-            productDeleted
-          );
-
-          console.log({
-            productDeleted: productDoc,
-            content: JSON.parse(content),
-          });
-
           let response = await productServices.addProductToHistorical(
             creator?._id,
             {
@@ -272,14 +262,23 @@ const deleteProduct = async (req, res) => {
             req.token
           );
 
+          let content = await addProductFromJsonFile(
+            productServices,
+            productDeleted
+          );
+
+          console.log({
+            content: JSON.parse(content),
+          });
+
           return response;
         },
         async () => {
-          for (const field in productCopy) {
-            if (Object.hasOwnProperty.call(productCopy, field)) {
-              productDeleted[field] = productCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          productDeleted["deletedAt"] = productCopy["deletedAt"];
+          productDeleted["updatedAt"] = productCopy["updatedAt"];
+          productDeleted["createdAt"] = productCopy["createdAt"];
+
           let productRestored = await productDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
