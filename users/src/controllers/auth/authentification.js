@@ -34,7 +34,7 @@ const login = async function (req, res) {
 
     print("LOGIN SUCCESSFULY!");
 
-    res.status(200).json({ userAuthenticated, accessToken });
+    res.status(200).json({ user: userAuthenticated, accessToken });
   } catch (e) {
     res.status(500).json(e);
     console.log(e);

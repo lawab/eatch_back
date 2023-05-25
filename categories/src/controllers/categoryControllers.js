@@ -24,11 +24,19 @@ const createCategory = async (req, res) => {
     restaurant_id: body?.restaurant_id,
   };
 
-  console.log("USER: " + newCategory.user_id);
+  console.log("USER: " + newCategory.user_id, { newCategory });
   try {
     const user = await api_consumer.getUserById(newCategory.user_id, req.token);
 
+    let restaurant = await api_consumer.getRestaurantById(
+      newCategory.restaurant_id,
+      req.token
+    );
+
+    console.log("THE RESTAURANT:");
+    console.log({ restaurant });
     console.log("THE USER:");
+
     //console.log(user)
     const creator = {
       _id: user?.data._id,
@@ -37,17 +45,18 @@ const createCategory = async (req, res) => {
       firstName: user?.data.firstName,
       lastName: user?.data.lastName,
     };
-    const restaurant = {
-      _id: user?.data.restaurant?._id,
-      name_restaurant: user?.data.restaurant?.name_restaurant,
-      image_restaurant: user?.data.restaurant?.image_restaurant,
-    };
+    // const restaurant = {
+    //   _id: user?.data.restaurant?._id,
+    //   name_restaurant: user?.data.restaurant?.name_restaurant,
+    //   image_restaurant: user?.data.restaurant?.image_restaurant,
+    // };
     newCategory._creator = creator;
     newCategory["restaurant"] = restaurant;
     console.log(newCategory);
     const category = await categoryService.createCategory(newCategory);
     res.status(200).json({ message: "Category created successfuly!!!" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error encounterd creating Category!!!" });
   }
 };
@@ -98,7 +107,7 @@ const getCategories = async (req, res) => {
 
 //Get All Categories By Restaurant in Data Base
 const getCategoriesByRestaurant = async (req, res) => {
-  const restaurant = req.body;
+  const restaurant = req.params?.restaurantId;
   try {
     const categories = await categoryService.getCategoriesByRestaurantId(
       restaurant

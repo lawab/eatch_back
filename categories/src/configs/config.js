@@ -1,5 +1,4 @@
-
-
-  module.exports ={
-      "url_user": "http://127.0.0.1:4001/api/users",
-  }
+module.exports = {
+  url_user: "http://127.0.0.1:4001/api/users",
+  url_restaurant: "http://127.0.0.1:4000/api/restaurants",
+};

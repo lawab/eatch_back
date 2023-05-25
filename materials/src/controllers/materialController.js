@@ -8,83 +8,80 @@ const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
+const setMaterialValues = require("../methods/setMaterialValues");
 
 // create one Material
 const createMaterial = async (req, res) => {
+  let newMaterial = null;
   try {
-    let body = JSON.parse(req.body);
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
+    let body = JSON.parse(req.headers.body);
 
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
+    console.log({ body });
 
-    // get creator since microservice users
-    let creator = await materialServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
+    let BodyUpdate = await setMaterialValues(body, req, req.token);
 
-    print({ creator: creator?._id }, "*");
+    // // get creator since microservice users
+    // let creator = await materialServices.getUserAuthor(
+    //   body?._creator,
+    //   req.token
+    // );
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "invalid data send,you must authenticated to create a raw material!!!",
-      });
-    }
+    // print({ creator: creator?._id }, "*");
 
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you have not authorization to create material,please see you administrator",
-      });
-    }
+    // if (!creator?._id) {
+    //   return res.status(401).json({
+    //     message:
+    //       "invalid data send,you must authenticated to create a raw material!!!",
+    //   });
+    // }
 
-    body["_creator"] = creator; //set creator value found in database
+    // if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    //   return res.status(401).json({
+    //     message:
+    //       "you have not authorization to create material,please see you administrator",
+    //   });
+    // }
 
-    let restaurant = await materialServices.getRestaurant(
-      body?.restaurant,
-      req.token
-    );
+    // body["_creator"] = creator; //set creator value found in database
 
-    if (!restaurant?._id) {
-      return res.status(401).json({
-        message: "invalid restaurant value send",
-      });
-    }
+    // let restaurant = await materialServices.getRestaurant(
+    //   body?.restaurant,
+    //   req.token
+    // );
+    // console.log({ restaurant });
+    // if (!restaurant?._id) {
+    //   return res.status(401).json({
+    //     message: "invalid restaurant value send",
+    //   });
+    // }
 
-    body["restaurant"] = restaurant; //set restaurant value found in database
+    // body["restaurant"] = restaurant; //set restaurant value found in database
 
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png"; //set image for material
+    // body["image"] = req.file
+    //   ? "/datas/" + req.file?.filename
+    //   : "/datas/avatar.png"; //set image for material
 
-    let material = await materialServices.createMaterial(body);
+    newMaterial = await materialServices.createMaterial(BodyUpdate);
 
-    print({ material }, "*");
+    print({ newMaterial }, "*");
 
-    if (material?._id) {
+    if (newMaterial) {
       let response = await addElementToHistorical(
         async () => {
-          let addResponse = await materialServices.addMaterialToHistorical(
-            creator._id,
+          return await materialServices.addMaterialToHistorical(
+            newMaterial._creator._id,
             {
               materials: {
-                _id: material?._id,
+                _id: newMaterial._id,
                 action: "CREATED",
               },
             },
             req.token
           );
-
-          return addResponse;
         },
         async () => {
           let elementDeleted = await materialServices.deleteTrustlyMaterial({
-            _id: material?._id,
+            _id: newMaterial?._id,
           });
           print({ elementDeleted });
           return elementDeleted;
@@ -95,15 +92,23 @@ const createMaterial = async (req, res) => {
         response,
         res,
         "Material has been created successfully!!!",
-        "Material has  been not creadted successfully,please try again later,thanks!!!"
+        "Create Material failed,please try again"
       );
     } else {
       res
         .status(200)
-        .json({ message: "Material has been not created successfully!!!" });
+        .json({ message: "Create Material failed,please try again" });
     }
   } catch (error) {
+    if (newMaterial) {
+      let elementDeleted = await materialServices.deleteTrustlyMaterial({
+        _id: newMaterial?._id,
+      });
+      print({ elementDeleted });
+    }
+
     print(error, "x");
+
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Material!!!" });
@@ -112,40 +117,20 @@ const createMaterial = async (req, res) => {
 
 // update Material
 const updateMaterial = async (req, res) => {
+  let materialCopy = null;
+  let materialsaved = null;
+
   try {
     // get body request
-    let body = JSON.parse(req.body);
+    let body = JSON.parse(req.headers.body);
 
-    // get the auathor to update Material
-    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-    if (!validate) {
-      return res.status(401).json({
-        message: "invalid data send!!!",
-      });
-    }
-    let creator = await materialServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
+    let BodyUpdated = await updateForeignFields(body, req, req.token);
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "you don't have authorization to update current material,please see you administrator!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you have not authorization to update material,please see you administrator",
-      });
-    }
     let material = await materialServices.findOneMaterial({
       _id: req.params?.id,
     });
 
-    if (!material?._id) {
+    if (!material) {
       return res.status(401).json({
         message: "unable to update material beacuse it not exists!!!",
       });
@@ -153,42 +138,32 @@ const updateMaterial = async (req, res) => {
 
     console.log({ material });
 
-    let materialCopy = Object.assign({}, material._doc); // cppy documment before update it
-
-    body["_creator"] = creator; //update creator who update the current material
-
-    //  update foreign Fields
-
-    body = await updateForeignFields(materialServices, body, req.token);
-
-    // update image url
-    body["image"] = req.file ? "/datas/" + req.file?.filename : body["image"]; //update image for material
+    // cppy documment before update it
+    materialCopy = Object.assign({}, material._doc);
 
     // update all valid fields before save it in database
     for (let key in body) {
-      material[key] = body[key];
+      material[key] = BodyUpdated[key];
     }
 
     // update field in database
-    let materialsaved = await material.save();
+    materialsaved = await material.save();
 
     print({ materialsaved });
 
     if (materialsaved?._id) {
       let response = await addElementToHistorical(
         async () => {
-          let response = await materialServices.addMaterialToHistorical(
-            creator?._id,
+          return await materialServices.addMaterialToHistorical(
+            materialsaved._creator._id,
             {
               materials: {
-                _id: materialsaved?._id,
+                _id: materialsaved._id,
                 action: "UPDATED",
               },
             },
             req.token
           );
-
-          return response;
         },
         async () => {
           for (const field in materialCopy) {
@@ -196,9 +171,11 @@ const updateMaterial = async (req, res) => {
               materialsaved[field] = materialCopy[field];
             }
           }
+
+          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
           let materialRestored = await materialsaved.save({
             timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          });
           print({ materialRestored });
           return materialRestored;
         }
@@ -216,6 +193,20 @@ const updateMaterial = async (req, res) => {
       });
     }
   } catch (error) {
+    if (materialCopy && materialsaved) {
+      for (const field in materialCopy) {
+        if (Object.hasOwnProperty.call(materialCopy, field)) {
+          materialsaved[field] = materialCopy[field];
+        }
+      }
+
+      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      let materialRestored = await materialsaved.save({
+        timestamps: false,
+      });
+
+      print({ materialRestored });
+    }
     print(error.message, "x");
     res.status(500).json({
       message: "Error(s) occured during the update Material!!!",
@@ -224,6 +215,8 @@ const updateMaterial = async (req, res) => {
 };
 // delete one Material
 const deleteMaterial = async (req, res) => {
+  let materialCopy = null;
+  let MaterialDeleted = null;
   try {
     let body = req.body;
     // check if creator have authorization
@@ -232,14 +225,10 @@ const deleteMaterial = async (req, res) => {
       req.token
     );
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "Invalid data send: you must authenticated to delete current materail!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
           "you have not authorization to delete material,please see you administrator",
@@ -251,7 +240,7 @@ const deleteMaterial = async (req, res) => {
       deletedAt: null,
     });
 
-    if (!material?._id) {
+    if (!material) {
       return res.status(401).json({
         message:
           "unable to update material beacuse it not exists or already deleted!!!",
@@ -260,14 +249,14 @@ const deleteMaterial = async (req, res) => {
 
     console.log({ material });
 
-    let materialCopy = Object.assign({}, material._doc); // cppy documment before update it
+    // cppy documment before update it
+    materialCopy = Object.assign({}, material._doc);
 
     //update deleteAt and cretor fields from material
+    material.deletedAt = Date.now();
+    material._creator = creator._id;
 
-    material.deletedAt = Date.now(); // set date of deletion
-    material._creator = creator; // the current material who do this action
-
-    let MaterialDeleted = await material.save();
+    MaterialDeleted = await material.save();
 
     print({ MaterialDeleted });
 
@@ -275,10 +264,10 @@ const deleteMaterial = async (req, res) => {
       let response = await addElementToHistorical(
         async () => {
           let response = await materialServices.addMaterialToHistorical(
-            creator?._id,
+            MaterialDeleted._creator._id,
             {
               materials: {
-                _id: MaterialDeleted?._id,
+                _id: MaterialDeleted._id,
                 action: "DELETED",
               },
             },
@@ -288,11 +277,11 @@ const deleteMaterial = async (req, res) => {
           return response;
         },
         async () => {
-          for (const field in materialCopy) {
-            if (Object.hasOwnProperty.call(materialCopy, field)) {
-              MaterialDeleted[field] = materialCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          MaterialDeleted["deletedAt"] = materialCopy["deletedAt"];
+          MaterialDeleted["updatedAt"] = materialCopy["updatedAt"];
+          MaterialDeleted["createdAt"] = materialCopy["createdAt"];
+
           let materialRestored = await MaterialDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
@@ -311,6 +300,17 @@ const deleteMaterial = async (req, res) => {
       return res.status(500).json({ message: "deletion of Material failed" });
     }
   } catch (error) {
+    if (MaterialDeleted && materialCopy) {
+      // restore only fields would had changed in database
+      MaterialDeleted["deletedAt"] = materialCopy["deletedAt"];
+      MaterialDeleted["updatedAt"] = materialCopy["updatedAt"];
+      MaterialDeleted["createdAt"] = materialCopy["createdAt"];
+
+      let materialRestored = await MaterialDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      print({ materialRestored });
+    }
     console.log(error.message);
     return res
       .status(500)

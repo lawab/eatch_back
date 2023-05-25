@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const restaurantSchemaObject = {
+const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant_name: { type: String, required: true },
   infos: {
@@ -13,7 +13,7 @@ const restaurantSchemaObject = {
 const materialObject = {
   restaurant: {
     required: true,
-    type: restaurantSchemaObject,
+    type: restaurantType,
   },
   _creator: { type: mongoose.Types.ObjectId, required: true },
   lifetime: {
@@ -26,11 +26,11 @@ const materialObject = {
   quantity: { type: Number, default: 0, required: true },
   consumer_quantity: { type: Number, default: 0 },
   current_quantity: { type: Number, default: 0 },
-  deletedAt: { type: Date, default: null },
   unity: {
     type: String,
     default: "g",
   },
+  deletedAt: { type: Date, default: null },
 };
 const fieldsRequired = Object.keys(materialObject);
 const materialSchema = new Schema(materialObject, { timestamps: true });
