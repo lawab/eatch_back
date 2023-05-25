@@ -3,10 +3,20 @@ const userServices = require("../services/userServices");
 
 module.exports = async (body, req) => {
   try {
+    let token = req.token;
     // get author that update current user
     let creator = await userServices.findUser({
       _id: body?._creator,
     });
+
+    // fetch restaurant since microservice restaurant
+    let restaurant = await userServices.getRestaurant(body?.restaurant, token);
+
+    if (restaurant?._id) {
+      body["restaurant"] = restaurant;
+    } else {
+      throw new Error("restaurant not found!!");
+    }
 
     if (!creator) {
       throw new Error("you must authenticated to update current user!!!");
