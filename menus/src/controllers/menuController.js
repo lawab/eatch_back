@@ -76,77 +76,53 @@ const createMenu = async (req, res) => {
 
 // update Menu
 const updateMenu = async (req, res) => {
+  let menusaved = null;
+  let menuCopy = null;
   try {
     // get body request
     let body = req.body;
-    // get the auathor to update Menu
-    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-    if (!validate) {
-      return res.status(401).json({
-        message: "invalid data send!!!",
-      });
-    }
-    let creator = await menuServices.getUserAuthor(body?._creator, req.token);
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "you don't have authorization to update current menu,please see you administrator!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you have not authorization to update menu,please see you administrator",
-      });
-    }
     let menu = await menuServices.findOneMenu({
       _id: req.params?.id,
     });
 
     if (!menu?._id) {
       return res.status(401).json({
-        message: "unable to update menu beacuse it not exists!!!",
+        message: "unable to update menu because it not exists!!!",
       });
     }
 
     console.log({ menu });
 
-    let menuCopy = Object.assign({}, menu._doc); // cppy documment before update it
-
-    body["_creator"] = creator; //update creator who update the current menu
+    menuCopy = Object.assign({}, menu._doc); // cppy documment before update it
 
     //  update foreign Fields
 
-    body = await updateForeignFields(menuServices, body, req.token);
+    let bodyUpdated = await updateForeignFields(body, req, req.token);
 
     // update all valid fields before save it in database
     for (let key in body) {
-      menu[key] = body[key];
+      menu[key] = bodyUpdated[key];
     }
 
-    // update avatar if exists
-    menu["image"] = req.file ? "/datas/" + req.file?.filename : menu["image"];
-
     // update field in database
-    let menusaved = await menu.save();
+    menusaved = await menu.save();
+
+    print({ menusaved });
 
     if (menusaved?._id) {
       let response = await addElementToHistorical(
         async () => {
-          let response = await menuServices.addMenuToHistorical(
-            creator?._id,
+          return await menuServices.addMenuToHistorical(
+            menusaved._creator._id,
             {
               menus: {
-                _id: menusaved?._id,
+                _id: menusaved._id,
                 action: "UPDATED",
               },
             },
             req.token
           );
-
-          return response;
         },
         async () => {
           for (const field in menuCopy) {
@@ -174,6 +150,17 @@ const updateMenu = async (req, res) => {
       });
     }
   } catch (error) {
+    if (menuCopy && menusaved) {
+      for (const field in menuCopy) {
+        if (Object.hasOwnProperty.call(menuCopy, field)) {
+          menusaved[field] = menuCopy[field];
+        }
+      }
+      let menuRestored = await menusaved.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      print({ menuRestored });
+    }
     print(error.message, "x");
     res.status(500).json({
       message: "Error(s) occured during the update Menu!!!",
