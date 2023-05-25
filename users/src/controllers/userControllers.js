@@ -291,25 +291,24 @@ const UpdateUser = async (req, res) => {
 
 //Delete user in database
 const deleteUser = async (req, res) => {
+  let userCopy = null;
+  let userDeleted = null;
   try {
-    let body = JSON.parse(req.headers?.body);
+    // let body = JSON.parse(req.headers?.body);
 
-    console.log({ body });
+    const body = req.body;
 
     let creator = await userService.findUser({
       _id: body?._creator,
     });
 
-    if (!creator) {
-      return res
-        .status(401)
-        .json({ message: "you must authenticated to delete current user!!!" });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
-          "your cannot delete user because you don't have an authorization,please see your administrator!!!",
+          "you must authenticated and has authorization ro delete current user!!",
       });
     }
 
@@ -319,7 +318,7 @@ const deleteUser = async (req, res) => {
       deletedAt: null,
     });
 
-    if (!user?._id) {
+    if (!user) {
       return res.status(401).json({
         message:
           "unable to delete User because he not exists or already deleted in database!!!",
@@ -329,25 +328,23 @@ const deleteUser = async (req, res) => {
     /* copy values and fields from user found in database before updated it. 
        it will use to restore user updated if connection with historical failed
       */
-    let userCopy = Object.assign({}, user._doc);
-
-    print({ userCopy });
+    userCopy = Object.assign({}, user._doc);
 
     //update deleteAt and cretor fields from user
 
-    user.deletedAt = Date.now(); // set date of deletion
-    user._creator = creator?._id; // the current user who do this action
+    user.deletedAt = Date.now();
+    user._creator = creator._id;
 
     let userDeleted = await user.save();
 
-    console.log({ userDeleted });
+    print({ userDeleted });
 
     if (userDeleted?.deletedAt) {
       // add new user create in historical
       let response = await addElementToHistorical(
         async () => {
-          let response = await userService.addUserToHistorical(
-            creator?._id,
+          let response = await userService.addToHistorical(
+            userDeleted._creator._id,
             {
               users: {
                 _id: userDeleted?._id,
@@ -360,29 +357,45 @@ const deleteUser = async (req, res) => {
           return response;
         },
         async () => {
-          for (const field in userCopy) {
-            if (Object.hasOwnProperty.call(userCopy, field)) {
-              userDeleted[field] = userCopy[field];
-            }
-          }
-          let userRestored = await userDeleted.save({ timestamps: false }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          // restore only fields would had changed in database
+          userDeleted["deletedAt"] = userCopy["deletedAt"];
+          userDeleted["updatedAt"] = userCopy["updatedAt"];
+          userDeleted["createdAt"] = userCopy["createdAt"];
+
+          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          let userRestored = await userDeleted.save({ timestamps: false });
           print({ userRestored });
           return userRestored;
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "User has been delete successfully!!!",
-        "User has not been deleete successfully,please try again later,thanks!!!"
-      );
+      if (response?.status === 200) {
+        print({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "User has been delete successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message: "Delete user failed,please try again",
+        });
+      }
     } else {
       return res
         .status(401)
-        .json({ message: "User has been not delete successfully!!" });
+        .json({ message: "Delete user failed,please try again" });
     }
   } catch (error) {
+    if (userDeleted && userCopy) {
+      // restore only fields would had changed in database
+      userDeleted["deletedAt"] = userCopy["deletedAt"];
+      userDeleted["updatedAt"] = userCopy["updatedAt"];
+      userDeleted["createdAt"] = userCopy["createdAt"];
+
+      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      let userRestored = await userDeleted.save({ timestamps: false });
+      print({ userRestored });
+      return userRestored;
+    }
     console.log(error);
     res.status(500).json({ message: "Error occured during delete request!!" });
   }
