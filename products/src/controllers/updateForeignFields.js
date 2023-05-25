@@ -1,28 +1,35 @@
+const roles = require("../models/roles");
+const productServices = require("../services/productServices");
 /**
  *
- * @param {Object} res [Object Response from express to send response to client if necessary]
- * @param {Object} productServices [product microservice to manage product in database]
  * @param {Object} body [Body Object from express]
+ * @param {String} req [request Object from express]
  * @param {String} token [token to authenticate user session]
  * @returns {Promise<Array<Object>}
  */
-module.exports = async (productServices, body, token) => {
+module.exports = async (body, req, token) => {
   try {
     let errorMessage = (field) => `Invalid ${field}`;
 
-    // if user want to update a restaurant product
-    if (body?.restaurant) {
-      // get restaurant in database
-      let restaurant = await productServices.getRestaurant(
-        body?.restaurant,
-        token
-      );
+    // get the author to update product
+    let creator = await productServices.getUserAuthor(
+      body?._creator,
+      req.token
+    );
 
-      if (!restaurant?._id) {
-        throw new Error(errorMessage("restaurant"));
-      }
-      body["restaurant"] = restaurant; // update restaurant with value found in database
+    console.log({ creator });
+
+    // if product has authorization to update new product
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
+      throw new Error(
+        "you cannot create the product please see you admin,thanks!!!"
+      );
     }
+
+    body["_creator"] = creator; // set user that make update in database
 
     // if user want to update a category product
     if (body?.category) {
@@ -47,6 +54,11 @@ module.exports = async (productServices, body, token) => {
         throw new Error(errorMessage("materials"));
       }
       body["materials"] = materials; // update category with value found in database
+    }
+
+    // update avatar if exists
+    if (req.file) {
+      product["image"] = "/datas/" + req.file.filename;
     }
 
     return body;

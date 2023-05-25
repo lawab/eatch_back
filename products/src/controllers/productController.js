@@ -28,14 +28,7 @@ const createProduct = async (req, res) => {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
-          let content = await addProductFromJsonFile(
-            productServices,
-            newproduct
-          );
-
-          console.log({ content: JSON.parse(content) });
-
-          return await productServices.addProductToHistorical(
+          let response = await productServices.addProductToHistorical(
             newproduct._creator._id,
             {
               products: {
@@ -45,6 +38,15 @@ const createProduct = async (req, res) => {
             },
             req.token
           );
+
+          let content = await addProductFromJsonFile(
+            productServices,
+            newproduct
+          );
+
+          console.log({ content: JSON.parse(content) });
+
+          return response;
         },
         async () => {
           let elementDeleted = await productServices.deleteTrustlyProduct({
@@ -87,27 +89,11 @@ const createProduct = async (req, res) => {
 
 // update product in database
 const updateProduct = async (req, res) => {
+  let productCopy = null;
+  let productUpdated = null;
+
   try {
     let body = req.body;
-    // get the author to update product
-    let creator = await productServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    if (!creator?._id || !validate) {
-      return res.status(401).json({
-        message: "Invalid data send!!!",
-      });
-    }
-
-    // if product has authorization to update new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message: "you cannot create the product please see you admin,thanks!!!",
-      });
-    }
 
     // find product which must be update
     let product = await productServices.findProduct({
@@ -120,56 +106,41 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    let productCopy = Object.assign({}, product._doc); // cppy documment before update it
+    // cppy documment before update it
+    let productCopy = Object.assign({}, product._doc);
 
-    body["_creator"] = creator; // set user that make update in database
-
-    // update foreign fields and update body request before save in database
-    body = await updateForeignFields(productServices, body, req.token);
-    print(
-      {
-        restaurant: body.restaurant,
-        product: product._id,
-        materials: body.materials,
-      },
-      "*"
-    );
+    let bodyUpdated = await updateForeignFields(body, req, req.token);
 
     // update all valid fields before save it in database
     for (let key in body) {
-      product[key] = body[key];
+      product[key] = bodyUpdated[key];
     }
 
-    // update avatar if exists
-    product["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : product["image"];
-
     // update product in database
-    let productUpdated = await product.save({ validateModifiedOnly: true });
+    productUpdated = await product.save();
 
-    print({ productUpdated }, "U");
+    print({ productUpdated }, "~");
 
-    if (productUpdated?._id) {
+    if (productUpdated) {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
+          let response = await productServices.addProductToHistorical(
+            productUpdated._creator._id,
+            {
+              products: {
+                _id: productUpdated._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
           let content = await addProductFromJsonFile(
             productServices,
             productUpdated
           );
 
           console.log({ content: JSON.parse(content) });
-          let response = await productServices.addProductToHistorical(
-            creator?._id,
-            {
-              products: {
-                _id: productUpdated?._id,
-                action: "UPDATED",
-              },
-            },
-            req.token
-          );
 
           return response;
         },
@@ -179,10 +150,11 @@ const updateProduct = async (req, res) => {
               productUpdated[field] = productCopy[field];
             }
           }
+
+          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
           let productRestored = await productUpdated.save({
-            validateModifiedOnly: true,
             timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          });
           print({ productRestored });
           return productRestored;
         }
@@ -200,6 +172,21 @@ const updateProduct = async (req, res) => {
       });
     }
   } catch (error) {
+    if (productCopy && productUpdated) {
+      for (const field in productCopy) {
+        if (Object.hasOwnProperty.call(productCopy, field)) {
+          productUpdated[field] = productCopy[field];
+        }
+      }
+
+      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      let productRestored = await productUpdated.save({
+        validateModifiedOnly: true,
+        timestamps: false,
+      });
+      print({ productRestored });
+    }
+
     console.log(error);
     res.status(500).json({
       message: "Erros occured during the update product!!!",
