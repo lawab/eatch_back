@@ -4,10 +4,10 @@ const { isEmail } = require("validator");
 
 const restaurantSchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: { type: String },
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
+    town: { type: String },
+    address: { type: String },
     logo: { type: String, default: "/datas/avatar.png" },
   },
 };
@@ -37,10 +37,8 @@ const productType = {
     required: true,
   },
   category: {
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      title: { type: String, maxlength: 50 },
-    },
+    _id: { type: mongoose.Types.ObjectId, required: true },
+    title: { type: String },
     required: true,
   },
   promotion: {
@@ -56,16 +54,7 @@ const productType = {
   },
   image: {
     type: String,
-    default: "/data/uploads/mcf.png",
-  },
-  liked: {
-    type: Number,
-    default: 0,
-  },
-
-  likedPersonCount: {
-    type: Number,
-    default: 0,
+    default: "/datas/avatar.png",
   },
 };
 const userSchemaObject = {
@@ -75,9 +64,6 @@ const userSchemaObject = {
   },
   email: {
     type: String,
-    required: function () {
-      return isEmail(this.email);
-    },
     validate: {
       validator: function (email) {
         return isEmail(this.email);
