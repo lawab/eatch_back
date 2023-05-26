@@ -777,7 +777,7 @@ const logisticType = {
       infos: {
         town: { type: String },
         address: { type: String },
-        logo: string,
+        logo: String,
       },
     },
   },

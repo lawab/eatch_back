@@ -40,8 +40,8 @@ const createProduct = async (req, res) => {
           );
 
           let content = await addProductFromJsonFile(
-            productServices,
-            newproduct
+            bodyUpdate.restaurant._id,
+            req.token
           );
 
           console.log({ content: JSON.parse(content) });
@@ -365,32 +365,13 @@ const fetchProductsByRestaurant = async (req, res) => {
 // fetch products by restaurant in database
 const fetchProductsByRestaurantAndCategory = async (req, res) => {
   try {
-    let restaurantId = req.params?.restaurantId;
-    let categories = await productServices.getProductsByCategories();
+    let categories =
+      await productServices.getProductsByCategoriesForOneRestaurant(
+        req.params?.restaurantId,
+        req.token
+      );
 
-    let newCategories = categories
-      .filter((category) => {
-        let product = category.products[0];
-        // console.log({
-        //   idrestaurant: product.restaurant._id.valueOf(),
-        //   restaurantId,
-        // });
-        return product.restaurant._id.valueOf() === restaurantId;
-      })
-      .map((category) => {
-        let product = category.products[0];
-        return {
-          id: product.category?._id,
-          title: category._id,
-          _creator: product.category?._creator,
-          restaurant: product.category?.restaurant,
-          deletedAt: product.category?.deletedAt,
-          image: product.category?.image,
-          products: category.products,
-        };
-      });
-    console.log(newCategories);
-    res.status(200).json(newCategories);
+    res.status(200).json(categories);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Error occured during get request!!!" });

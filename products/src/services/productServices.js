@@ -188,17 +188,48 @@ const getCategories = async (token = null) => {
   return categories;
 };
 
-const getProductsByCategories = () => {
-  let products = Product.aggregate([
-    {
-      $group: {
-        _id: "$category.title",
-        products: { $push: "$$ROOT" },
-      },
-    },
-  ]);
+// const getProductsByCategoriesWithAllCategories = async () => {
+//   let categories = await getCategories(token);
 
-  return products;
+//   let productsByCategoryAndRestaurant = [];
+
+//   for (let index = 0; index < categories.length; index++) {
+//     const category = categories[index];
+
+//     if (category) {
+//       productsFound = await findProducts({
+//         "category._id": category._id,
+//       });
+
+//       productsByCategoryAndRestaurant.push({
+//         ...category,
+//         products: productsFound,
+//       });
+//     }
+//   }
+// };
+
+const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
+  let categories = await getCategories(token);
+  let productsByCategoryAndRestaurant = [];
+
+  for (let index = 0; index < categories.length; index++) {
+    const category = categories[index];
+
+    if (category) {
+      productsFound = await findProducts({
+        "category._id": category._id,
+        "restaurant._id": restaurantId,
+      });
+
+      productsByCategoryAndRestaurant.push({
+        ...category,
+        products: productsFound,
+      });
+    }
+  }
+
+  return productsByCategoryAndRestaurant;
 };
 
 // const getProductsByCategoriesAndRestaurant = (restaurantId) => {
@@ -231,6 +262,5 @@ module.exports = {
   addProductToHistorical,
   deleteTrustlyProduct,
   getCategories,
-  getProductsByCategories,
-  // getProductsByCategoriesAndRestaurant,
+  getProductsByCategoriesForOneRestaurant,
 };

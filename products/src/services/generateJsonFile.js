@@ -1,33 +1,35 @@
 const print = require("../log/print");
 const File = require("./File");
+const productServices = require("../services/productServices");
 /**
  *
- * @param {Object} productServices [product service]
- * @param {Object} newproduct [new product created successfully ]
+ * @param {String} restaurantId [id of restaurant ]
+ * @param {token} token [token to authenticated user ]
  * @returns {Promise<String>}
  */
-const addProductFromJsonFile = async (productServices, _ = null) => {
+const addProductFromJsonFile = async (restaurantId, token) => {
   try {
     const FILENAME = "categories.json";
     // get all catégories in database
-    let categories = (await productServices.getProductsByCategories()) || [];
+    let categories =
+      (await productServices.getProductsByCategoriesForOneRestaurant(
+        restaurantId,
+        token
+      )) || [];
 
-    print({ categories, products: categories[0].products });
+    print({ categories });
 
     // find index category in list of categories
-    let newCategories = categories.map((category) => {
-      return {
-        title: category._id,
-        products: category.products,
-      };
-    });
+    // let newCategories = categories.map((category) => {
+    //   return {
+    //     title: category._id,
+    //     products: category.products,
+    //   };
+    // });
 
     let file = new File();
 
-    let content = await file.writeToFile(
-      FILENAME,
-      JSON.stringify(newCategories)
-    );
+    let content = await file.writeToFile(FILENAME, JSON.stringify(categories));
 
     return content;
   } catch (error) {

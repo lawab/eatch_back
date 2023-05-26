@@ -20,7 +20,7 @@ const createCategory = async (req, res) => {
   const newCategory = {
     title: body?.title,
     user_id: body?.user_id,
-    image: req.file ? "/datas/" + req.file.filename : "/datas/avatar.jpeg",
+    image: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     restaurant_id: body?.restaurant_id,
   };
 
@@ -73,7 +73,7 @@ const updateCategory = async (req, res) => {
   };
 
   if (req.file) {
-    newCategory["image"] = "/data/uploads/" + req.file.filename;
+    newCategory["image"] = "/datas/" + req.file.filename;
   }
   // const newCategory = new category({
   //   title: body.title,
@@ -108,7 +108,6 @@ const getCategory = async (req, res) => {
 
 //Get All Categories in Data Base
 const getCategories = async (req, res) => {
-  const restaurant = req.body;
   try {
     const categories = await categoryService.getCategories();
     res.status(200).json(categories);
