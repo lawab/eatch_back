@@ -2,7 +2,6 @@ const { fieldsRequired } = require("../models/comment/comment");
 const { fieldsValidator } = require("../models/comment/validators");
 const print = require("../log/print");
 const commentServices = require("../services/commentServices");
-const roles = require("../models/roles");
 const { default: mongoose } = require("mongoose");
 // create one comment in database
 const createComment = async (req, res) => {
