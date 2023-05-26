@@ -169,19 +169,17 @@ const updateMenu = async (req, res) => {
 };
 // delete one Menu
 const deleteMenu = async (req, res) => {
+  let MenuDeleted = null;
+  let menuCopy = null;
   try {
     let body = req.body;
     // check if creator have authorization
     let creator = await menuServices.getUserAuthor(body?._creator, req.token);
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "Invalid data send: you must authenticated to delete current materail!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
           "you have not authorization to delete menu,please see you administrator",
@@ -202,39 +200,37 @@ const deleteMenu = async (req, res) => {
 
     console.log({ menu });
 
-    let menuCopy = Object.assign({}, menu._doc); // cppy documment before update it
+    menuCopy = Object.assign({}, menu._doc); // cppy documment before update it
 
     //update deleteAt and cretor fields from menu
 
-    menu.deletedAt = Date.now(); // set date of deletion
-    menu._creator = creator; // the current menu who do this action
+    menu.deletedAt = Date.now();
 
-    let MenuDeleted = await menu.save();
+    menu._creator = creator;
+
+    MenuDeleted = await menu.save();
 
     print({ MenuDeleted });
 
     if (MenuDeleted?.deletedAt) {
       let response = await addElementToHistorical(
         async () => {
-          let response = await menuServices.addMenuToHistorical(
-            creator?._id,
+          return await menuServices.addMenuToHistorical(
+            MenuDeleted._creator._id,
             {
               menus: {
-                _id: MenuDeleted?._id,
+                _id: MenuDeleted._id,
                 action: "DELETED",
               },
             },
             req.token
           );
-
-          return response;
         },
         async () => {
-          for (const field in menuCopy) {
-            if (Object.hasOwnProperty.call(menuCopy, field)) {
-              MenuDeleted[field] = menuCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          MenuDeleted["deletedAt"] = menuCopy["deletedAt"];
+          MenuDeleted["updatedAt"] = menuCopy["updatedAt"];
+          MenuDeleted["createdAt"] = menuCopy["createdAt"];
           let menuRestored = await MenuDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
@@ -253,6 +249,17 @@ const deleteMenu = async (req, res) => {
       return res.status(500).json({ message: "deletion of menu failed" });
     }
   } catch (error) {
+    if (MenuDeleted && menuCopy) {
+      // restore only fields would had changed in database
+      MenuDeleted["deletedAt"] = menuCopy["deletedAt"];
+      MenuDeleted["updatedAt"] = menuCopy["updatedAt"];
+      MenuDeleted["createdAt"] = menuCopy["createdAt"];
+      let menuRestored = await MenuDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+
+      print({ menuRestored });
+    }
     console.log(error.message);
     return res
       .status(500)
