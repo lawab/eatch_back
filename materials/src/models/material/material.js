@@ -3,10 +3,10 @@ const Schema = mongoose.Schema;
 
 const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: { type: String },
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
+    town: { type: String },
+    address: { type: String },
     logo: { type: String, default: "/datas/avatar.png" },
   },
 };
@@ -19,7 +19,7 @@ const materialObject = {
   lifetime: {
     required: true,
     type: Date,
-    default: Date.now,
+    default: null,
   },
   image: { type: String, default: "/datas/avatar.png" },
   mp_name: { required: true, type: String, maxlength: 50 },

@@ -19,15 +19,29 @@ const productType = {
   quantity: {
     type: Number,
     default: 0,
+    required: true,
   },
   price: {
     type: Number,
+    required: true,
   },
   category: {
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
-      title: { type: String, maxlength: 50 },
-      deletedAt: Date,
+      title: String,
+      image: String,
+      _creator: {
+        _id: { type: String },
+        role: { type: String },
+        email: { type: String },
+        firstName: { type: String },
+        lastName: { type: String },
+      },
+      restaurant: {
+        _id: { type: String },
+        restaurant_name: { type: String },
+        logo: { type: String },
+      },
     },
   },
   promotion: {

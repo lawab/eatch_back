@@ -24,7 +24,7 @@ const logisticSchemaObject = {
   name: { type: String, unique: true },
   price: { type: Number },
   devise: { type: String, default: "MAD" },
-  quantity: { type: Number, default: 1 },
+  quantity: { type: Number, default: 0 },
   deletedAt: { type: Date, default: null },
 };
 

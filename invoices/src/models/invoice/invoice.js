@@ -54,9 +54,20 @@ const productType = {
   category: {
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
-      title: { type: String, maxlength: 50 },
+      title: { type: String },
+      _creator: {
+        _id: { type: String },
+        role: { type: String },
+        email: { type: String },
+        firstName: { type: String },
+        lastName: { type: String },
+      },
+      restaurant: {
+        _id: { type: String },
+        restaurant_name: { type: String },
+        logo: { type: String },
+      },
     },
-    required: true,
   },
   promotion: {
     type: Boolean,
@@ -85,20 +96,20 @@ const productType = {
 };
 const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: { type: String },
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
-    logo: { type: String, default: "/datas/avatar.png" },
+    town: { type: String },
+    address: { type: String },
+    logo: { type: String },
   },
 };
 const orderType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   order_title: {
     type: String,
     default: null,
   },
   restaurant: {
-    required: true,
     type: restaurantType,
   },
   client: {

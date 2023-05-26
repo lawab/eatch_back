@@ -40,6 +40,20 @@ const productType = {
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
       title: { type: String },
+      image: String,
+      _creator: {
+        _id: { type: String },
+        role: { type: String },
+        email: { type: String },
+        firstName: { type: String },
+        lastName: { type: String },
+      },
+      restaurant: {
+        _id: { type: String },
+        restaurant_name: { type: String },
+        logo: { type: String },
+      },
+      deletedAt: { type: Date, default: null },
     },
     required: true,
   },
@@ -68,7 +82,7 @@ const userSchemaObject = {
     type: String,
     validate: {
       validator: function (email) {
-        return isEmail(this.email);
+        return isEmail(email);
       },
     },
   },
@@ -82,6 +96,7 @@ const menuSchemaObject = {
     required: true,
     type: [{ type: productType }],
   },
+  menutype: { type: String, default: "" },
   _creator: { required: true, type: userSchemaObject },
   description: { type: String, minlength: 1, default: "description" },
   menu_title: { type: String, minlength: 1, required: true },

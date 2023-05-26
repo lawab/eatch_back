@@ -385,6 +385,7 @@ const fetchProductsByRestaurantAndCategory = async (req, res) => {
           _creator: product.category?._creator,
           restaurant: product.category?.restaurant,
           deletedAt: product.category?.deletedAt,
+          image: product.category?.image,
           products: category.products,
         };
       });

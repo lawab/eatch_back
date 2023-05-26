@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 //Category Schema Object
 const CategorySchemaObject = {
   title: { type: String, unique: true, require: true, maxlength: 50 },
-  image: { type: String },
+  image: { type: String, default: "/datas/avatar.png" },
   // products: {
   //     type:[ {type: mongoose.SchemaTypes.ObjectId} ],
   //     default: []
