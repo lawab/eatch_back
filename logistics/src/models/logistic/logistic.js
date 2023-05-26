@@ -1,23 +1,20 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const restaurantSchemaObject = {
+const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: { type: String },
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
+    town: String,
+    address: String,
+    logo: String,
   },
 };
-
-// const dynamicTypeRequired = {
-
-// };
 
 const logisticSchemaObject = {
   restaurant: {
     required: true,
-    type: restaurantSchemaObject,
+    type: restaurantType,
   },
   image: { type: String, default: "/datas/avatar.png" },
   _creator: {
