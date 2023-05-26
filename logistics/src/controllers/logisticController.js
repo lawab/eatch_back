@@ -1,11 +1,6 @@
-const {
-  dynamicTypeRequired,
-  logisticSchema,
-} = require("../models/logistic/logistic");
 const print = require("../log/print");
 const logisticServices = require("../services/logisticServices");
 const roles = require("../models/roles");
-const { default: mongoose } = require("mongoose");
 const {
   addElementToHistorical,
   closeRequest,
@@ -13,6 +8,7 @@ const {
 
 // create one logistic in database
 const createLogistic = async (req, res) => {
+  let newElement = null;
   try {
     let body = req.body;
 
@@ -21,13 +17,10 @@ const createLogistic = async (req, res) => {
       req.token
     );
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message: "unable to create this logistic because creator not exists!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
           "your cannot create logistic element because you don't have an authorization,please see your administrator",
@@ -41,7 +34,7 @@ const createLogistic = async (req, res) => {
       req.token
     );
 
-    if (!restaurant?._id) {
+    if (!restaurant) {
       return res.status(401).json({
         message: "you cannot create logistic because restauranst not exists!!!",
       });
@@ -65,31 +58,29 @@ const createLogistic = async (req, res) => {
       });
     }
 
-    // create new filed with dynamically
+    // create new logistic
 
-    let newElement = await logisticServices.createLogistic(body);
+    newElement = await logisticServices.createLogistic(body);
 
     print({ newElement }, "*");
 
     if (newElement?._id) {
       let response = await addElementToHistorical(
         async () => {
-          let addResponse = await logisticServices.addElementToHistorical(
-            creator._id,
+          return await logisticServices.addElementToHistorical(
+            newElement._creator._id,
             {
               logistics: {
-                _id: newElement?._id,
+                _id: newElement._id,
                 action: "CREATED",
               },
             },
             req.token
           );
-
-          return addResponse;
         },
         async () => {
           let elementDeleted = await logisticServices.deleteTrustlyElement({
-            _id: newElement?._id,
+            _id: newElement._id,
           });
           print({ elementDeleted });
           return elementDeleted;
@@ -108,6 +99,12 @@ const createLogistic = async (req, res) => {
         .json({ message: "Logistic has been not created successfully!!!" });
     }
   } catch (error) {
+    if (newElement) {
+      let elementDeleted = await logisticServices.deleteTrustlyElement({
+        _id: newElement._id,
+      });
+      print({ elementDeleted });
+    }
     print(error, "x");
     return res
       .status(500)
@@ -116,6 +113,8 @@ const createLogistic = async (req, res) => {
 };
 // update logistic in database
 const updateLogistic = async (req, res) => {
+  let logisticCopy = null;
+  let logisticUpdated = null;
   try {
     let body = req.body;
 
@@ -124,14 +123,10 @@ const updateLogistic = async (req, res) => {
       req.token
     );
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to update this logistic element because creator not exists!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
           "your cannot update logistic element because you don't have an authorization,please see your administrator",
@@ -144,20 +139,19 @@ const updateLogistic = async (req, res) => {
     body["image"] = req.file ? "/datas/" + req.file?.filename : body["image"]; //set image for logistic
 
     // if restaurant value exists update it with new content found in database
-    if (body?.restaurant) {
-      let restaurant = await logisticServices.getRestaurant(
-        req?.params?.id,
-        req.token
-      );
+    let restaurant = await logisticServices.getRestaurant(
+      req?.params?.id,
+      req.token
+    );
 
-      if (!restaurant?._id) {
-        return res.status(401).json({
-          message:
-            "you cannot update logistic because restauranst not exists!!!",
-        });
-      }
-      body["restaurant"] = restaurant; //set restaurant found in database
+    if (!restaurant) {
+      return res.status(401).json({
+        message: "you cannot update logistic because restauranst not exists!!!",
+      });
     }
+
+    //set restaurant found in database
+    body["restaurant"] = restaurant;
 
     let logistic = await logisticServices.findLogistic({
       _id: req.params?.id,
@@ -169,7 +163,8 @@ const updateLogistic = async (req, res) => {
       });
     }
 
-    let logisticCopy = Object.assign({}, logistic._doc); // cppy documment before update it
+    // copy document
+    logisticCopy = Object.assign({}, logistic._doc);
 
     print({ logisticCopy });
 
@@ -184,25 +179,23 @@ const updateLogistic = async (req, res) => {
       : logistic["image"];
 
     // update field in database
-    let logisticUpdated = await logistic.save();
+    logisticUpdated = await logistic.save();
 
     print({ logisticUpdated }, "*");
 
     if (logisticUpdated?._id) {
       let response = await addElementToHistorical(
         async () => {
-          let response = await logisticServices.addElementToHistorical(
-            creator?._id,
+          return await logisticServices.addElementToHistorical(
+            logisticUpdated._creator._id,
             {
               logistics: {
-                _id: logisticUpdated?._id,
+                _id: logisticUpdated._id,
                 action: "UPDATED",
               },
             },
             req.token
           );
-
-          return response;
         },
         async () => {
           for (const field in logisticCopy) {
@@ -225,6 +218,18 @@ const updateLogistic = async (req, res) => {
         "Logistic has not been Updated successfully,please try again later,thanks!!!"
       );
     } else {
+      if (logisticUpdated && logisticCopy) {
+        for (const field in logisticCopy) {
+          if (Object.hasOwnProperty.call(logisticCopy, field)) {
+            logisticUpdated[field] = logisticCopy[field];
+          }
+        }
+        let logisticRestored = await logisticUpdated.save({
+          timestamps: false,
+        }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+        print({ logisticRestored });
+        return logisticRestored;
+      }
       res.status(401).json({
         message: "Logistic has been not updated successfully!!",
       });
@@ -238,6 +243,8 @@ const updateLogistic = async (req, res) => {
 };
 // delete one logistic in database
 const deleteLogistic = async (req, res) => {
+  let logisticCopy = null;
+  let logisticDeleted = null;
   try {
     let body = req.body;
 
@@ -246,14 +253,10 @@ const deleteLogistic = async (req, res) => {
       req.token
     );
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to delete this logistic element because creator not exists!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
           "your cannot delete logistic element because you don't have an authorization,please see your administrator",
@@ -265,14 +268,14 @@ const deleteLogistic = async (req, res) => {
       deletedAt: null,
     });
 
-    if (!logistic?._id) {
+    if (!logistic) {
       return res.status(401).json({
         message:
           "unable to delete a logistic because it not exists or already be deleted!!!",
       });
     }
 
-    let logisticCopy = Object.assign({}, logistic._doc); // cppy documment before update it
+    logisticCopy = Object.assign({}, logistic._doc); // cppy documment before update it
 
     print({ logisticCopy });
 
@@ -280,32 +283,29 @@ const deleteLogistic = async (req, res) => {
     logistic._creator = creator;
 
     // find and delete logistic
-    let logisticDeleted = await logistic.save();
+    logisticDeleted = await logistic.save();
 
     print({ logisticDeleted });
     // logistic exits and had deleted successfully
     if (logisticDeleted?.deletedAt) {
       let response = await addElementToHistorical(
         async () => {
-          let response = await logisticServices.addElementToHistorical(
-            creator?._id,
+          return await logisticServices.addElementToHistorical(
+            logisticDeleted._creator._id,
             {
               logistics: {
-                _id: logisticDeleted?._id,
+                _id: logisticDeleted._id,
                 action: "DELETED",
               },
             },
             req.token
           );
-
-          return response;
         },
         async () => {
-          for (const field in logisticCopy) {
-            if (Object.hasOwnProperty.call(logisticCopy, field)) {
-              logisticDeleted[field] = logisticCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          logisticDeleted["deletedAt"] = logisticCopy["deletedAt"];
+          logisticDeleted["updatedAt"] = logisticCopy["updatedAt"];
+          logisticDeleted["createdAt"] = logisticCopy["createdAt"];
           let logisticRestored = await logisticDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
@@ -324,6 +324,16 @@ const deleteLogistic = async (req, res) => {
       return res.status(500).json({ message: "deletion of logistic failed" });
     }
   } catch (error) {
+    if (logisticDeleted && logisticCopy) {
+      // restore only fields would had changed in database
+      logisticDeleted["deletedAt"] = logisticCopy["deletedAt"];
+      logisticDeleted["updatedAt"] = logisticCopy["updatedAt"];
+      logisticDeleted["createdAt"] = logisticCopy["createdAt"];
+      let logisticRestored = await logisticDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      print({ logisticRestored });
+    }
     console.log(error.message);
     return res
       .status(500)
