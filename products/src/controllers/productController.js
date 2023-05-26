@@ -18,9 +18,9 @@ const createProduct = async (req, res) => {
 
     console.log({ body });
 
-    let bodyUpdate = await setProductValues(body, req, req.token);
+    let bodyUpdated = await setProductValues(body, req, req.token);
 
-    newproduct = await productServices.createProduct(bodyUpdate);
+    newproduct = await productServices.createProduct(bodyUpdated);
 
     print({ newproduct });
 
@@ -40,7 +40,7 @@ const createProduct = async (req, res) => {
           );
 
           let content = await addProductFromJsonFile(
-            bodyUpdate.restaurant._id,
+            bodyUpdated.restaurant._id,
             req.token
           );
 
@@ -136,8 +136,8 @@ const updateProduct = async (req, res) => {
             req.token
           );
           let content = await addProductFromJsonFile(
-            productServices,
-            productUpdated
+            bodyUpdated.restaurant._id,
+            req.token
           );
 
           console.log({ content: JSON.parse(content) });
@@ -271,11 +271,7 @@ const deleteProduct = async (req, res) => {
             req.token
           );
 
-          let content = await addProductFromJsonFile(
-            productServices,
-            productDeleted
-          );
-
+          let content = await addProductFromJsonFile(restaurant._id, req.token);
           console.log({
             content: JSON.parse(content),
           });
