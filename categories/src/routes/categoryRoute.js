@@ -25,6 +25,14 @@ categoryRouter.patch(
 );
 //**************************************** *//
 
+//************UPDATE CATEGORY********************
+categoryRouter.patch(
+  "/delete/:categoryId",
+  auth.authmiddleware,
+  controller.deleteCategory
+);
+//**************************************** *//
+
 //************GET A CATEGORY********************
 categoryRouter.get(
   "/fetch/one/:categoryId",

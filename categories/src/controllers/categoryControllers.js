@@ -132,13 +132,16 @@ const getCategoriesByRestaurant = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
-  const body = JSON.parse(req.headers?.body);
-
-  const categoryId = req.body;
+  const categoryId = req.params?.categoryId;
 
   try {
-    const category = await categoryService.getCategoryById({});
-    res.status(200).json(categories);
+    const category = await categoryService.updateCategoryById(categoryId, {
+      deletedAt: Date.now(),
+    });
+
+    console.log({ category });
+
+    res.status(200).json(category);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Categories not exist in DB!!!" });
@@ -152,4 +155,5 @@ module.exports = {
   getCategory,
   getCategories,
   getCategoriesByRestaurant,
+  deleteCategory,
 };

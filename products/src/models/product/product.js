@@ -79,17 +79,6 @@ const productSchemaObject = {
     required: true,
     maxlength: 50,
   },
-  quantity: {
-    type: Number,
-    required: true,
-    validate: {
-      validator(v) {
-        return v >= 0;
-      },
-    },
-    default: 0,
-    min: 0,
-  },
 
   pusharePrice: {
     type: Number,

@@ -36,17 +36,6 @@ const productType = {
     maxlength: 50,
     required: true,
   },
-  quantity: {
-    type: Number,
-    required: true,
-    default: 0,
-    validate: {
-      validator(v) {
-        return v >= 0;
-      },
-    },
-    min: 0,
-  },
   price: {
     type: Number,
     required: true,

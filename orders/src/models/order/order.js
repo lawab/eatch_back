@@ -16,11 +16,7 @@ const productType = {
     type: String,
     maxlength: 50,
   },
-  quantity: {
-    type: Number,
-    default: 0,
-    required: true,
-  },
+
   price: {
     type: Number,
     required: true,

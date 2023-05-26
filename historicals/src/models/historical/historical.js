@@ -177,11 +177,6 @@ const productType = {
     maxlength: 50,
     required: true,
   },
-  quantity: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
 
   pusharePrice: {
     type: Number,
@@ -287,16 +282,10 @@ const OrderType = {
           productName: {
             type: String,
             maxlength: 50,
-            required: true,
           },
-          quantity: {
-            type: Number,
-            required: true,
-            default: 0,
-          },
+
           price: {
             type: Number,
-            required: true,
           },
           category: {
             type: {
@@ -400,11 +389,6 @@ const menuType = {
             type: String,
             maxlength: 50,
             required: true,
-          },
-          quantity: {
-            type: Number,
-            required: true,
-            default: 0,
           },
           price: {
             type: Number,

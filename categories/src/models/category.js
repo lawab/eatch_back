@@ -16,7 +16,6 @@ const CategorySchemaObject = {
         _id: { type: String },
         price: { type: Number },
         productName: { type: String, maxlength: 50 },
-        quantity: { type: Number, default: 0 },
         promotion: { type: Boolean, default: false },
         description: { type: String },
         devise: { type: String, default: "MAD" },
