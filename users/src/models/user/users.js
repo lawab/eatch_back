@@ -5,11 +5,11 @@ const Schema = mongoose.Schema;
 
 const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: String,
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
-    logo: { type: String, default: "/datas/avatar.png" },
+    town: String,
+    address: String,
+    logo: String,
   },
 };
 
@@ -36,19 +36,16 @@ const UserSchemaObject = {
     required: true,
     validate: {
       validator: function (email) {
-        return validator.isEmail(this.email);
+        return validator.isEmail(email);
       },
     },
   },
   username: {
     type: String,
-    required: true,
-    unique: true,
   },
   password: {
     type: String,
     required: true,
-    unique: true,
   },
   role: {
     type: String,

@@ -39,8 +39,8 @@ const CategorySchemaObject = {
   },
   restaurant: {
     _id: { type: String, required: true },
-    name_restaurant: { type: String },
-    image_restaurant: { type: String },
+    restaurant_name: { type: String },
+    logo: { type: String },
   },
   deletedAt: { type: Date, default: null },
 };

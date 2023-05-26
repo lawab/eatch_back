@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Custum schema Object from foreign fields in product model
-const materialSchemaObject = {
+const materialType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   mp_name: { type: String, maxlength: 50 },
   quantity: { type: Number, default: 0 },
@@ -10,7 +10,7 @@ const materialSchemaObject = {
     type: Date,
   },
 };
-const commentSchemaObject = {
+const commentType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   client: {
     firstName: String,
@@ -19,7 +19,7 @@ const commentSchemaObject = {
   },
 };
 
-const restaurantSchemaObject = {
+const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant_name: String,
   infos: {
@@ -29,28 +29,41 @@ const restaurantSchemaObject = {
   },
 };
 
-const categorySchemaObject = {
+const categoryType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   title: String,
   image: String,
+  _creator: {
+    _id: { type: String },
+    role: { type: String },
+    email: { type: String },
+    firstName: { type: String },
+    lastName: { type: String },
+  },
+  restaurant: {
+    _id: { type: String },
+    restaurant_name: { type: String },
+    logo: { type: String },
+  },
+  deletedAt: { type: Date, default: null },
 };
 
 // Product schema Object
 const productSchemaObject = {
   comments: {
-    type: [commentSchemaObject],
+    type: [commentType],
   },
   materials: {
     required: true,
-    type: [{ type: materialSchemaObject }],
+    type: [materialType],
   },
   restaurant: {
     required: true,
-    type: restaurantSchemaObject,
+    type: restaurantType,
   },
   category: {
     required: true,
-    type: categorySchemaObject,
+    type: categoryType,
   },
   price: {
     type: Number,

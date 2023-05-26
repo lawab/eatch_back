@@ -15,23 +15,20 @@ const productType = {
   productName: {
     type: String,
     maxlength: 50,
-    required: true,
   },
   quantity: {
     type: Number,
-    required: true,
     default: 0,
   },
   price: {
     type: Number,
-    required: true,
   },
   category: {
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
       title: { type: String, maxlength: 50 },
+      deletedAt: Date,
     },
-    required: true,
   },
   promotion: {
     type: Boolean,
@@ -88,7 +85,7 @@ const OrderschemaObject = {
     required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
-      restaurant_name: { type: String, required: true },
+      restaurant_name: String,
       infos: {
         town: { type: String, required: true },
         address: { type: String, required: true },

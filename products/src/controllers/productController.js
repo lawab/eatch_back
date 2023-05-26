@@ -380,8 +380,11 @@ const fetchProductsByRestaurantAndCategory = async (req, res) => {
       .map((category) => {
         let product = category.products[0];
         return {
-          id: product.category._id,
+          id: product.category?._id,
           title: category._id,
+          _creator: product.category?._creator,
+          restaurant: product.category?.restaurant,
+          deletedAt: product.category?.deletedAt,
           products: category.products,
         };
       });
