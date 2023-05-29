@@ -112,7 +112,8 @@ const createCategory = async (req, res) => {
 
 //Update Category in Data Base
 const updateCategory = async (req, res) => {
-  const body = JSON.parse(req.headers.body);
+  // const body = JSON.parse(req.headers.body);
+  const body = req.body;
 
   const user = await api_consumer.getUserById(body.user_id, req.token);
 
@@ -124,18 +125,87 @@ const updateCategory = async (req, res) => {
   if (req.file) {
     newCategory["image"] = "/datas/" + req.file.filename;
   }
-  // const newCategory = new category({
-  //   title: body.title,
-  //   image: req.file ? "/data/uploads/" + req.file.filename : body.image,
-  // });
+
+  let categoryCopied = null;
+  let category = null;
+
   try {
-    const category = await categoryService.updateCategoryById(
-      req.params.categoryId,
-      newCategory
+    let oldCategory = await categoryService.getCategoryById(
+      req.params.categoryId
     );
-    console.log({ category });
-    res.status(200).json({ message: "Category updatedted successfuly!!!" });
+
+    if (!oldCategory) {
+      throw new Error("unable to update unexisting category");
+    }
+
+    categoryCopied = Object.assign({}, oldCategory._doc);
+
+    for (const field in newCategory) {
+      if (Object.hasOwnProperty.call(newCategory, field)) {
+        oldCategory[field] = newCategory[field];
+      }
+    }
+
+    category = await oldCategory.save();
+
+    console.log({ categoryUpdated: category });
+
+    if (category) {
+      // add new user create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          return await api_consumer.addToHistorical(
+            category._creator._id,
+            {
+              categories: {
+                _id: category._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+        },
+        async () => {
+          for (const field in categoryCopied) {
+            if (Object.hasOwnProperty.call(categoryCopied, field)) {
+              category[field] = categoryCopied[field];
+            }
+          }
+
+          let elementRestored = await category.save({
+            timestamps: false,
+          });
+          console.log({ elementRestored });
+        }
+      );
+
+      if (response?.status === 200) {
+        console.log({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "Category has been updated successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message: "update Category failed,please try again!!!",
+        });
+      }
+    } else {
+      res
+        .status(401)
+        .json({ message: "Update Category failed,please try again!!!" });
+    }
   } catch (err) {
+    if (category && categoryCopied) {
+      for (const field in categoryCopied) {
+        if (Object.hasOwnProperty.call(categoryCopied, field)) {
+          category[field] = categoryCopied[field];
+        }
+      }
+      let elementRestored = await category.save({
+        timestamps: false,
+      });
+      console.log({ elementRestored });
+    }
     console.log(err);
     res.status(500).json({ message: "Error encounterd creating category!!!" });
   }
