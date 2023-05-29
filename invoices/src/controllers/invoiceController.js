@@ -7,7 +7,7 @@ const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
-const { default: mongoose } = require("mongoose");
+const setInvoiceValues = require("../methods/setInvoiceValues");
 
 // create one Invoice
 const createInvoice = async (req, res) => {
@@ -16,65 +16,23 @@ const createInvoice = async (req, res) => {
   let orderCopy = {};
 
   try {
-    let idOrder = req.params?.id;
     let body = req.body;
-    // if body have invalid fields
-    if (!idOrder) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
+    let idOrder = req.params?.id;
 
-    // get creator since microservice users
-    let creator = await invoiceServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-
-    print({ creator: creator?._id }, "*");
-
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "invalid data send,you must authenticated to create a invoice!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you have not authorization to create invoice,please see you administrator",
-      });
-    }
-
-    // get restaurant before save invoice
-
-    let restaurant = await invoiceServices.getRestaurant(
-      body?.restaurant,
-      req.token
-    );
-
-    if (!restaurant) {
-      return res.status(401).json({
-        message:
-          "unable to create invoice because restaurant not know,please see your administrator,thanks!!!",
-      });
-    }
-
-    body["restaurant"] = restaurant; //set restaurant value found in database
-
-    body["_creator"] = creator; //set creator value found in database
+    let bodyUpdate = await setInvoiceValues(body, req.token, req);
 
     // get order in databsase
     let order = await invoiceServices.getOrder(idOrder, req.token);
 
     print({ order }, "*");
-    if (!order?._id || order.deletedAt) {
+    if (!order || order.deletedAt) {
       return res.status(401).json({
         message:
           "unable to create invoice because order not exists or has been deleted!!!",
       });
     }
 
-    // if order has already paid or body content invalid status or body status is not send with done
+    // if order has already paid or body content invalid status or body status is not send with done value
     if (
       order.status === orderStatus.DONE ||
       !Object.keys(orderStatus).includes(body?.status) ||
@@ -96,7 +54,7 @@ const createInvoice = async (req, res) => {
       order._id,
       {
         status: orderStatus.DONE,
-        _creator: creator?._id,
+        _creator: bodyUpdate.creator._id,
       },
       req.token
     );
