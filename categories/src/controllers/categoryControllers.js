@@ -17,7 +17,8 @@ const createCategory = async (req, res) => {
   console.log(req.file);
   console.log("*********************************************");
 
-  let body = JSON.parse(req.headers?.body);
+  // let body = JSON.parse(req.headers?.body);
+  let body = req.body;
 
   const newCategory = {
     title: body?.title,
@@ -25,6 +26,7 @@ const createCategory = async (req, res) => {
     image: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     restaurant_id: body?.restaurant_id,
   };
+  let category = null;
 
   console.log("USER: " + newCategory.user_id, { newCategory });
   try {
@@ -56,17 +58,17 @@ const createCategory = async (req, res) => {
     newCategory["restaurant"] = restaurant;
     console.log(newCategory);
 
-    const newCategory = await categoryService.createCategory(newCategory);
+    category = await categoryService.createCategory(newCategory);
 
-    if (newCategory) {
+    if (category) {
       // add new user create in historical
       let response = await addElementToHistorical(
         async () => {
           return await api_consumer.addToHistorical(
-            newCategory._creator._id,
+            category._creator._id,
             {
               categories: {
-                _id: newCategory._id,
+                _id: category._id,
                 action: "CREATED",
               },
             },
@@ -75,14 +77,14 @@ const createCategory = async (req, res) => {
         },
         async () => {
           let elementDeleted = await categoryService.deleteTrustlyCategory({
-            _id: newCategory._id,
+            _id: category._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
         }
       );
 
       if (response?.status === 200) {
-        print({ response: response.data?.message });
+        console.log({ response: response.data?.message });
         return res
           .status(200)
           .json({ message: "Category has been created successfully!!!" });
@@ -97,6 +99,12 @@ const createCategory = async (req, res) => {
         .json({ message: "Created Category failed,please try again!!!" });
     }
   } catch (error) {
+    if (category) {
+      let elementDeleted = await categoryService.deleteTrustlyCategory({
+        _id: category._id,
+      });
+      console.log({ elementDeleted });
+    }
     console.log(error);
     res.status(500).json({ message: "Error encounterd creating Category!!!" });
   }
