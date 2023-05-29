@@ -8,15 +8,6 @@ const {
   closeRequest,
 } = require("../services/historicalFunctions");
 
-const updateHistorical = async (addElementmethod, errorHandler) => {
-  try {
-    return await addElementmethod();
-  } catch (error) {
-    print(error.message);
-    return await errorHandler();
-  }
-};
-
 // create one order in database
 const createOrder = async (req, res) => {
   try {
@@ -108,17 +99,16 @@ const updateOrder = async (req, res) => {
     print({ orderUpdated });
 
     if (orderUpdated?._id) {
-      let response = await updateHistorical(
+      let response = await addElementToHistorical(
         async () => {
-          let bodyAction = {
-            orders: {
-              _id: orderUpdated._id,
-              action: "UPDATED",
-            },
-          };
           return await orderServices.addOrderToHistorical(
-            orderUpdated._id,
-            bodyAction,
+            orderUpdated._creator._id,
+            {
+              orders: {
+                _id: orderUpdated._id,
+                action: "UPDATED",
+              },
+            },
             req.token
           );
         },
