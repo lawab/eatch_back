@@ -54,18 +54,30 @@ module.exports = async (body, req, token) => {
       body["category"] = category; // update category with value found in database
     }
 
-    // if user want to update the raws materials product
-    if (body?.materials?.length) {
-      // verify category in database
-      let materials = await productServices.getMaterials(
-        body?.materials,
-        token
-      );
+    // if user want to update the raws recette product
+    // if (body?.materials?.length) {
+    //   // verify recette in database
+    //   let materials = await productServices.getMaterials(
+    //     body?.materials,
+    //     token
+    //   );
 
-      if (!materials?.length || materials?.length !== body?.materials?.length) {
-        throw new Error(errorMessage("materials"));
+    //   if (!materials?.length || materials?.length !== body?.materials?.length) {
+    //     throw new Error(errorMessage("materials"));
+    //   }
+    //   body["materials"] = materials; // update category with value found in database
+    // }
+
+    if (body?.recette) {
+      // get recette in database
+      let recette = await productServices.getRecette(body?.recette, token);
+
+      if (!recette) {
+        throw new Error(errorMessage("recette"));
       }
-      body["materials"] = materials; // update category with value found in database
+      console.log({ recette });
+      //set materials value found in database
+      body["recette"] = recette;
     }
 
     // update avatar if exists

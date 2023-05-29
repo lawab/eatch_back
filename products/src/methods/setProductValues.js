@@ -49,7 +49,7 @@ module.exports = async (body, req, token) => {
     //   throw new Error(errorMessage("materials"));
     // }
 
-    console.log({ materials });
+    console.log({ recette });
     //set materials value found in database
     body["recette"] = recette;
 
@@ -70,7 +70,7 @@ module.exports = async (body, req, token) => {
 
     return body;
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     throw new Error(error);
   }
 };

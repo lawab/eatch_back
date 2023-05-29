@@ -1,6 +1,6 @@
 const productServices = require("../services/productServices");
 const roles = require("../models/roles");
-const updateForeignFields = require("./updateForeignFields");
+const updateForeignFields = require("../methods/updateForeignFields");
 const print = require("../log/print");
 const {
   addElementToHistorical,
@@ -8,13 +8,14 @@ const {
 } = require("../services/historicalFunctions");
 const { addProductFromJsonFile } = require("../services/generateJsonFile");
 const setProductValues = require("../methods/setProductValues");
-const category = require("../../../categories/src/models/category");
 
 // create one product in database
 const createProduct = async (req, res) => {
   let newproduct = null;
   try {
-    let body = JSON.parse(req.headers?.body);
+    // let body = JSON.parse(req.headers?.body);
+
+    let body = req.body;
 
     console.log({ body });
 

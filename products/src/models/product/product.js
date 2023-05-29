@@ -71,9 +71,9 @@ const productSchemaObject = {
   comments: {
     type: [commentType],
   },
-  recettes: {
+  recette: {
     required: true,
-    type: [recetteType],
+    type: recetteType,
   },
   restaurant: {
     required: true,
