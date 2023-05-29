@@ -806,6 +806,30 @@ const categeryType = {
   deletedAt: { type: Date, default: null },
 };
 
+const recetteType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+
+  title: { type: String },
+  image: { type: String, default: "/datas/avatar.png" },
+  description: { type: String },
+  engredients: [
+    {
+      material: { type: materialType },
+      grammage: { type: Number },
+    },
+  ],
+  _creator: {
+    type: mongoose.Types.ObjectId,
+  },
+  action: {
+    type: String,
+    required: true,
+    enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
+  },
+
+  deletedAt: { type: Date, default: null },
+};
+
 // historical type
 const hIstoricalSchemaObject = {
   users: {
@@ -837,6 +861,9 @@ const hIstoricalSchemaObject = {
   },
   categories: {
     type: [{ type: categeryType }],
+  },
+  recettes: {
+    type: [{ type: recetteType }],
   },
   deletedAt: { type: Date, default: null },
 };

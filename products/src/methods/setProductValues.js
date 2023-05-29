@@ -39,16 +39,19 @@ module.exports = async (body, req, token) => {
       throw new Error("restaurant not found!!");
     }
 
-    // get materials in database
-    let materials = await productServices.getMaterials(body?.materials, token);
+    // get recette in database
+    let recette = await productServices.getRecette(body?.recette, token);
 
-    if (!materials?.length || materials?.length !== body?.materials?.length) {
-      throw new Error(errorMessage("materials"));
+    if (!recette) {
+      throw new Error(errorMessage("recette"));
     }
+    // if (!materials?.length || materials?.length !== body?.materials?.length) {
+    //   throw new Error(errorMessage("materials"));
+    // }
 
     console.log({ materials });
     //set materials value found in database
-    body["materials"] = materials;
+    body["recette"] = recette;
 
     let category = await productServices.getCategory(body?.category, token);
 

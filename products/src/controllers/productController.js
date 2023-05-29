@@ -302,6 +302,19 @@ const deleteProduct = async (req, res) => {
       return res.status(500).json({ message: "deletion of product failed" });
     }
   } catch (error) {
+    if (productCopy && productDeleted) {
+      // restore only fields would had changed in database
+      productDeleted["deletedAt"] = productCopy["deletedAt"];
+      productDeleted["updatedAt"] = productCopy["updatedAt"];
+      productDeleted["createdAt"] = productCopy["createdAt"];
+
+      let productRestored = await productDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      print({ productRestored });
+      return productRestored;
+    }
+
     console.log(error.message);
     return res
       .status(500)

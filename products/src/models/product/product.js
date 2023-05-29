@@ -48,14 +48,32 @@ const categoryType = {
   deletedAt: { type: Date, default: null },
 };
 
+const recetteType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+  title: { type: String },
+  image: { type: String },
+  description: { type: String },
+  engredients: [
+    {
+      material: { type: mongoose.Types.ObjectId },
+      grammage: { type: Number },
+    },
+  ],
+  _creator: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+  },
+  deletedAt: { type: Date, default: null },
+};
+
 // Product schema Object
 const productSchemaObject = {
   comments: {
     type: [commentType],
   },
-  materials: {
+  recettes: {
     required: true,
-    type: [materialType],
+    type: [recetteType],
   },
   restaurant: {
     required: true,

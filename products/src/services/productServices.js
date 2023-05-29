@@ -188,6 +188,23 @@ const getCategories = async (token = null) => {
   return categories;
 };
 
+/**
+ * @param {String} recetteID [id from recette that we want to retrive]
+ * @param {String} token [token to valid the session of user]
+ * @returns {Promise<[Object]>} [return the current categories send by eatch_category microservice]
+ */
+const getRecette = async (recetteID, token = null) => {
+  let { data: recette } = await axios.get(
+    `${process.env.APP_URL_RECETTE}/fetch/one/${recetteID}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return recette;
+};
+
 // const getProductsByCategoriesWithAllCategories = async () => {
 //   let categories = await getCategories(token);
 
@@ -232,22 +249,6 @@ const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
   return productsByCategoryAndRestaurant;
 };
 
-// const getProductsByCategoriesAndRestaurant = (restaurantId) => {
-//   let products = Product.aggregate([
-
-//     {
-//       $group: {
-//         _id: "$category.title",
-//         products: { $push: "$$ROOT" },
-//       },
-//     },
-//   ]);
-
-//   console.log({ products: products._pipeline });
-
-//   return products;
-// };
-
 module.exports = {
   createProduct,
   findOneProduct,
@@ -263,4 +264,5 @@ module.exports = {
   deleteTrustlyProduct,
   getCategories,
   getProductsByCategoriesForOneRestaurant,
+  getRecette,
 };
