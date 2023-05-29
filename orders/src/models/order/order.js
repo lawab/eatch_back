@@ -106,6 +106,11 @@ const OrderschemaObject = {
   products: {
     required: true,
     type: [{ type: productType }],
+    validator(products) {
+      let invalidProducts = products.filter((el) => !el._id);
+
+      return invalidProducts.lenght > 0;
+    },
   },
   status: {
     type: String,

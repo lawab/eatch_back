@@ -82,7 +82,7 @@ module.exports = async (body, req, token) => {
 
     // update avatar if exists
     if (req.file) {
-      product["image"] = "/datas/" + req.file.filename;
+      body["image"] = "/datas/" + req.file.filename;
     }
 
     return body;

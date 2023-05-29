@@ -30,17 +30,16 @@ const createOrder = async (req, res) => {
     print({ orderCreated }, "*");
 
     if (orderCreated?._id) {
-      let response = await updateHistorical(
+      let response = await addElementToHistorical(
         async () => {
-          let bodyAction = {
-            orders: {
-              _id: orderCreated._id,
-              action: "CREATED",
-            },
-          };
           return await orderServices.addOrderToHistorical(
             orderCreated._id,
-            bodyAction,
+            {
+              orders: {
+                _id: orderCreated._id,
+                action: "CREATED",
+              },
+            },
             req.token
           );
         },
@@ -74,6 +73,9 @@ const createOrder = async (req, res) => {
 
 // update order in database
 const updateOrder = async (req, res) => {
+  let orderUpdated = null;
+  let orderCopy = null;
+
   try {
     // get body request
     let body = req.body;
@@ -92,7 +94,7 @@ const updateOrder = async (req, res) => {
     console.log({ order });
 
     // copy documment before update it
-    let orderCopy = Object.assign({}, order._doc);
+    orderCopy = Object.assign({}, order._doc);
 
     // update products only because it is a user that update his order
     body = await updateOrderValues(orderServices, body, req);
@@ -101,7 +103,7 @@ const updateOrder = async (req, res) => {
     order["products"] = body["products"];
 
     // update order in database
-    let orderUpdated = await order.save({ validateModifiedOnly: true });
+    orderUpdated = await order.save();
 
     print({ orderUpdated });
 
@@ -131,7 +133,6 @@ const updateOrder = async (req, res) => {
             because it is restoration from olds values fields in database
           */
           let orderRestored = await orderUpdated.save({
-            validateModifiedOnly: true,
             timestamps: false,
           });
           print({ orderRestored });
@@ -151,6 +152,21 @@ const updateOrder = async (req, res) => {
       });
     }
   } catch (error) {
+    if (orderUpdated && orderCopy) {
+      for (const field in orderCopy) {
+        if (Object.hasOwnProperty.call(orderCopy, field)) {
+          orderUpdated[field] = orderCopy[field];
+        }
+      }
+
+      //restore Object in database,not update timestamps
+      //because it is restoration from olds values fields in database
+      let orderRestored = await orderUpdated.save({
+        timestamps: false,
+      });
+      print({ orderRestored });
+    }
+
     print(error.message);
     res.status(500).json({
       message: "Error(s) occured during the update order!!!",
@@ -188,6 +204,8 @@ const deleteOrderRemote = async (req, res) => {
 };
 // delete one order in database
 const deleteOrder = async (req, res) => {
+  let orderCopy = null;
+  let orderDeleted = null;
   try {
     let body = req.body;
     // check if creator has authorization
@@ -222,7 +240,7 @@ const deleteOrder = async (req, res) => {
     /* copy values and fields from order found in database before updated it. 
        it will use to restore order updated if connection with historical failed
       */
-    let orderCopy = Object.assign({}, order._doc);
+    orderCopy = Object.assign({}, order._doc);
 
     print({ orderCopy });
 
@@ -231,7 +249,7 @@ const deleteOrder = async (req, res) => {
     order.deletedAt = Date.now(); // set date of deletion
     order._creator = creator?._id; // the current order who do this action
 
-    let orderDeleted = await order.save();
+    orderDeleted = await order.save();
     console.log({ orderDeleted });
     // order exits and had deleted successfully
     if (orderDeleted?.deletedAt) {
@@ -251,11 +269,10 @@ const deleteOrder = async (req, res) => {
           return response;
         },
         async () => {
-          for (const field in orderCopy) {
-            if (Object.hasOwnProperty.call(orderCopy, field)) {
-              orderDeleted[field] = orderCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          orderDeleted["deletedAt"] = orderCopy["deletedAt"];
+          orderDeleted["updatedAt"] = orderCopy["updatedAt"];
+          orderDeleted["createdAt"] = orderCopy["createdAt"];
           let orderRestored = await orderDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
@@ -274,6 +291,17 @@ const deleteOrder = async (req, res) => {
       return res.status(500).json({ message: "deletion order failed" });
     }
   } catch (error) {
+    if (orderDeleted && orderCopy) {
+      // restore only fields would had changed in database
+      orderDeleted["deletedAt"] = orderCopy["deletedAt"];
+      orderDeleted["updatedAt"] = orderCopy["updatedAt"];
+      orderDeleted["createdAt"] = orderCopy["createdAt"];
+      let orderRestored = await orderDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      print({ orderRestored });
+    }
+
     print(error, "x");
     return res
       .status(500)

@@ -21,23 +21,25 @@ module.exports = async (orderServices, body, req) => {
       throw new Error(errorMessage("products"));
     }
 
-    // get list of products
-    let products = await orderServices.getProducts(productsIds, token);
+    if (body?.products) {
+      let productsIds = body?.products?.map((p) => p);
+      // get list of products
+      let products = await orderServices.getProducts(productsIds, token);
 
-    print({ productsIds, products });
+      print({ products });
 
-    let productUpdated = products.map((product) => {
-      let productFound = body.products.find((p) => p._id === product._id);
-      return { ...product, quantity: productFound.quantity };
-    });
+      let invalidProducts = products.filter((el) => !el?._id);
 
-    print({ productUpdated });
+      // verify that products has been set successfully
+      if (
+        !products?.length ||
+        products?.length !== body?.products?.length ||
+        invalidProducts?.length
+      ) {
+        throw new Error(errorMessage("products"));
+      }
 
-    body["products"] = productUpdated;
-
-    // verify that products has been set successfully
-    if (!products?.length || products?.length !== body?.products?.length) {
-      throw new Error(errorMessage("products"));
+      body["products"] = products;
     }
 
     return body;

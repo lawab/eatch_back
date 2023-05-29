@@ -20,6 +20,8 @@ module.exports = async (orderServices, body, req) => {
       throw new Error(errorMessage("restaurant"));
     }
 
+    console.log({ restaurant });
+
     // update restaurant with value found in database
     body["restaurant"] = restaurant;
 
@@ -40,7 +42,7 @@ module.exports = async (orderServices, body, req) => {
     }
 
     // set ids list from products
-    let productsIds = body?.products?.map((product) => product._id);
+    let productsIds = body?.products;
 
     if (!productsIds?.length) {
       throw new Error(errorMessage("products"));
@@ -49,17 +51,25 @@ module.exports = async (orderServices, body, req) => {
     // get list of products
     let products = await orderServices.getProducts(productsIds, token);
 
-    print({ products });
-
-    body["products"] = products.map((product) => {
-      let productFound = body.products.find((p) => p._id === product._id);
-      return { ...product, quantity: productFound.quantity };
-    });
+    let invalidProducts = products.filter((el) => !el?._id);
 
     // verify that products has been set successfully
-    if (!products?.length || products?.length !== body?.products?.length) {
+    if (
+      !products?.length ||
+      products?.length !== body?.products?.length ||
+      invalidProducts?.length
+    ) {
       throw new Error(errorMessage("products"));
     }
+
+    print({ products });
+
+    body["products"] = products;
+
+    // body["products"] = products.map((product) => {
+    //   let productFound = body.products.find((p) => p._id === product._id);
+    //   return { ...product, quantity: productFound.quantity };
+    // });
 
     // add image from order
     body["image"] = req.file
