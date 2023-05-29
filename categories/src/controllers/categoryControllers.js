@@ -253,17 +253,85 @@ const getCategoriesByRestaurant = async (req, res) => {
 const deleteCategory = async (req, res) => {
   const categoryId = req.params?.categoryId;
 
+  let categoryCopied = null;
+  let category = null;
+
   try {
-    const category = await categoryService.updateCategoryById(categoryId, {
-      deletedAt: Date.now(),
-    });
+    let oldCategory = await categoryService.getCategoryById(
+      req.params.categoryId
+    );
+
+    if (!oldCategory) {
+      throw new Error("unable to update unexisting category");
+    }
+
+    categoryCopied = Object.assign({}, oldCategory._doc);
+
+    oldCategory.deletedAt = Date.now();
+
+    const category = await oldCategory.save();
+    console.log({ categoryDeleted: category });
+    if (category) {
+      // add new user create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          return await api_consumer.addToHistorical(
+            category._creator._id,
+            {
+              categories: {
+                _id: category._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+        },
+        async () => {
+          // restore only fields would had changed in database
+          category["deletedAt"] = categoryCopied["deletedAt"];
+          category["updatedAt"] = categoryCopied["updatedAt"];
+          category["createdAt"] = categoryCopied["createdAt"];
+
+          let elementRestored = await category.save({
+            timestamps: false,
+          });
+          console.log({ elementRestored });
+        }
+      );
+
+      if (response?.status === 200) {
+        console.log({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "Category has been deleted successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message: "delection of category failed,please try again!!!",
+        });
+      }
+    } else {
+      res
+        .status(401)
+        .json({ message: "delection of category failed,please try again!!!" });
+    }
 
     console.log({ category });
 
     res.status(200).json(category);
   } catch (err) {
+    if (category && categoryCopied) {
+      // restore only fields would had changed in database
+      category["deletedAt"] = categoryCopied["deletedAt"];
+      category["updatedAt"] = categoryCopied["updatedAt"];
+      category["createdAt"] = categoryCopied["createdAt"];
+
+      let elementRestored = await category.save({
+        timestamps: false,
+      });
+      console.log({ elementRestored });
+    }
     console.log(err);
-    res.status(500).json({ message: "Categories not exist in DB!!!" });
+    res.status(500).json({ message: "Categories not exists in DB!!!" });
   }
 };
 
