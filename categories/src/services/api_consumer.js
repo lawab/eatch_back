@@ -42,7 +42,29 @@ const getRestaurantById = async (restaurantId, token) => {
   }
 };
 
+/**
+ *
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  console.log(`*******URL: ${config.url_historical}/update/${id}`);
+
+  let response = await axios.put(
+    `${config.url_historical}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
 module.exports = {
   getUserById,
   getRestaurantById,
+  addToHistorical,
 };

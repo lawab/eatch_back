@@ -1,6 +1,7 @@
 const categoryService = require("../services/categoryServices");
 const api_consumer = require("../services/api_consumer");
 const category = require("../models/category");
+const { addElementToHistorical } = require("../services/historicalFunctions");
 
 //Create Category in Data Base
 const createCategory = async (req, res) => {
@@ -17,6 +18,7 @@ const createCategory = async (req, res) => {
   console.log("*********************************************");
 
   let body = JSON.parse(req.headers?.body);
+
   const newCategory = {
     title: body?.title,
     user_id: body?.user_id,
@@ -53,8 +55,47 @@ const createCategory = async (req, res) => {
     newCategory._creator = creator;
     newCategory["restaurant"] = restaurant;
     console.log(newCategory);
-    const category = await categoryService.createCategory(newCategory);
-    res.status(200).json({ message: "Category created successfuly!!!" });
+
+    const newCategory = await categoryService.createCategory(newCategory);
+
+    if (newCategory) {
+      // add new user create in historical
+      let response = await addElementToHistorical(
+        async () => {
+          return await api_consumer.addToHistorical(
+            newCategory._creator._id,
+            {
+              categories: {
+                _id: newCategory._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+        },
+        async () => {
+          let elementDeleted = await categoryService.deleteTrustlyCategory({
+            _id: newCategory._id,
+          });
+          print({ elementDeleted });
+        }
+      );
+
+      if (response?.status === 200) {
+        print({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "Category has been created successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message: "Created Category failed,please try again!!!",
+        });
+      }
+    } else {
+      res
+        .status(401)
+        .json({ message: "Created Category failed,please try again!!!" });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Error encounterd creating Category!!!" });

@@ -55,6 +55,16 @@ const getAllCategory = async () => {
   return categories;
 };
 
+/**
+ *
+ * @param {Object} query [query to find category in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyCategory = async (query = {}) => {
+  const category = await Category.deleteOne(query);
+  return category;
+};
+
 module.exports = {
   createCategory,
   getCategories,
@@ -62,4 +72,5 @@ module.exports = {
   getCategoryById,
   getAllCategory,
   getCategoriesByRestaurantId,
+  deleteTrustlyCategory,
 };

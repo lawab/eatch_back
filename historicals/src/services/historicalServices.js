@@ -278,6 +278,28 @@ const getLogistic = async (id = null, token = null) => {
   }
 };
 
+/**
+ *
+ * @param {String} id [ObjectId to find category in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getCategorie = async (id = null, token = null) => {
+  try {
+    let { data: category } = await axios.get(
+      `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return category;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   updateHistorical,
   findOneHIstorical,
@@ -296,4 +318,5 @@ module.exports = {
   getInvoice,
   getPromotion,
   getLogistic,
+  getCategorie,
 };
