@@ -782,6 +782,30 @@ const logisticType = {
   deletedAt: { type: Date, default: null },
 };
 
+const categeryType = {
+  _id: { type: String, required: true },
+  title: { type: String, required: true },
+  image: { type: String },
+  restaurant: {
+    _id: { type: String, required: true },
+    restaurant_name: { type: String },
+    logo: { type: String },
+  },
+  _creator: {
+    _id: { type: String },
+    role: { type: String },
+    email: { type: String },
+    firstName: { type: String },
+    lastName: { type: String },
+  },
+  action: {
+    type: String,
+    required: true,
+    enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
+  },
+  deletedAt: { type: Date, default: null },
+};
+
 // historical type
 const hIstoricalSchemaObject = {
   users: {
@@ -810,6 +834,9 @@ const hIstoricalSchemaObject = {
   },
   logistics: {
     type: [{ type: logisticType }],
+  },
+  categories: {
+    type: [{ type: categeryType }],
   },
   deletedAt: { type: Date, default: null },
 };
