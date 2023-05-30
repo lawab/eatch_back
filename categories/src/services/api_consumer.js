@@ -63,8 +63,28 @@ const addToHistorical = async (id = null, bodyUpdate = {}, token) => {
   return response;
 };
 
+const getRemoteProductsByCategoriesForOneRestaurant = async (
+  restaurantId,
+  token
+) => {
+  console.log(
+    `*******URL: ${config.url_product}/fetch/categories/${restaurantId}`
+  );
+
+  let { data: response } = await axios.get(
+    `${config.url_product}/fetch/categories/${restaurantId}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
 module.exports = {
   getUserById,
   getRestaurantById,
   addToHistorical,
+  getRemoteProductsByCategoriesForOneRestaurant,
 };

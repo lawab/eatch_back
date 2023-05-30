@@ -9,18 +9,14 @@
     "products": [
       {
         "_id": "6474bd9387d18e56cb466944",
-        "price": "20",
-        "productName": "tacos 1",
+        "price": "40",
+        "productName": "tacos 2",
         "promotion": "false",
         "devise": "MAD",
         "image": "/datas/avatar.png",
-        "deletedAt": "Mon May 29 2023 15:58:27 GMT+0100 (GMT+01:00)",
-        "updatedAt": "Mon May 29 2023 15:58:27 GMT+0100 (GMT+01:00)",
-        "category": {
-          "_id": "646f6a2a66b7a77572a1b299",
-          "title": "nouvelle catego modifiée",
-          "image": "/datas/1685023273944_Image.jpg"
-        }
+        "deletedAt": "null",
+        "createdAt": "2023-05-29T14:58:27.619Z",
+        "updatedAt": "2023-05-30T18:44:51.348Z"
       }
     ]
   },
@@ -48,13 +44,9 @@
         "promotion": "false",
         "devise": "MAD",
         "image": "/datas/avatar.png",
-        "deletedAt": "Tue May 30 2023 12:12:12 GMT+0100 (GMT+01:00)",
-        "updatedAt": "Tue May 30 2023 12:12:12 GMT+0100 (GMT+01:00)",
-        "category": {
-          "_id": "64709b7e8df4a5afacae5d01",
-          "title": "Nouvelle categorie",
-          "image": "/datas/1685101437988_Image.jpg"
-        }
+        "deletedAt": "null",
+        "createdAt": "2023-05-30T11:12:12.038Z",
+        "updatedAt": "2023-05-30T11:12:12.038Z"
       }
     ]
   },

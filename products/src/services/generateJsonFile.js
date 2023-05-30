@@ -36,13 +36,13 @@ const addProductFromJsonFile = async (restaurantId, token) => {
         p["devise"] = product.devise.toString();
         p["image"] = product.image.toString();
         p["deletedAt"] = product.deletedAt ? product.deletedAt : "null";
-        p["deletedAt"] = product.createdAt.toString();
-        p["updatedAt"] = product.createdAt.toString();
-        p["category"] = {
-          _id: product.category._id,
-          title: product.category.title,
-          image: product.category.image,
-        };
+        p["createdAt"] = product.createdAt;
+        p["updatedAt"] = product.updatedAt;
+        // p["category"] = {
+        //   _id: product.category._id,
+        //   title: product.category.title,
+        //   image: product.category.image,
+        // };
         return p;
       });
 

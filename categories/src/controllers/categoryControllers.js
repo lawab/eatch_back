@@ -2,6 +2,7 @@ const categoryService = require("../services/categoryServices");
 const api_consumer = require("../services/api_consumer");
 const category = require("../models/category");
 const { addElementToHistorical } = require("../services/historicalFunctions");
+const { addProductFromJsonFile } = require("../services/generateJsonFile");
 
 //Create Category in Data Base
 const createCategory = async (req, res) => {
@@ -64,7 +65,7 @@ const createCategory = async (req, res) => {
       // add new user create in historical
       let response = await addElementToHistorical(
         async () => {
-          return await api_consumer.addToHistorical(
+          let response = await api_consumer.addToHistorical(
             category._creator._id,
             {
               categories: {
@@ -74,6 +75,13 @@ const createCategory = async (req, res) => {
             },
             req.token
           );
+
+          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          console.log({
+            content: JSON.parse(content),
+          });
+
+          return response;
         },
         async () => {
           let elementDeleted = await categoryService.deleteTrustlyCategory({

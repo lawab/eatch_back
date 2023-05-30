@@ -13,9 +13,9 @@ const setProductValues = require("../methods/setProductValues");
 const createProduct = async (req, res) => {
   let newproduct = null;
   try {
-    // let body = JSON.parse(req.headers?.body);
+    let body = JSON.parse(req.headers?.body);
 
-    let body = req.body;
+    // let body = req.body;
 
     console.log({ body });
 
@@ -339,6 +339,7 @@ const fetchProducts = async (req, res) => {
   try {
     let products = [];
     let ids = req.params?.ids ? JSON.parse(req.params?.ids) : [];
+    console.log({ ids });
     if (ids.length) {
       for (let index = 0; index < ids.length; index++) {
         const id = ids[index];
@@ -355,7 +356,7 @@ const fetchProducts = async (req, res) => {
     }
   } catch (error) {
     print(error.message, "x");
-    res.status(500).json({ message: "Error occured during get request!!!" });
+    throw new Error(error);
   }
 };
 
