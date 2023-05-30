@@ -50,11 +50,7 @@ const createCategory = async (req, res) => {
       firstName: user?.data.firstName,
       lastName: user?.data.lastName,
     };
-    // const restaurant = {
-    //   _id: user?.data.restaurant?._id,
-    //   name_restaurant: user?.data.restaurant?.name_restaurant,
-    //   image_restaurant: user?.data.restaurant?.image_restaurant,
-    // };
+
     newCategory._creator = creator;
     newCategory["restaurant"] = restaurant;
     console.log(newCategory);
