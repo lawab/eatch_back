@@ -17,19 +17,46 @@ const addProductFromJsonFile = async (restaurantId, token) => {
         token
       )) || [];
 
-    print({ categories });
+    let newCategories = categories.map((cat) => {
+      let products = cat.products;
+      let category = {};
+      category["_id"] = cat["_id"];
+      category["title"] = cat["title"];
+      category["image"] = cat["image"];
+      category["deletedAt"] = cat.deletedAt ? cat.deletedAt : "null";
+      category["createdAt"] = cat["createdAt"];
+      category["updatedAt"] = cat["updatedAt"];
 
-    // find index category in list of categories
-    // let newCategories = categories.map((category) => {
-    //   return {
-    //     title: category._id,
-    //     products: category.products,
-    //   };
-    // });
+      let newproducts = products.map((product) => {
+        let p = {};
+        p["_id"] = product._id;
+        p["price"] = product.price.toString();
+        p["productName"] = product.productName.toString();
+        p["promotion"] = product.promotion.toString();
+        p["devise"] = product.devise.toString();
+        p["image"] = product.image.toString();
+        p["deletedAt"] = product.deletedAt ? product.deletedAt : "null";
+        p["deletedAt"] = product.createdAt.toString();
+        p["updatedAt"] = product.createdAt.toString();
+        p["category"] = {
+          _id: product.category._id,
+          title: product.category.title,
+          image: product.category.image,
+        };
+        return p;
+      });
+
+      category["products"] = [...newproducts];
+
+      return category;
+    });
 
     let file = new File();
 
-    let content = await file.writeToFile(FILENAME, JSON.stringify(categories));
+    let content = await file.writeToFile(
+      FILENAME,
+      JSON.stringify(newCategories)
+    );
 
     return content;
   } catch (error) {

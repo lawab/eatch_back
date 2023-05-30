@@ -19,7 +19,7 @@ const createInvoice = async (req, res) => {
     let body = req.body;
     let idOrder = req.params?.id;
 
-    let bodyUpdate = await setInvoiceValues(body, req.token, req);
+    let bodyUpdated = await setInvoiceValues(body, req.token, req);
 
     // get order in databsase
     let order = await invoiceServices.getOrder(idOrder, req.token);
@@ -54,7 +54,7 @@ const createInvoice = async (req, res) => {
       order._id,
       {
         status: orderStatus.DONE,
-        _creator: bodyUpdate.creator._id,
+        _creator: bodyUpdated._creator._id,
       },
       req.token
     );
@@ -64,22 +64,28 @@ const createInvoice = async (req, res) => {
         message: "create invoice failed !!!",
       });
     }
+    let productIds = orderUpdated.products?.map((pd) => {
+      console.log({ pd });
+      return { _id: pd._id };
+    }); // get list of products to set decrement quantity value
 
-    let products = orderUpdated.products?.map((pd) => ({
-      _id: pd._id,
-      // quantity: pd.quantity,
-    })); // get list of products to set decrement quantity value
+    let materials = await invoiceServices.getRemoteMaterialsFromProducts(
+      productIds,
+      req.token
+    );
 
-    print({ products, token: req.token });
+    print({ productIds, materials });
 
-    // decrement each quantity from products
-    let productsUpdated =
-      await invoiceServices.decrementQuantityFromRemoteProducts(
-        products,
-        req.token
-      );
+    return res.status(200).json(materials);
 
-    print({ orderUpdated, productsUpdated });
+    // // decrement each quantity from products
+    // let productsUpdated =
+    //   await invoiceServices.decrementQuantityFromRemoteProducts(
+    //     products,
+    //     req.token
+    //   );
+
+    // print({ orderUpdated, productsUpdated });
 
     // if decrementation failed
     if (!productsUpdated) {
@@ -99,9 +105,9 @@ const createInvoice = async (req, res) => {
       throw new Error("unable to update remote products");
     }
 
-    body["order"] = orderUpdated; //set order value found in database
-    body["total"] = getInvoicePrice(orderUpdated?.products); // set total price to current invoice
-    body["image"] = req.file
+    bodyUpdated["order"] = orderUpdated; //set order value found in database
+    bodyUpdated["total"] = getInvoicePrice(orderUpdated?.products); // set total price to current invoice
+    bodyUpdated["image"] = req.file
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png"; //set image for current invoice
 
@@ -152,7 +158,7 @@ const createInvoice = async (req, res) => {
     if (orderUpdated?._id) {
       await resetOrder(orderUpdated, orderCopy, req);
     }
-    print(error.message, "x");
+    print(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Invoice!!!" });

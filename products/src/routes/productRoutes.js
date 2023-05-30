@@ -9,6 +9,7 @@ const {
   incrementQuantityFromProducts,
   decrementQuantityFromProducts,
   fetchProductsByRestaurantAndCategory,
+  fetchMaterialsFromProdcuts,
 } = require("../controllers/productController");
 const uploadFileService = require("../services/uploadFile");
 const { authmiddleware } = require("../middlewares/authmiddleware");
@@ -47,6 +48,13 @@ productRouter.get(
   "/fetch/categories/:restaurantId",
   authmiddleware,
   fetchProductsByRestaurantAndCategory
+);
+
+//get products by restaurant and category
+productRouter.get(
+  "/fetch/all/materials/:ids",
+  authmiddleware,
+  fetchMaterialsFromProdcuts
 );
 //update product
 productRouter.put(

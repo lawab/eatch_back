@@ -16,6 +16,22 @@ const productType = {
     type: String,
     maxlength: 50,
   },
+  recette: {
+    _id: { type: mongoose.Types.ObjectId, required: true },
+    title: { type: String },
+    image: { type: String },
+    description: { type: String },
+    engredients: [
+      {
+        material: { type: mongoose.Types.ObjectId },
+        grammage: { type: Number },
+      },
+    ],
+    _creator: {
+      type: mongoose.Types.ObjectId,
+    },
+    deletedAt: { type: Date, default: null },
+  },
 
   price: {
     type: Number,

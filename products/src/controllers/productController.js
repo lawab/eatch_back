@@ -373,6 +373,50 @@ const fetchProductsByRestaurant = async (req, res) => {
 };
 
 // fetch products by restaurant in database
+const fetchMaterialsFromProdcuts = async (req, res) => {
+  try {
+    let engredients = [];
+    let ids = req.params?.ids ? JSON.parse(req.params?.ids) : [];
+
+    if (ids.length) {
+      // get array of array engredients
+      for (let index = 0; index < ids.length; index++) {
+        const id = ids[index];
+        let product = await productServices.findOneProduct({
+          _id: id,
+        });
+        engredients.push(product.recette.engredients);
+      }
+
+      // get all array of array materials
+      let materials = engredients.map((e) => {
+        let material = [];
+        for (let index = 0; index < e.length; index++) {
+          const element = e[index];
+          material.push(element.material);
+        }
+        return material;
+      });
+
+      let values = [];
+      // merge all values of array material in one array
+      for (let index = 0; index < materials.length; index++) {
+        const element = materials[index];
+        values = [...values, ...element];
+      }
+
+      print({ materials: values }, "~");
+      return res.status(200).json(values);
+    } else {
+      return res.status(401).json({ message: "invalid data send!!!" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during get request!!!" });
+  }
+};
+
+// fetch products by restaurant in database
 const fetchProductsByRestaurantAndCategory = async (req, res) => {
   try {
     let categories =
@@ -475,4 +519,5 @@ module.exports = {
   incrementQuantityFromProducts,
   decrementQuantityFromProducts,
   fetchProductsByRestaurantAndCategory,
+  fetchMaterialsFromProdcuts,
 };

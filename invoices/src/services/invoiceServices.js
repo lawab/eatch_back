@@ -216,6 +216,20 @@ const incrementQuantityFromRemoteProducts = async (products = [], token) => {
   return response;
 };
 
+const getRemoteMaterialsFromProducts = async (ids, token) => {
+  let { data: response } = await axios.get(
+    `${process.env.APP_URL_PRODUCTS}/fetch/all/materials/${JSON.stringify(
+      ids
+    )}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
 module.exports = {
   createInvoice,
   findOneInvoice,
@@ -232,4 +246,5 @@ module.exports = {
   updateOrderRemote,
   decrementQuantityFromRemoteProducts,
   incrementQuantityFromRemoteProducts,
+  getRemoteMaterialsFromProducts,
 };

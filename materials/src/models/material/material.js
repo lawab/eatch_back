@@ -23,7 +23,17 @@ const materialObject = {
   },
   image: { type: String, default: "/datas/avatar.png" },
   mp_name: { required: true, type: String, maxlength: 50 },
-  quantity: { type: Number, default: 0, required: true },
+  quantity: {
+    type: Number,
+    default: 0,
+    required: true,
+    validate: {
+      validator(quantity) {
+        return quantity >= 0;
+      },
+    },
+    min: 0,
+  },
   consumer_quantity: { type: Number, default: 0 },
   current_quantity: { type: Number, default: 0 },
   unity: {

@@ -37,8 +37,8 @@ const deleteOne = async (query = {}, bodyUpdate = {}) => {
  * @param {Object} query [query to get products in database]
  * @returns {Promise}
  */
-const findProducts = async (query = null) => {
-  const products = await Product.find(query);
+const findProducts = async (query = null, projection = {}) => {
+  const products = await Product.find(query, projection);
   return products;
 };
 /**

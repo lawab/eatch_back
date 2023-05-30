@@ -1,365 +1,115 @@
 [
   {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": { "_id": "64679d98d4843fd36e085a4c" },
     "_id": "646f6a2a66b7a77572a1b299",
     "title": "nouvelle catego modifiée",
     "image": "/datas/1685023273944_Image.jpg",
-    "deletedAt": null,
-    "products": [
-      {
-        "_id": "6470d9547dac8699328649e9",
-        "materials": [
-          {
-            "_id": "646f4a77035e10146f1699b1",
-            "mp_name": "Fromage",
-            "quantity": 36,
-            "lifetime": "2023-07-11T23:00:00.000Z"
-          }
-        ],
-        "restaurant": {
-          "_id": "64679d98d4843fd36e085a4c",
-          "restaurant_name": "Restaurant eatch"
-        },
-        "category": {
-          "_creator": {
-            "_id": "6433e8a9bd4f93d742bb0ee8",
-            "role": "SUPER_ADMIN",
-            "email": "wablearn@gmail.com",
-            "firstName": "SUPER",
-            "lastName": "ADMIN"
-          },
-          "restaurant": { "_id": "64679d98d4843fd36e085a4c" },
-          "_id": "646f6a2a66b7a77572a1b299",
-          "title": "nouvelle catego",
-          "image": "/datas/1685023273944_Image.jpg",
-          "deletedAt": null
-        },
-        "price": 12,
-        "_creator": "6433e8a9bd4f93d742bb0ee8",
-        "productName": "Produit 88",
-        "quantity": 22,
-        "promotion": false,
-        "devise": "MAD",
-        "image": "/datas/avatar.png",
-        "liked": 0,
-        "likedPersonCount": 0,
-        "deletedAt": null,
-        "comments": [],
-        "createdAt": "2023-05-26T16:07:48.553Z",
-        "updatedAt": "2023-05-26T16:07:48.553Z",
-        "__v": 0
-      },
-      {
-        "_id": "6474bd9387d18e56cb466944",
-        "recette": {
-          "_id": "6474ac6645a52e481fac4932",
-          "title": "recette 1",
-          "image": "/datas/avatar.png",
-          "description": "description 1",
-          "engredients": [
-            {
-              "material": "6436b7a8756195df72d0fdfc",
-              "grammage": 100,
-              "_id": "6474ac6645a52e481fac4933"
-            }
-          ],
-          "_creator": "6433e8a9bd4f93d742bb0ee8",
-          "deletedAt": null
-        },
-        "restaurant": {
-          "_id": "64679d98d4843fd36e085a4c",
-          "restaurant_name": "Restaurant eatch"
-        },
-        "category": {
-          "_creator": {
-            "_id": "6433e8a9bd4f93d742bb0ee8",
-            "role": "SUPER_ADMIN",
-            "email": "wablearn@gmail.com",
-            "firstName": "SUPER",
-            "lastName": "ADMIN"
-          },
-          "restaurant": { "_id": "64679d98d4843fd36e085a4c" },
-          "_id": "646f6a2a66b7a77572a1b299",
-          "title": "nouvelle catego modifiée",
-          "image": "/datas/1685023273944_Image.jpg",
-          "deletedAt": null
-        },
-        "price": 50,
-        "_creator": "6433e8a9bd4f93d742bb0ee8",
-        "productName": "tacos 3",
-        "promotion": false,
-        "devise": "MAD",
-        "image": "/datas/avatar.png",
-        "liked": 0,
-        "likedPersonCount": 0,
-        "deletedAt": null,
-        "comments": [],
-        "createdAt": "2023-05-29T14:58:27.619Z",
-        "updatedAt": "2023-05-29T15:12:38.254Z",
-        "__v": 0
-      }
-    ],
+    "deletedAt": "null",
     "createdAt": "2023-05-25T14:01:14.837Z",
     "updatedAt": "2023-05-26T17:01:16.754Z",
-    "__v": 0
+    "products": [
+      {
+        "_id": "6474bd9387d18e56cb466944",
+        "price": "20",
+        "productName": "tacos 1",
+        "promotion": "false",
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "deletedAt": "Mon May 29 2023 15:58:27 GMT+0100 (GMT+01:00)",
+        "updatedAt": "Mon May 29 2023 15:58:27 GMT+0100 (GMT+01:00)",
+        "category": {
+          "_id": "646f6a2a66b7a77572a1b299",
+          "title": "nouvelle catego modifiée",
+          "image": "/datas/1685023273944_Image.jpg"
+        }
+      }
+    ]
   },
   {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": { "_id": "64679d98d4843fd36e085a4c" },
     "_id": "646f6a3c66b7a77572a1b29c",
     "title": "newcate",
     "image": "/datas/1685023291513_Image.jpg",
     "deletedAt": "2023-05-26T17:02:08.421Z",
-    "products": [],
     "createdAt": "2023-05-25T14:01:32.038Z",
     "updatedAt": "2023-05-26T17:02:08.445Z",
-    "__v": 0
+    "products": []
   },
   {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": {
-      "_id": "64679d98d4843fd36e085a4c",
-      "restaurant_name": "restaurant 1"
-    },
     "_id": "64709b7e8df4a5afacae5d01",
     "title": "Nouvelle categorie",
     "image": "/datas/1685101437988_Image.jpg",
-    "deletedAt": null,
-    "products": [
-      {
-        "_id": "64709c525458be8699521814",
-        "materials": [
-          {
-            "_id": "646f4a77035e10146f1699b1",
-            "mp_name": "Fromage",
-            "quantity": 36,
-            "lifetime": "2023-07-11T23:00:00.000Z"
-          }
-        ],
-        "restaurant": {
-          "infos": {
-            "town": "agadir",
-            "address": "agadir rue 200 immeuble 20 appt 1"
-          },
-          "_id": "64679d98d4843fd36e085a4c",
-          "restaurant_name": "restaurant 1"
-        },
-        "category": {
-          "_creator": {
-            "_id": "6433e8a9bd4f93d742bb0ee8",
-            "role": "SUPER_ADMIN",
-            "email": "wablearn@gmail.com",
-            "firstName": "SUPER",
-            "lastName": "ADMIN"
-          },
-          "restaurant": { "_id": "64679d98d4843fd36e085a4c" },
-          "_id": "64709b7e8df4a5afacae5d01",
-          "title": "Nouvelle categorie",
-          "image": "/datas/1685101437988_Image.jpg",
-          "deletedAt": null
-        },
-        "price": 12,
-        "_creator": "6433e8a9bd4f93d742bb0ee8",
-        "productName": "Nouveau Produit",
-        "quantity": 13,
-        "promotion": false,
-        "devise": "MAD",
-        "image": "/datas/avatar.png",
-        "liked": 0,
-        "likedPersonCount": 0,
-        "deletedAt": null,
-        "comments": [],
-        "createdAt": "2023-05-26T11:47:30.955Z",
-        "updatedAt": "2023-05-26T11:47:30.955Z",
-        "__v": 0
-      },
-      {
-        "_id": "6470d7db7dac8699328649bc",
-        "materials": [
-          {
-            "_id": "646f4a77035e10146f1699b1",
-            "mp_name": "Fromage",
-            "quantity": 36,
-            "lifetime": "2023-07-11T23:00:00.000Z"
-          }
-        ],
-        "restaurant": {
-          "_id": "64679d98d4843fd36e085a4c",
-          "restaurant_name": "Restaurant eatch"
-        },
-        "category": {
-          "_creator": {
-            "_id": "6433e8a9bd4f93d742bb0ee8",
-            "role": "SUPER_ADMIN",
-            "email": "wablearn@gmail.com",
-            "firstName": "SUPER",
-            "lastName": "ADMIN"
-          },
-          "restaurant": {
-            "_id": "64679d98d4843fd36e085a4c",
-            "restaurant_name": "restaurant 1"
-          },
-          "_id": "64709b7e8df4a5afacae5d01",
-          "title": "Nouvelle categorie",
-          "image": "/datas/1685101437988_Image.jpg",
-          "deletedAt": null
-        },
-        "price": 33,
-        "_creator": "6433e8a9bd4f93d742bb0ee8",
-        "productName": "produit 5",
-        "quantity": 2,
-        "promotion": false,
-        "devise": "MAD",
-        "image": "/datas/avatar.png",
-        "liked": 0,
-        "likedPersonCount": 0,
-        "deletedAt": null,
-        "comments": [],
-        "createdAt": "2023-05-26T16:01:31.467Z",
-        "updatedAt": "2023-05-26T16:01:31.467Z",
-        "__v": 0
-      }
-    ],
+    "deletedAt": "null",
     "createdAt": "2023-05-26T11:43:58.902Z",
     "updatedAt": "2023-05-26T11:43:58.902Z",
-    "__v": 0
+    "products": [
+      {
+        "_id": "6475da0b2cd4f0744c181fb8",
+        "price": "50",
+        "productName": "tacos 3",
+        "promotion": "false",
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "deletedAt": "Tue May 30 2023 12:12:12 GMT+0100 (GMT+01:00)",
+        "updatedAt": "Tue May 30 2023 12:12:12 GMT+0100 (GMT+01:00)",
+        "category": {
+          "_id": "64709b7e8df4a5afacae5d01",
+          "title": "Nouvelle categorie",
+          "image": "/datas/1685101437988_Image.jpg"
+        }
+      }
+    ]
   },
   {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": {
-      "_id": "64679d98d4843fd36e085a4c",
-      "restaurant_name": "restaurant 1"
-    },
     "_id": "6470a88cb729778faef6b219",
     "title": "CAtegorie 3",
     "image": "/datas/1685104780414_2023-05-26 13_34_08-.png",
     "deletedAt": "2023-05-26T17:02:57.851Z",
-    "products": [],
     "createdAt": "2023-05-26T12:39:40.774Z",
     "updatedAt": "2023-05-26T17:02:57.853Z",
-    "__v": 0
+    "products": []
   },
   {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": {
-      "_id": "64679d98d4843fd36e085a4c",
-      "restaurant_name": "restaurant 1"
-    },
     "_id": "6470a8acb729778faef6b21b",
     "title": "Categorie 4",
     "image": "/datas/1685104812463_2023-05-26 13_34_08-.png",
     "deletedAt": "2023-05-26T17:02:15.670Z",
-    "products": [],
     "createdAt": "2023-05-26T12:40:12.667Z",
     "updatedAt": "2023-05-26T17:02:15.672Z",
-    "__v": 0
+    "products": []
   },
   {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": {
-      "_id": "64679d98d4843fd36e085a4c",
-      "restaurant_name": "restaurant 1"
-    },
     "_id": "6470c04d0f0b93159d5122c7",
     "title": "categorie 5",
     "image": "/datas/1685110861493_2023-05-26 13_34_08-.png",
     "deletedAt": "2023-05-26T17:02:43.788Z",
-    "products": [],
     "createdAt": "2023-05-26T14:21:01.856Z",
     "updatedAt": "2023-05-26T17:02:43.790Z",
-    "__v": 0
+    "products": []
   },
   {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": {
-      "_id": "64679d98d4843fd36e085a4c",
-      "restaurant_name": "restaurant 1"
-    },
     "_id": "6470c9ff0f0b93159d5122cf",
     "title": "Categorie 7",
     "image": "/datas/1685113343386_2023-05-26 13_34_08-.png",
     "deletedAt": "2023-05-26T17:05:55.206Z",
-    "products": [],
     "createdAt": "2023-05-26T15:02:23.544Z",
     "updatedAt": "2023-05-26T17:05:55.208Z",
-    "__v": 0
-  },
-  {
-    "_creator": {
-      "_id": "6433e8a9bd4f93d742bb0ee8",
-      "role": "SUPER_ADMIN",
-      "email": "wablearn@gmail.com",
-      "firstName": "SUPER",
-      "lastName": "ADMIN"
-    },
-    "restaurant": {
-      "_id": "64679d98d4843fd36e085a4c",
-      "restaurant_name": "Restaurant eatch"
-    },
-    "_id": "6474938af22d6519e130865c",
-    "title": "new catgery",
-    "image": "/datas/avatar.png",
-    "deletedAt": null,
-    "createdAt": "2023-05-29T11:59:06.665Z",
-    "updatedAt": "2023-05-29T11:59:06.665Z",
-    "__v": 0,
     "products": []
   },
   {
-    "restaurant": {
-      "_id": "64679d98d4843fd36e085a4c",
-      "restaurant_name": "Restaurant eatch"
-    },
+    "_id": "6474938af22d6519e130865c",
+    "title": "new catgery",
+    "image": "/datas/avatar.png",
+    "deletedAt": "2023-05-29T16:54:49.789Z",
+    "createdAt": "2023-05-29T11:59:06.665Z",
+    "updatedAt": "2023-05-29T16:54:49.833Z",
+    "products": []
+  },
+  {
     "_id": "647494c9f22d6519e1308667",
     "title": "new categery one",
     "image": "/datas/avatar.png",
     "deletedAt": "2023-05-29T13:07:07.686Z",
     "createdAt": "2023-05-29T12:04:25.065Z",
     "updatedAt": "2023-05-29T13:07:07.697Z",
-    "__v": 0,
     "products": []
   }
 ]
