@@ -201,7 +201,9 @@ const deleteProduct = async (req, res) => {
   let productDeleted = null;
 
   try {
-    let body = req.body;
+    // let body = req.body;
+    const body = JSON.parse(req.headers.body);
+    console.log({ body });
     // check if creator has authorization
     let creator = await productServices.getUserAuthor(
       body?._creator,
@@ -234,7 +236,7 @@ const deleteProduct = async (req, res) => {
     // fetch restaurant since microservice restaurant
     let restaurant = await productServices.getRestaurant(
       body?.restaurant,
-      token
+      req.token
     );
 
     if (!restaurant?._id) {
@@ -316,7 +318,7 @@ const deleteProduct = async (req, res) => {
       return productRestored;
     }
 
-    console.log(error.message);
+    console.log(error);
     return res
       .status(500)
       .json({ message: "Error occured during the deletion of product!!!" });

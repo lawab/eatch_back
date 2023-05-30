@@ -61,8 +61,8 @@ module.exports = async (body, req, token) => {
       throw new Error("category not found!!");
     }
 
-    // set user avatar
-    body["avatar"] = req.file
+    // set product image
+    body["image"] = req.file
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png";
 

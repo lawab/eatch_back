@@ -18,8 +18,8 @@ const createCategory = async (req, res) => {
   console.log(req.file);
   console.log("*********************************************");
 
-  // let body = JSON.parse(req.headers?.body);
-  let body = req.body;
+  let body = JSON.parse(req.headers?.body);
+  // let body = req.body;
 
   const newCategory = {
     title: body?.title,
@@ -124,7 +124,13 @@ const updateCategory = async (req, res) => {
   const newCategory = {
     title: body.title,
     _creator: user._id,
+    restaurant_id: body.restaurant_id,
   };
+
+  let restaurant = await api_consumer.getRestaurantById(
+    newCategory.restaurant_id,
+    req.token
+  );
 
   if (req.file) {
     newCategory["image"] = "/datas/" + req.file.filename;
@@ -158,7 +164,7 @@ const updateCategory = async (req, res) => {
       // add new user create in historical
       let response = await addElementToHistorical(
         async () => {
-          return await api_consumer.addToHistorical(
+          let response = await api_consumer.addToHistorical(
             category._creator._id,
             {
               categories: {
@@ -168,6 +174,13 @@ const updateCategory = async (req, res) => {
             },
             req.token
           );
+
+          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          console.log({
+            content: JSON.parse(content),
+          });
+
+          return response;
         },
         async () => {
           for (const field in categoryCopied) {
@@ -255,18 +268,28 @@ const getCategoriesByRestaurant = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
-  const categoryId = req.params?.categoryId;
-
   let categoryCopied = null;
   let category = null;
 
   try {
+    const body = JSON.parse(req.headers.body);
+    // const body = req.body;
     let oldCategory = await categoryService.getCategoryById(
       req.params.categoryId
     );
 
     if (!oldCategory) {
       throw new Error("unable to update unexisting category");
+    }
+
+    // fetch restaurant since microservice restaurant
+    let restaurant = await productServices.getRestaurant(
+      body?.restaurant,
+      token
+    );
+
+    if (!restaurant?._id) {
+      throw new Error("restaurant not found!!");
     }
 
     categoryCopied = Object.assign({}, oldCategory._doc);
@@ -279,7 +302,7 @@ const deleteCategory = async (req, res) => {
       // add new user create in historical
       let response = await addElementToHistorical(
         async () => {
-          return await api_consumer.addToHistorical(
+          let response = await api_consumer.addToHistorical(
             category._creator._id,
             {
               categories: {
@@ -289,6 +312,13 @@ const deleteCategory = async (req, res) => {
             },
             req.token
           );
+
+          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          console.log({
+            content: JSON.parse(content),
+          });
+
+          return response;
         },
         async () => {
           // restore only fields would had changed in database

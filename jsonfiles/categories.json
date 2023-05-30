@@ -14,9 +14,31 @@
         "promotion": "false",
         "devise": "MAD",
         "image": "/datas/avatar.png",
-        "deletedAt": "null",
+        "deletedAt": "2023-05-30T20:18:21.250Z",
         "createdAt": "2023-05-29T14:58:27.619Z",
-        "updatedAt": "2023-05-30T18:44:51.348Z"
+        "updatedAt": "2023-05-30T20:31:15.263Z"
+      },
+      {
+        "_id": "64764fe06bb2f8a5c0e02e65",
+        "price": "12",
+        "productName": "Produits 222",
+        "promotion": "false",
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "deletedAt": "2023-05-30T20:43:10.085Z",
+        "createdAt": "2023-05-30T19:34:56.150Z",
+        "updatedAt": "2023-05-30T20:43:10.096Z"
+      },
+      {
+        "_id": "64765196badffa94c0c904bc",
+        "price": "2022",
+        "productName": "Prodit Image",
+        "promotion": "false",
+        "devise": "MAD",
+        "image": "/datas/Screenshot 2023-05-29 130030.png",
+        "deletedAt": "2023-05-30T20:41:59.123Z",
+        "createdAt": "2023-05-30T19:42:14.130Z",
+        "updatedAt": "2023-05-30T20:41:59.179Z"
       }
     ]
   },
@@ -97,11 +119,11 @@
   },
   {
     "_id": "647494c9f22d6519e1308667",
-    "title": "new categery one",
+    "title": "super categery",
     "image": "/datas/avatar.png",
     "deletedAt": "2023-05-29T13:07:07.686Z",
     "createdAt": "2023-05-29T12:04:25.065Z",
-    "updatedAt": "2023-05-29T13:07:07.697Z",
+    "updatedAt": "2023-05-30T20:25:00.356Z",
     "products": []
   },
   {
@@ -111,15 +133,48 @@
     "deletedAt": "null",
     "createdAt": "2023-05-30T19:01:54.553Z",
     "updatedAt": "2023-05-30T19:01:54.553Z",
-    "products": []
+    "products": [
+      {
+        "_id": "647650ba6bb2f8a5c0e02ec6",
+        "price": "31",
+        "productName": "Product Hans",
+        "promotion": "false",
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "deletedAt": "null",
+        "createdAt": "2023-05-30T19:38:34.535Z",
+        "updatedAt": "2023-05-30T19:38:34.535Z"
+      }
+    ]
   },
   {
     "_id": "6476486695ebed6f2c7a5fc9",
     "title": "new catgery 2",
     "image": "/datas/avatar.png",
-    "deletedAt": "null",
+    "deletedAt": "2023-05-30T19:43:40.789Z",
     "createdAt": "2023-05-30T19:03:02.219Z",
-    "updatedAt": "2023-05-30T19:03:02.219Z",
+    "updatedAt": "2023-05-30T19:43:40.792Z",
+    "products": [
+      {
+        "_id": "6476502d6bb2f8a5c0e02e94",
+        "price": "123",
+        "productName": "Product 223",
+        "promotion": "false",
+        "devise": "MAD",
+        "image": "/datas/avatar.png",
+        "deletedAt": "null",
+        "createdAt": "2023-05-30T19:36:13.926Z",
+        "updatedAt": "2023-05-30T19:36:13.926Z"
+      }
+    ]
+  },
+  {
+    "_id": "647651ca1ad577b6f5ed6e17",
+    "title": "Categorie Image",
+    "image": "/datas/1685475785790_Screenshot 2023-05-29 130030.png",
+    "deletedAt": "null",
+    "createdAt": "2023-05-30T19:43:06.126Z",
+    "updatedAt": "2023-05-30T19:43:06.126Z",
     "products": []
   }
 ]
