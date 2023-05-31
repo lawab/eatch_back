@@ -230,6 +230,19 @@ const getRemoteMaterialsFromProducts = async (ids, token) => {
   return response;
 };
 
+const decrementRemoteMaterials = async (body, token) => {
+  let { data: response } = await axios.put(
+    `${process.env.APP_URL_MATERIAL}/decrement`,
+    { ...body },
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
 module.exports = {
   createInvoice,
   findOneInvoice,
@@ -247,4 +260,5 @@ module.exports = {
   decrementQuantityFromRemoteProducts,
   incrementQuantityFromRemoteProducts,
   getRemoteMaterialsFromProducts,
+  decrementRemoteMaterials,
 };

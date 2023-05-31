@@ -48,6 +48,7 @@ module.exports = async (body, req, token) => {
 
     return body;
   } catch (error) {
+    console.log(error);
     throw new Error(error.message);
   }
 };

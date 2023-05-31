@@ -12,8 +12,9 @@ const setInvoiceValues = require("../methods/setInvoiceValues");
 // create one Invoice
 const createInvoice = async (req, res) => {
   // global variable to do fallback if error occured during execution
-  let orderUpdated = {};
-  let orderCopy = {};
+  let orderUpdated = null;
+  let orderCopy = null;
+  let materialsCopy = null;
 
   try {
     let body = req.body;
@@ -46,8 +47,6 @@ const createInvoice = async (req, res) => {
 
     orderCopy = Object.assign({}, order);
 
-    print({ orderCopy });
-
     //update status order since order microservice
 
     orderUpdated = await invoiceServices.updateOrderRemote(
@@ -64,52 +63,34 @@ const createInvoice = async (req, res) => {
         message: "create invoice failed !!!",
       });
     }
-    let productIds = orderUpdated.products?.map((pd) => {
-      console.log({ pd });
+
+    // return res.status(200).json({ materialsUpdated });
+    // set order value found in database
+    bodyUpdated["order"] = orderUpdated;
+
+    // set total price to current invoice
+    bodyUpdated["total"] = getInvoicePrice(orderUpdated?.products);
+
+    //set image for current invoice
+    bodyUpdated["image"] = req.file
+      ? "/datas/" + req.file?.filename
+      : "/datas/avatar.png";
+
+    // get list of products to set decrement quantity value
+    let productIds = orderUpdated.products.map((pd) => {
       return { _id: pd._id };
-    }); // get list of products to set decrement quantity value
+    });
 
     let materials = await invoiceServices.getRemoteMaterialsFromProducts(
       productIds,
       req.token
     );
 
-    print({ productIds, materials });
+    materialsCopy = Object.assign({}, materials);
 
-    return res.status(200).json(materials);
-
-    // // decrement each quantity from products
-    // let productsUpdated =
-    //   await invoiceServices.decrementQuantityFromRemoteProducts(
-    //     products,
-    //     req.token
-    //   );
-
-    // print({ orderUpdated, productsUpdated });
-
-    // if decrementation failed
-    if (!productsUpdated) {
-      // reset order because products have not updated successfully
-      let orderRestored = await invoiceServices.updateOrderRemote(
-        orderUpdated?._id,
-        orderCopy,
-        req.token
-      );
-      let productsRestored =
-        await invoiceServices.incrementQuantityFromRemoteProducts(
-          products,
-          req.token
-        );
-      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      print({ orderRestored, productsRestored });
-      throw new Error("unable to update remote products");
+    if (!materials) {
+      throw new Error("unable to generate invoice,please try again");
     }
-
-    bodyUpdated["order"] = orderUpdated; //set order value found in database
-    bodyUpdated["total"] = getInvoicePrice(orderUpdated?.products); // set total price to current invoice
-    bodyUpdated["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png"; //set image for current invoice
 
     let invoice = await invoiceServices.createInvoice(body);
 
@@ -118,6 +99,13 @@ const createInvoice = async (req, res) => {
     if (invoice?._id) {
       let response = await addElementToHistorical(
         async () => {
+          let materialsUpdated = await invoiceServices.decrementRemoteMaterials(
+            {
+              materials,
+            },
+            req.token
+          );
+          console.log({ materialsUpdated });
           let addResponse = await invoiceServices.addInvoiceToHistorical(
             creator._id,
             {
@@ -132,11 +120,18 @@ const createInvoice = async (req, res) => {
           return addResponse;
         },
         async () => {
+          let materialRestored = await invoiceServices.restoreRemoteMaterials(
+            {
+              materialsCopy,
+            },
+            req.token
+          );
+
           let elementDeleted = await invoiceServices.deleteTrustlyInvoice({
             _id: invoice?._id,
           });
 
-          print({ elementDeleted });
+          print({ elementDeleted, materialRestored });
 
           // reset order because creation of invoice failed or orther error occured
           return await resetOrder(orderUpdated, orderCopy, req);
@@ -157,6 +152,14 @@ const createInvoice = async (req, res) => {
   } catch (error) {
     if (orderUpdated?._id) {
       await resetOrder(orderUpdated, orderCopy, req);
+    }
+    if (materialsCopy) {
+      await invoiceServices.restoreRemoteMaterials(
+        {
+          materialsCopy,
+        },
+        req.token
+      );
     }
     print(error, "x");
     return res

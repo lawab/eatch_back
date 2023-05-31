@@ -6,6 +6,8 @@ const {
   updateMaterial,
   fetchMaterial,
   fetchMaterialsByRestaurant,
+  decrementMaterials,
+  incrementMaterials,
 } = require("../controllers/materialController");
 const uploadFileService = require("../services/uploadFile");
 const { authmiddleware } = require("../middlewares/authmiddleware");
@@ -47,6 +49,9 @@ materialRouter.put(
   upload.single("file"),
   updateMaterial
 );
+
+//decrement materials
+materialRouter.put("/decrement", authmiddleware, decrementMaterials);
 
 //Export route to be used on another place
 module.exports = materialRouter;

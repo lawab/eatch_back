@@ -408,8 +408,23 @@ const fetchMaterialsFromProdcuts = async (req, res) => {
         values = [...values, ...element];
       }
 
-      print({ materials: values }, "~");
-      return res.status(200).json(values);
+      let remoteMaterials = await productServices.getMaterials(
+        values,
+        req.token
+      );
+
+      // merge all values of array material in one array
+      for (let index = 0; index < remoteMaterials.length; index++) {
+        const element = remoteMaterials[index];
+        if (element.quantity <= 0) {
+          throw new Error(
+            "Material had been finish please update material and try again"
+          );
+        }
+      }
+
+      // print({ materials: values }, "~");
+      return res.status(200).json(remoteMaterials);
     } else {
       return res.status(401).json({ message: "invalid data send!!!" });
     }

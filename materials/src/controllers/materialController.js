@@ -122,7 +122,8 @@ const updateMaterial = async (req, res) => {
 
   try {
     // get body request
-    let body = JSON.parse(req.headers.body);
+    // let body = JSON.parse(req.headers.body);
+    let body = req.body;
 
     let BodyUpdated = await updateForeignFields(body, req, req.token);
 
@@ -213,6 +214,28 @@ const updateMaterial = async (req, res) => {
     });
   }
 };
+
+const decrementMaterials = async (req, res) => {
+  console.log({ boy: req.body });
+  let materials = req.body.materials;
+  let materialsUpdated = [];
+  for (let index = 0; index < materials.length; index++) {
+    const material = materials[index];
+    let mat = await materialServices.updateMaterial(
+      {
+        _id: material._id,
+      },
+      {
+        quantity: material.quantity - 1,
+        _creator: material._creator,
+      }
+    );
+    materialsUpdated.push(mat);
+  }
+
+  res.status(200).json(materialsUpdated);
+};
+
 // delete one Material
 const deleteMaterial = async (req, res) => {
   let materialCopy = null;
@@ -329,10 +352,11 @@ const fetchMaterial = async (req, res) => {
     res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
+
 // get Materials
 const fetchMaterials = async (req, res) => {
   try {
-    print({ ids: req.params?.ids });
+    // print({ ids: req.params?.ids });
     let materials = [];
     if (req.params?.ids) {
       let ids = JSON.parse(req.params?.ids);
@@ -376,4 +400,5 @@ module.exports = {
   updateMaterial,
   fetchMaterial,
   fetchMaterialsByRestaurant,
+  decrementMaterials,
 };
