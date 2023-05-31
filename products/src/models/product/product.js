@@ -95,7 +95,6 @@ const productSchemaObject = {
   productName: {
     type: String,
     required: true,
-    unique: true,
   },
 
   pusharePrice: {

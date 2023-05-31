@@ -74,7 +74,6 @@ const updateProduct = async (query = null, bodyUpdate = {}) => {
  * @returns {Promise} [return the current author send by eatch_users microservice]
  */
 const getUserAuthor = async (id = null, token = null) => {
-  console.log({ id });
   let { data: creator } = await axios.get(
     `${process.env.APP_URL_USER}/fetch/one/${id}`,
     {

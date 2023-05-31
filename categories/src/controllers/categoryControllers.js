@@ -272,8 +272,9 @@ const deleteCategory = async (req, res) => {
   let category = null;
 
   try {
-    // const body = JSON.parse(req.headers.body);
-    const body = req.body;
+    const body = JSON.parse(req.headers.body);
+    console.log({ body });
+    // const body = req.body;
     let oldCategory = await categoryService.getCategoryById(
       req.params.categoryId
     );

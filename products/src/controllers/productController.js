@@ -203,7 +203,7 @@ const deleteProduct = async (req, res) => {
   try {
     // let body = req.body;
     const body = JSON.parse(req.headers.body);
-    console.log({ body });
+    console.log({ body ,productId:req.params.id});
     // check if creator has authorization
     let creator = await productServices.getUserAuthor(
       body?._creator,
@@ -216,7 +216,7 @@ const deleteProduct = async (req, res) => {
       ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
     ) {
       return res.status(401).json({
-        message: "you cannot create the product please see you admin,thanks!!!",
+        message: "you cannot delete the product please see you admin,thanks!!!",
       });
     }
 
