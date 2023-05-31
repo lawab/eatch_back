@@ -91,11 +91,11 @@ const productSchemaObject = {
     type: mongoose.Types.ObjectId,
     required: true,
   },
-
+  quantity: { type: Number, default: 0 },
   productName: {
     type: String,
     required: true,
-    maxlength: 50,
+    unique: true,
   },
 
   pusharePrice: {

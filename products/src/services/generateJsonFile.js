@@ -17,39 +17,38 @@ const addProductFromJsonFile = async (restaurantId, token) => {
         token
       )) || [];
 
-    let newCategories = categories.map((cat) => {
-      let products = cat.products;
-      let category = {};
-      category["_id"] = cat["_id"];
-      category["title"] = cat["title"];
-      category["image"] = cat["image"];
-      category["deletedAt"] = cat.deletedAt ? cat.deletedAt : "null";
-      category["createdAt"] = cat["createdAt"];
-      category["updatedAt"] = cat["updatedAt"];
+    let newCategories = categories
+      .filter((cat) => cat.deletedAt === null)
+      .map((cat) => {
+        let products = cat.products;
+        let category = {};
+        category["_id"] = cat["_id"];
+        category["title"] = cat["title"];
+        category["image"] = cat["image"];
+        category["deletedAt"] = "null";
+        category["createdAt"] = cat["createdAt"];
+        category["updatedAt"] = cat["updatedAt"];
 
-      let newproducts = products.map((product) => {
-        let p = {};
-        p["_id"] = product._id;
-        p["price"] = product.price.toString();
-        p["productName"] = product.productName.toString();
-        p["promotion"] = product.promotion.toString();
-        p["devise"] = product.devise.toString();
-        p["image"] = product.image.toString();
-        p["deletedAt"] = product.deletedAt ? product.deletedAt : "null";
-        p["createdAt"] = product.createdAt;
-        p["updatedAt"] = product.updatedAt;
-        // p["category"] = {
-        //   _id: product.category._id,
-        //   title: product.category.title,
-        //   image: product.category.image,
-        // };
-        return p;
+        let newproducts = products
+          .filter((prod) => prod.deletedAt === null)
+          .map((product) => {
+            let p = {};
+            p["_id"] = product._id;
+            p["price"] = product.price.toString();
+            p["productName"] = product.productName.toString();
+            p["promotion"] = product.promotion.toString();
+            p["devise"] = product.devise.toString();
+            p["image"] = product.image.toString();
+            p["deletedAt"] = "null";
+            p["createdAt"] = product.createdAt;
+            p["updatedAt"] = product.updatedAt;
+            p["quantity"] = Math.floor(Math.random() * 50);
+          });
+
+        category["products"] = [...newproducts];
+
+        return category;
       });
-
-      category["products"] = [...newproducts];
-
-      return category;
-    });
 
     let file = new File();
 
