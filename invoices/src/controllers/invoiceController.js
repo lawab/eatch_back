@@ -120,9 +120,9 @@ const createInvoice = async (req, res) => {
           return addResponse;
         },
         async () => {
-          let materialRestored = await invoiceServices.restoreRemoteMaterials(
+          let materialsRestored = await invoiceServices.restoreRemoteMaterials(
             {
-              materialsCopy,
+              materials: materialsCopy,
             },
             req.token
           );
@@ -131,7 +131,7 @@ const createInvoice = async (req, res) => {
             _id: invoice?._id,
           });
 
-          print({ elementDeleted, materialRestored });
+          print({ elementDeleted, materialsRestored });
 
           // reset order because creation of invoice failed or orther error occured
           return await resetOrder(orderUpdated, orderCopy, req);
@@ -156,7 +156,7 @@ const createInvoice = async (req, res) => {
     if (materialsCopy) {
       await invoiceServices.restoreRemoteMaterials(
         {
-          materialsCopy,
+          materials: materialsCopy,
         },
         req.token
       );

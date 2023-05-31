@@ -87,6 +87,7 @@ const menuSchemaObject = {
     required: true,
     type: restaurantType,
   },
+  price:{type:Number,required:true},
   products: {
     required: true,
     type: [{ type: productType }],

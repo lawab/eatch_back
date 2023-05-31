@@ -236,6 +236,26 @@ const decrementMaterials = async (req, res) => {
   res.status(200).json(materialsUpdated);
 };
 
+const restoreMaterials = async (req, res) => {
+  console.log({ boy: req.body });
+  let materials = req.body.materials;
+  let materialsUpdated = [];
+  for (let index = 0; index < materials.length; index++) {
+    const material = materials[index];
+    let mat = await materialServices.updateMaterial(
+      {
+        _id: material._id,
+      },
+      {
+        ...material,
+      }
+    );
+    materialsUpdated.push(mat);
+  }
+
+  res.status(200).json(materialsUpdated);
+};
+
 // delete one Material
 const deleteMaterial = async (req, res) => {
   let materialCopy = null;
@@ -401,4 +421,5 @@ module.exports = {
   fetchMaterial,
   fetchMaterialsByRestaurant,
   decrementMaterials,
+  restoreMaterials,
 };
