@@ -44,6 +44,11 @@ module.exports = async (body, req, token) => {
 
     if (body?.products?.length) {
       //   get products in databsase
+      // let products = await menuServices.getProducts(body?.products, token);
+
+      // if (!products?.length || products?.length !== body?.products?.length) {
+      //   throw new Error(errorMessage("products"));
+      // }
       let products = await menuServices.getProducts(body?.products, token);
 
       if (!products?.length || products?.length !== body?.products?.length) {
@@ -53,6 +58,17 @@ module.exports = async (body, req, token) => {
       body["products"] = products; //set products values found in database
     }
 
+    if (body?.category) {
+      //   get category in databsase
+      let category = await menuServices.getCategory(body?.category, token);
+
+      if (!category) {
+        throw new Error(errorMessage("category"));
+      }
+
+      body["category"] = category;
+    }
+
     // update avatar if exists
     if (req.file) {
       body["image"] = "/datas/" + req.file?.filename;
@@ -60,6 +76,7 @@ module.exports = async (body, req, token) => {
 
     return body;
   } catch (error) {
+    console.log(error)
     throw new Error(error);
   }
 };

@@ -82,6 +82,26 @@ const userSchemaObject = {
     },
   },
 };
+
+const categoryType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+  title: String,
+  image: String,
+  _creator: {
+    _id: { type: String },
+    role: { type: String },
+    email: { type: String },
+    firstName: { type: String },
+    lastName: { type: String },
+  },
+  restaurant: {
+    _id: { type: String },
+    restaurant_name: { type: String },
+    logo: { type: String },
+  },
+  deletedAt: { type: Date, default: null },
+};
+
 const menuSchemaObject = {
   restaurant: {
     required: true,
@@ -91,6 +111,10 @@ const menuSchemaObject = {
   products: {
     required: true,
     type: [{ type: productType }],
+  },
+  category: {
+    required: true,
+    type: categoryType,
   },
   menutype: { type: String, default: "" },
   _creator: { required: true, type: userSchemaObject },

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const category = require("./src/models/category");
 mongoose.set("strictQuery", true);
 module.exports = async function () {
   try {

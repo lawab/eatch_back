@@ -37,20 +37,34 @@ module.exports = async (body, req, token) => {
 
     body["restaurant"] = restaurant; //set restaurant value found in database
 
-    //   get products in databsase
-    let products = await menuServices.getProducts(
-      JSON.parse(body?.products),
-      token
-    );
+    let products = await menuServices.getProducts(body?.products, token);
 
-    if (
-      !products?.length ||
-      products?.length !== JSON.parse(body?.products)?.length
-    ) {
+    if (!products?.length || products?.length !== body?.products?.length) {
       throw new Error(errorMessage("products"));
     }
 
+    //   get products in databsase
+    // let products = await menuServices.getProducts(
+    //   JSON.parse(body?.products),
+    //   token
+    // );
+    // if (
+    //   !products?.length ||
+    //   products?.length !== JSON.parse(body?.products)?.length
+    // ) {
+    //   throw new Error(errorMessage("products"));
+    // }
+
     body["products"] = products; //set product value found in database
+
+    //   get category in databsase
+    let category = await menuServices.getCategory(body?.category, token);
+
+    if (!category) {
+      throw new Error(errorMessage("category"));
+    }
+
+    body["category"] = category;
 
     // set user avatar
     body["image"] = req.file

@@ -142,6 +142,27 @@ const addMenuToHistorical = async (id = null, bodyUpdate = {}, token) => {
 
 /**
  *
+ * @param {Number} id [id to find categories in database from eatch_category microservice]
+ * @param {String} token [token to valid the session of user]
+ * @returns {Promise<[Object]>} [return the current category send by eatch_category microservice]
+ */
+const getCategory = async (id = null, token = null) => {
+  console.log("test", id, {
+    url: `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
+  });
+  let { data: category } = await axios.get(
+    `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return category;
+};
+
+/**
+ *
  * @param {Object} query [query to find menu in documents list. Default value is {}]
  * @returns {Promise}
  */
@@ -162,4 +183,5 @@ module.exports = {
   getProducts,
   addMenuToHistorical,
   deleteTrustlyMenu,
+  getCategory,
 };
