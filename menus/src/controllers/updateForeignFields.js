@@ -42,18 +42,24 @@ module.exports = async (body, req, token) => {
     }
     body["restaurant"] = restaurant; // update restaurant with value found in database
 
-    if (body?.products?.length) {
+    if (JSON.parse(body?.products)?.length) {
       //   get products in databsase
-      // let products = await menuServices.getProducts(body?.products, token);
+      let products = await menuServices.getProducts(
+        JSON.parse(body?.products),
+        token
+      );
 
-      // if (!products?.length || products?.length !== body?.products?.length) {
-      //   throw new Error(errorMessage("products"));
-      // }
-      let products = await menuServices.getProducts(body?.products, token);
-
-      if (!products?.length || products?.length !== body?.products?.length) {
+      if (
+        !products?.length ||
+        products?.length !== JSON.parse(body?.products)?.length
+      ) {
         throw new Error(errorMessage("products"));
       }
+      // let products = await menuServices.getProducts(JSON.parse(body?.products), token);
+
+      // if (!products?.length || products?.length !== JSON.parse(body?.products)?.length) {
+      //   throw new Error(errorMessage("products"));
+      // }
 
       body["products"] = products; //set products values found in database
     }
@@ -76,7 +82,7 @@ module.exports = async (body, req, token) => {
 
     return body;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     throw new Error(error);
   }
 };
