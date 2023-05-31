@@ -414,14 +414,14 @@ const fetchMaterialsFromProdcuts = async (req, res) => {
       );
 
       // merge all values of array material in one array
-      for (let index = 0; index < remoteMaterials.length; index++) {
-        const element = remoteMaterials[index];
-        if (element.quantity <= 0) {
-          throw new Error(
-            "Material had been finish please update material and try again"
-          );
-        }
-      }
+      // for (let index = 0; index < remoteMaterials.length; index++) {
+      //   const element = remoteMaterials[index];
+      //   if (element.quantity <= 0) {
+      //     throw new Error(
+      //       "Material had been finish please update material and try again"
+      //     );
+      //   }
+      // }
 
       // print({ materials: values }, "~");
       return res.status(200).json(remoteMaterials);

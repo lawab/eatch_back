@@ -1,7 +1,9 @@
 const print = require("../log/print");
 const invoiceServices = require("../services/invoiceServices");
-const roles = require("../models/roles");
-const getInvoicePrice = require("./getInvoicePrice");
+const {
+  getInvoicePrice,
+  setMaterialsByOccurences,
+} = require("./getInvoicePrice");
 const orderStatus = require("../models/invoice/orderStatus");
 const {
   addElementToHistorical,
@@ -15,7 +17,7 @@ const createInvoice = async (req, res) => {
   let orderUpdated = null;
   let orderCopy = null;
   let materialsCopy = null;
-
+  let materialsByOccurences = null;
   try {
     let body = req.body;
     let idOrder = req.params?.id;
@@ -92,7 +94,9 @@ const createInvoice = async (req, res) => {
       throw new Error("unable to generate invoice,please try again");
     }
 
-    let invoice = await invoiceServices.createInvoice(body);
+    materialsByOccurences = setMaterialsByOccurences(materials);
+
+    let invoice = await invoiceServices.createInvoice(bodyUpdated);
 
     print({ invoice }, "*");
 
@@ -101,13 +105,13 @@ const createInvoice = async (req, res) => {
         async () => {
           let materialsUpdated = await invoiceServices.decrementRemoteMaterials(
             {
-              materials,
+              materials: materialsByOccurences,
             },
             req.token
           );
           console.log({ materialsUpdated });
           let addResponse = await invoiceServices.addInvoiceToHistorical(
-            creator._id,
+            invoice._creator._id,
             {
               invoices: {
                 _id: invoice?._id,
@@ -122,7 +126,7 @@ const createInvoice = async (req, res) => {
         async () => {
           let materialsRestored = await invoiceServices.restoreRemoteMaterials(
             {
-              materials: materialsCopy,
+              materials: materialsByOccurences,
             },
             req.token
           );
@@ -153,15 +157,15 @@ const createInvoice = async (req, res) => {
     if (orderUpdated?._id) {
       await resetOrder(orderUpdated, orderCopy, req);
     }
-    if (materialsCopy) {
+    if (materialsByOccurences) {
       await invoiceServices.restoreRemoteMaterials(
         {
-          materials: materialsCopy,
+          materials: materialsByOccurences,
         },
         req.token
       );
     }
-    print(error, "x");
+    print(error.message, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Invoice!!!" });

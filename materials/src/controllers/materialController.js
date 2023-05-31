@@ -216,44 +216,57 @@ const updateMaterial = async (req, res) => {
 };
 
 const decrementMaterials = async (req, res) => {
-  console.log({ boy: req.body });
-  let materials = req.body.materials;
-  let materialsUpdated = [];
-  for (let index = 0; index < materials.length; index++) {
-    const material = materials[index];
-    let mat = await materialServices.updateMaterial(
-      {
-        _id: material._id,
-      },
-      {
-        quantity: material.quantity - 1,
-        _creator: material._creator,
-      }
-    );
-    materialsUpdated.push(mat);
-  }
+  try {
+    console.log({ boy: req.body });
+    let materials = req.body.materials;
+    let materialsUpdated = [];
 
-  res.status(200).json(materialsUpdated);
+    for (const _id in materials) {
+      if (materials.hasOwnProperty(_id)) {
+        let element = materials[_id];
+        let mat = await materialServices.findMaterial({
+          _id,
+        });
+
+        mat.quantity = mat.quantity - element.count;
+
+        let matUpd = await mat.save();
+
+        materialsUpdated.push(matUpd);
+      }
+    }
+    res.status(200).json(materialsUpdated);
+  } catch (error) {
+    res.status(500).json({ message: "Error occured during decrementation!!!" });
+  }
 };
 
 const restoreMaterials = async (req, res) => {
-  console.log({ boy: req.body });
-  let materials = req.body.materials;
-  let materialsUpdated = [];
-  for (let index = 0; index < materials.length; index++) {
-    const material = materials[index];
-    let mat = await materialServices.updateMaterial(
-      {
-        _id: material._id,
-      },
-      {
-        ...material,
-      }
-    );
-    materialsUpdated.push(mat);
-  }
+  try {
+    console.log({ boy: req.body });
+    let materials = req.body.materials;
+    let materialsUpdated = [];
 
-  res.status(200).json(materialsUpdated);
+    for (const _id in materials) {
+      if (materials.hasOwnProperty(_id)) {
+        let element = materials[_id];
+        let mat = await materialServices.findMaterial({
+          _id,
+        });
+
+        mat.quantity = element.quantity;
+        mat.createdAt = element.createdAt;
+        mat.updatedAt = element.updatedAt;
+
+        let matUpd = await mat.save();
+
+        materialsUpdated.push(matUpd);
+      }
+    }
+    res.status(200).json(materialsUpdated);
+  } catch (error) {
+    res.status(500).json({ message: "Error occured during restoration!!!" });
+  }
 };
 
 // delete one Material
