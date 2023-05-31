@@ -272,8 +272,8 @@ const deleteCategory = async (req, res) => {
   let category = null;
 
   try {
-    const body = JSON.parse(req.headers.body);
-    // const body = req.body;
+    // const body = JSON.parse(req.headers.body);
+    const body = req.body;
     let oldCategory = await categoryService.getCategoryById(
       req.params.categoryId
     );
@@ -283,9 +283,9 @@ const deleteCategory = async (req, res) => {
     }
 
     // fetch restaurant since microservice restaurant
-    let restaurant = await productServices.getRestaurant(
-      body?.restaurant,
-      token
+    let restaurant = await api_consumer.getRestaurantById(
+      body?.restaurant_id,
+      req.token
     );
 
     if (!restaurant?._id) {
