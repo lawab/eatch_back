@@ -16,8 +16,8 @@ const {
 const createMenu = async (req, res) => {
   let menu = null;
   try {
-    let body = req.body;
-    // let body = JSON.parse(req.headers.body);
+    // let body = req.body;
+    let body = JSON.parse(req.headers.body);
     console.log({ body });
     let bodyUpdated = await setForeignFields(body, req, req.token);
 
