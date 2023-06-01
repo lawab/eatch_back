@@ -43,12 +43,12 @@ const createProduct = async (req, res) => {
             req.token
           );
 
-          let content = await addProductFromJsonFile(
+          let { content, categories, menus } = await addProductFromJsonFile(
             bodyUpdated.restaurant._id,
             req.token
           );
 
-          console.log({ content: JSON.parse(content) });
+          console.log({ content: JSON.parse(content), categories, menus });
 
           return response;
         },

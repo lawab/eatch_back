@@ -37,23 +37,30 @@ module.exports = async (body, req, token) => {
 
     body["restaurant"] = restaurant; //set restaurant value found in database
 
-    // let products = await menuServices.getProducts(body?.products, token);
+    let products = await menuServices.getProducts(body?.products, token);
+    console.log({ products });
 
-    // if (!products?.length || products?.length !== body?.products?.length) {
-    //   throw new Error(errorMessage("products"));
-    // }
-
-    // get products in databsase
-    let products = await menuServices.getProducts(
-      JSON.parse(body?.products),
-      token
-    );
     if (
       !products?.length ||
-      products?.length !== JSON.parse(body?.products)?.length
+      products?.length !== body?.products?.length ||
+      products.filter((p) => !p).length
     ) {
       throw new Error(errorMessage("products"));
     }
+
+    // get products in databsase
+    // let products = await menuServices.getProducts(
+    //   JSON.parse(body?.products),
+    //   token
+    // );
+    // if (
+    //   !products?.length ||
+    //   products?.length !== JSON.parse(body?.products)?.length ||
+    //   products?.length !== body?.products?.length ||
+    //   products.filter((p) => !p).length
+    // ) {
+    //   throw new Error(errorMessage("products"));
+    // }
 
     body["products"] = products; //set product value found in database
 

@@ -67,6 +67,7 @@ const productType = {
     type: String,
     default: "/datas/avatar.png",
   },
+  deletedAt: { type: Date, default: null },
 };
 const userSchemaObject = {
   _id: { type: mongoose.Types.ObjectId, required: true },
