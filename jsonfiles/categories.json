@@ -18,7 +18,7 @@
           "deletedAt": "null",
           "createdAt": "2023-05-31T21:58:06.575Z",
           "updatedAt": "2023-06-01T12:14:27.181Z",
-          "quantity": "44"
+          "quantity": "32"
         }
       ]
     },
@@ -40,7 +40,7 @@
           "deletedAt": "null",
           "createdAt": "2023-05-31T21:52:06.282Z",
           "updatedAt": "2023-05-31T22:03:55.090Z",
-          "quantity": "6"
+          "quantity": "7"
         },
         {
           "_id": "647890c07cc2b83b4df76e3f",
@@ -52,7 +52,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T12:36:16.088Z",
           "updatedAt": "2023-06-01T12:36:16.088Z",
-          "quantity": "10"
+          "quantity": "5"
         },
         {
           "_id": "647892377cc2b83b4df76e53",
@@ -64,7 +64,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T12:42:31.357Z",
           "updatedAt": "2023-06-01T12:42:31.357Z",
-          "quantity": "35"
+          "quantity": "20"
         }
       ]
     },
@@ -86,7 +86,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T16:30:24.590Z",
           "updatedAt": "2023-06-01T16:30:24.590Z",
-          "quantity": "32"
+          "quantity": "31"
         },
         {
           "_id": "6478c7cac73be1cd44382420",
@@ -98,19 +98,19 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T16:31:06.975Z",
           "updatedAt": "2023-06-01T16:31:06.975Z",
-          "quantity": "48"
+          "quantity": "40"
         },
         {
-          "_id": "6478ec81f010f3321c410521",
+          "_id": "6478f61df010f3321c41063c",
           "price": "30",
           "productName": "panini viande hachée",
           "promotion": "false",
           "devise": "MAD",
           "image": "/datas/avatar.png",
           "deletedAt": "null",
-          "createdAt": "2023-06-01T19:07:45.916Z",
-          "updatedAt": "2023-06-01T19:07:45.916Z",
-          "quantity": "27"
+          "createdAt": "2023-06-01T19:48:45.531Z",
+          "updatedAt": "2023-06-01T19:48:45.531Z",
+          "quantity": "39"
         }
       ]
     }
