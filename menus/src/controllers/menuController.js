@@ -1,6 +1,5 @@
 const { fieldsRequired } = require("../models/menu/menu");
 const { fieldsValidator } = require("../models/menu/validators");
-const print = require("../log/print");
 const menuServices = require("../services/menuServices");
 const roles = require("../models/roles");
 const updateForeignFields = require("./updateForeignFields");
@@ -21,7 +20,7 @@ const createMenu = async (req, res) => {
 
     menu = await menuServices.createMenu(bodyUpdated);
 
-    print({ menucreated: menu }, "*");
+    console.log({ menucreated: menu }, "*");
 
     if (menu) {
       let response = await addElementToHistorical(
@@ -43,7 +42,7 @@ const createMenu = async (req, res) => {
           let elementDeleted = await menuServices.deleteTrustlyMenu({
             _id: menu._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
           return elementDeleted;
         }
       );
@@ -64,7 +63,7 @@ const createMenu = async (req, res) => {
       let elementDeleted = await menuServices.deleteTrustlyMenu({
         _id: menu._id,
       });
-      print({ elementDeleted });
+      console.log({ elementDeleted });
     }
 
     console.log({ error });
@@ -110,7 +109,7 @@ const updateMenu = async (req, res) => {
     // update field in database
     menusaved = await menu.save();
 
-    print({ menusaved });
+    console.log({ menusaved });
 
     if (menusaved?._id) {
       let response = await addElementToHistorical(
@@ -135,7 +134,7 @@ const updateMenu = async (req, res) => {
           let menuRestored = await menusaved.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ menuRestored });
+          console.log({ menuRestored });
           return menuRestored;
         }
       );
@@ -161,9 +160,9 @@ const updateMenu = async (req, res) => {
       let menuRestored = await menusaved.save({
         timestamps: false,
       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      print({ menuRestored });
+      console.log({ menuRestored });
     }
-    print(error.message, "x");
+    console.log(error.message, "x");
     res.status(500).json({
       message: "Error(s) occured during the update Menu!!!",
     });
@@ -214,7 +213,7 @@ const deleteMenu = async (req, res) => {
 
     MenuDeleted = await menu.save();
 
-    print({ MenuDeleted });
+    console.log({ MenuDeleted });
 
     if (MenuDeleted?.deletedAt) {
       let response = await addElementToHistorical(
@@ -238,7 +237,7 @@ const deleteMenu = async (req, res) => {
           let menuRestored = await MenuDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ menuRestored });
+          console.log({ menuRestored });
           return menuRestored;
         }
       );
@@ -262,7 +261,7 @@ const deleteMenu = async (req, res) => {
         timestamps: false,
       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
 
-      print({ menuRestored });
+      console.log({ menuRestored });
     }
     console.log(error.message);
     return res
@@ -278,14 +277,14 @@ const fetchMenu = async (req, res) => {
     });
     res.status(200).json(Menu);
   } catch (error) {
-    print(error.message);
+    console.log(error.message);
     res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
 // get Menus
 const fetchMenus = async (req, res) => {
   try {
-    print({ ids: req.params?.ids });
+    console.log({ ids: req.params?.ids });
     if (req.params?.ids) {
       let ids = JSON.parse(req.params?.ids);
       let Menus = await menuServices.findMenus({

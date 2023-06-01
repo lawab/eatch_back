@@ -1,5 +1,4 @@
 const { default: mongoose } = require("mongoose");
-const print = require("../log/print");
 
 /**
  *
@@ -27,7 +26,7 @@ module.exports = async (orderServices, body, req) => {
 
     // find client in database
     let client = await orderServices.getClient(body?.client, token);
-    print({ client });
+    console.log({ client });
 
     // if client not exists in database, generate random _id for client
     if (!client?._id) {
@@ -62,7 +61,7 @@ module.exports = async (orderServices, body, req) => {
       throw new Error(errorMessage("products"));
     }
 
-    print({ products });
+    console.log({ products });
 
     body["products"] = products;
 
@@ -78,7 +77,7 @@ module.exports = async (orderServices, body, req) => {
 
     return body;
   } catch (error) {
-    print({ error }, "x");
+    console.log({ error }, "x");
     throw new Error(error.message);
   }
 };

@@ -1,5 +1,3 @@
-const print = require("../log/print");
-
 /**
  * @author ulrich <uchokomeny@gmail.com>
  * @param {Object} res [Object Response from express to send response to client if necessary]
@@ -26,7 +24,7 @@ module.exports = async (orderServices, body, req) => {
       // get list of products
       let products = await orderServices.getProducts(productsIds, token);
 
-      print({ products });
+      console.log({ products });
 
       let invalidProducts = products.filter((el) => !el?._id);
 

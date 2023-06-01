@@ -1,6 +1,3 @@
-const { fieldsRequired } = require("../models/material/material");
-const { fieldsValidator } = require("../models/material/validators");
-const print = require("../log/print");
 const materialServices = require("../services/materialServices");
 const roles = require("../models/roles");
 const updateForeignFields = require("./updateForeignFields");
@@ -26,7 +23,7 @@ const createMaterial = async (req, res) => {
     //   req.token
     // );
 
-    // print({ creator: creator?._id }, "*");
+    // console.log({ creator: creator?._id }, "*");
 
     // if (!creator?._id) {
     //   return res.status(401).json({
@@ -63,7 +60,7 @@ const createMaterial = async (req, res) => {
 
     newMaterial = await materialServices.createMaterial(BodyUpdate);
 
-    print({ newMaterial }, "*");
+    console.log({ newMaterial }, "*");
 
     if (newMaterial) {
       let response = await addElementToHistorical(
@@ -83,7 +80,7 @@ const createMaterial = async (req, res) => {
           let elementDeleted = await materialServices.deleteTrustlyMaterial({
             _id: newMaterial?._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
           return elementDeleted;
         }
       );
@@ -104,10 +101,10 @@ const createMaterial = async (req, res) => {
       let elementDeleted = await materialServices.deleteTrustlyMaterial({
         _id: newMaterial?._id,
       });
-      print({ elementDeleted });
+      console.log({ elementDeleted });
     }
 
-    print(error, "x");
+    console.log(error, "x");
 
     return res
       .status(500)
@@ -150,7 +147,7 @@ const updateMaterial = async (req, res) => {
     // update field in database
     materialsaved = await material.save();
 
-    print({ materialsaved });
+    console.log({ materialsaved });
 
     if (materialsaved?._id) {
       let response = await addElementToHistorical(
@@ -177,7 +174,7 @@ const updateMaterial = async (req, res) => {
           let materialRestored = await materialsaved.save({
             timestamps: false,
           });
-          print({ materialRestored });
+          console.log({ materialRestored });
           return materialRestored;
         }
       );
@@ -206,9 +203,9 @@ const updateMaterial = async (req, res) => {
         timestamps: false,
       });
 
-      print({ materialRestored });
+      console.log({ materialRestored });
     }
-    print(error.message, "x");
+    console.log(error.message, "x");
     res.status(500).json({
       message: "Error(s) occured during the update Material!!!",
     });
@@ -314,7 +311,7 @@ const deleteMaterial = async (req, res) => {
 
     MaterialDeleted = await material.save();
 
-    print({ MaterialDeleted });
+    console.log({ MaterialDeleted });
 
     if (MaterialDeleted.deletedAt) {
       let response = await addElementToHistorical(
@@ -341,7 +338,7 @@ const deleteMaterial = async (req, res) => {
           let materialRestored = await MaterialDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ materialRestored });
+          console.log({ materialRestored });
           return materialRestored;
         }
       );
@@ -365,7 +362,7 @@ const deleteMaterial = async (req, res) => {
       let materialRestored = await MaterialDeleted.save({
         timestamps: false,
       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      print({ materialRestored });
+      console.log({ materialRestored });
     }
     console.log(error.message);
     return res
@@ -381,7 +378,7 @@ const fetchMaterial = async (req, res) => {
     });
     res.status(200).json(Material);
   } catch (error) {
-    print(error.message);
+    console.log(error.message);
     res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
@@ -389,7 +386,7 @@ const fetchMaterial = async (req, res) => {
 // get Materials
 const fetchMaterials = async (req, res) => {
   try {
-    // print({ ids: req.params?.ids });
+    // console.log({ ids: req.params?.ids });
     let materials = [];
     if (req.params?.ids) {
       let ids = JSON.parse(req.params?.ids);

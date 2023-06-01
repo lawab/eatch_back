@@ -1,4 +1,3 @@
-const print = require("../log/print");
 const promotionServices = require("../services/promotionServices");
 
 /**
@@ -32,7 +31,7 @@ module.exports = async (body, token) => {
 
     body["order"] = order; //set order found in database
 
-    // print({ body });
+    // console.log({ body });
 
     return body;
   } catch (error) {

@@ -1,29 +1,32 @@
 const productServices = require("../services/productServices");
 const roles = require("../models/roles");
 const updateForeignFields = require("../methods/updateForeignFields");
-const print = require("../log/print");
 const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
-const { addProductFromJsonFile } = require("../services/generateJsonFile");
 const setProductValues = require("../methods/setProductValues");
+const {
+  addProductFromJsonFile,
+} = require("../../../globalservices/generateJsonFile");
 
 // create one product in database
 const createProduct = async (req, res) => {
   let newproduct = null;
   try {
-    let body = JSON.parse(req.headers?.body);
+    // let body = JSON.parse(req.headers?.body);
 
-    // let body = req.body;
+    let body = req.body;
 
     console.log({ body });
 
     let bodyUpdated = await setProductValues(body, req, req.token);
 
+    // console.log({ body });
+
     newproduct = await productServices.createProduct(bodyUpdated);
 
-    print({ newproduct });
+    console.log({ newproduct });
 
     if (newproduct) {
       // add new product create in historical
@@ -53,13 +56,13 @@ const createProduct = async (req, res) => {
           let elementDeleted = await productServices.deleteTrustlyProduct({
             _id: newproduct?._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
           return elementDeleted;
         }
       );
 
       if (response?.status === 200) {
-        print({ response: response.data?.message });
+        console.log({ response: response.data?.message });
         return res
           .status(200)
           .json({ message: "Product has been created successfully!!!" });
@@ -75,7 +78,7 @@ const createProduct = async (req, res) => {
         .json({ message: "product has been not created successfully!!!" });
     }
   } catch (error) {
-    print({ error });
+    console.log({ error });
     if (newproduct) {
       await productServices.deleteTrustlyProduct({
         _id: newproduct._id,
@@ -120,7 +123,7 @@ const updateProduct = async (req, res) => {
     // update product in database
     productUpdated = await product.save();
 
-    print({ productUpdated }, "~");
+    console.log({ productUpdated }, "~");
 
     if (productUpdated) {
       // add new product create in historical
@@ -156,7 +159,7 @@ const updateProduct = async (req, res) => {
           let productRestored = await productUpdated.save({
             timestamps: false,
           });
-          print({ productRestored });
+          console.log({ productRestored });
           return productRestored;
         }
       );
@@ -185,7 +188,7 @@ const updateProduct = async (req, res) => {
         validateModifiedOnly: true,
         timestamps: false,
       });
-      print({ productRestored });
+      console.log({ productRestored });
     }
 
     console.log(error);
@@ -203,7 +206,7 @@ const deleteProduct = async (req, res) => {
   try {
     // let body = req.body;
     const body = JSON.parse(req.headers.body);
-    console.log({ body ,productId:req.params.id});
+    console.log({ body, productId: req.params.id });
     // check if creator has authorization
     let creator = await productServices.getUserAuthor(
       body?._creator,
@@ -247,7 +250,7 @@ const deleteProduct = async (req, res) => {
       */
     productCopy = Object.assign({}, product._doc);
 
-    print({ productCopy });
+    console.log({ productCopy });
 
     //update deleteAt and cretor fields from product
 
@@ -256,7 +259,7 @@ const deleteProduct = async (req, res) => {
 
     productDeleted = await product.save();
 
-    print({ productDeleted });
+    console.log({ productDeleted });
 
     // product exits and had deleted successfully
     if (productDeleted?.deletedAt) {
@@ -290,7 +293,7 @@ const deleteProduct = async (req, res) => {
           let productRestored = await productDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ productRestored });
+          console.log({ productRestored });
           return productRestored;
         }
       );
@@ -314,7 +317,7 @@ const deleteProduct = async (req, res) => {
       let productRestored = await productDeleted.save({
         timestamps: false,
       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      print({ productRestored });
+      console.log({ productRestored });
       return productRestored;
     }
 
@@ -350,14 +353,14 @@ const fetchProducts = async (req, res) => {
         });
         products.push(product);
       }
-      print({ products }, "~");
+      console.log({ products }, "~");
       res.status(200).json(products);
     } else {
       let products = await productServices.findProducts();
       res.status(200).json(products);
     }
   } catch (error) {
-    print(error.message, "x");
+    console.log(error.message, "x");
     throw new Error(error);
   }
 };
@@ -423,7 +426,7 @@ const fetchMaterialsFromProdcuts = async (req, res) => {
       //   }
       // }
 
-      // print({ materials: values }, "~");
+      // console.log({ materials: values }, "~");
       return res.status(200).json(remoteMaterials);
     } else {
       return res.status(401).json({ message: "invalid data send!!!" });
@@ -459,7 +462,7 @@ const incrementQuantityFromProducts = async (req, res) => {
       1
     );
 
-    print({ productsUpdated, productsIndexes });
+    console.log({ productsUpdated, productsIndexes });
 
     if (productsUpdated.length === products.length) {
       res.status(200).json(productsUpdated);
@@ -480,7 +483,7 @@ const decrementQuantityFromProducts = async (req, res) => {
       _id: { $in: productsIndexes },
     });
 
-    print({ productsValided });
+    console.log({ productsValided });
 
     // validaton of quantities from all product before save it in database
     for (let index = 0; index < productsValided.length; index++) {
@@ -497,7 +500,7 @@ const decrementQuantityFromProducts = async (req, res) => {
       -1
     );
 
-    print({ productsUpdated, productsIndexes });
+    console.log({ productsUpdated, productsIndexes });
 
     if (productsUpdated.length === productsIndexes.length) {
       res.status(200).json(productsUpdated);

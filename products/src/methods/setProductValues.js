@@ -45,9 +45,6 @@ module.exports = async (body, req, token) => {
     if (!recette) {
       throw new Error(errorMessage("recette"));
     }
-    // if (!materials?.length || materials?.length !== body?.materials?.length) {
-    //   throw new Error(errorMessage("materials"));
-    // }
 
     console.log({ recette });
     //set materials value found in database
@@ -65,8 +62,6 @@ module.exports = async (body, req, token) => {
     body["image"] = req.file
       ? "/datas/" + req.file?.filename
       : "/datas/avatar.png";
-
-    console.log({ body });
 
     return body;
   } catch (error) {

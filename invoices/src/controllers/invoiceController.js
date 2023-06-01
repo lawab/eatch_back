@@ -1,4 +1,3 @@
-const print = require("../log/print");
 const invoiceServices = require("../services/invoiceServices");
 const {
   getInvoicePrice,
@@ -27,7 +26,7 @@ const createInvoice = async (req, res) => {
     // get order in databsase
     let order = await invoiceServices.getOrder(idOrder, req.token);
 
-    print({ order }, "*");
+    console.log({ order }, "*");
     if (!order || order.deletedAt) {
       return res.status(401).json({
         message:
@@ -98,7 +97,7 @@ const createInvoice = async (req, res) => {
 
     let invoice = await invoiceServices.createInvoice(bodyUpdated);
 
-    print({ invoice }, "*");
+    console.log({ invoice }, "*");
 
     if (invoice?._id) {
       let response = await addElementToHistorical(
@@ -135,7 +134,7 @@ const createInvoice = async (req, res) => {
             _id: invoice?._id,
           });
 
-          print({ elementDeleted, materialsRestored });
+          console.log({ elementDeleted, materialsRestored });
 
           // reset order because creation of invoice failed or orther error occured
           return await resetOrder(orderUpdated, orderCopy, req);
@@ -165,7 +164,7 @@ const createInvoice = async (req, res) => {
         req.token
       );
     }
-    print(error.message, "x");
+    console.log(error.message, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Invoice!!!" });
@@ -180,7 +179,7 @@ const fetchInvoice = async (req, res) => {
     });
     res.status(200).json(invoice);
   } catch (error) {
-    print(error.message);
+    console.log(error.message);
     res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
@@ -214,7 +213,7 @@ async function resetOrder(orderUpdated, orderCopy, req) {
     req.token
   );
   // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-  print({ orderRestored });
+  console.log({ orderRestored });
   return orderRestored;
 }
 module.exports = {

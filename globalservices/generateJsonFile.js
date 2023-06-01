@@ -17,7 +17,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
       )) || [];
 
     let newCategories = categories
-      .filter((cat) => cat.deletedAt === null)
+      .filter((cat) => !cat.deletedAt)
       .map((cat) => {
         let products = cat.products;
         let category = {};
@@ -29,7 +29,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
         category["updatedAt"] = cat["updatedAt"];
 
         let newproducts = products
-          .filter((prod) => prod.deletedAt === null)
+          .filter((prod) => !prod.deletedAt)
           .map((product) => {
             let p = {};
             p["_id"] = product._id;

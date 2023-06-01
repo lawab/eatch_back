@@ -1,17 +1,9 @@
-const cryptoJS = require("crypto-js");
 const userService = require("../services/userServices");
 const roleService = require("../services/roleServices");
-
 const roles = require("../models/roles");
-const { fieldsRequired } = require("../models/user/users");
 const { fieldsRequired: fieldsRoleRequired } = require("../models/role/role");
-
-const print = require("../log/print");
 const { fieldsValidator } = require("../models/validators");
-const {
-  addElementToHistorical,
-  closeRequest,
-} = require("../services/historicalFunctions");
+const { addElementToHistorical } = require("../services/historicalFunctions");
 const setUserValues = require("../methods/setUserValues");
 const updateUserValues = require("../methods/updateUserValues");
 
@@ -54,12 +46,12 @@ const createUser = async (req, res) => {
           let elementDeleted = await userService.deleteTrustlyUser({
             _id: newuser._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
         }
       );
 
       if (response?.status === 200) {
-        print({ response: response.data?.message });
+        console.log({ response: response.data?.message });
         return res
           .status(200)
           .json({ message: "User has been created successfully!!!" });
@@ -74,12 +66,12 @@ const createUser = async (req, res) => {
         .json({ message: "Created User failed,please try again!!!" });
     }
   } catch (err) {
-    print({ err });
+    console.log({ err });
     if (newuser) {
       let elementDeleted = await userService.deleteTrustlyUser({
         _id: newuser._id,
       });
-      print({ elementDeleted });
+      console.log({ elementDeleted });
     }
     res
       .status(500)
@@ -127,7 +119,7 @@ const createUserRole = async (req, res) => {
 
     // save new role in database
     let newRole = await roleService.createRole(body);
-    print({ newRole });
+    console.log({ newRole });
     if (newRole?._id) {
       res
         .status(200)
@@ -180,7 +172,7 @@ const UpdateRole = async (req, res) => {
         ...body,
       }
     );
-    print({ newRole });
+    console.log({ newRole });
 
     if (newRole?._id) {
       res
@@ -226,7 +218,7 @@ const UpdateUser = async (req, res) => {
     // update user in database
     userUpdated = await user.save();
 
-    print({ userUpdated });
+    console.log({ userUpdated });
 
     if (userUpdated) {
       // add new user create in historical
@@ -252,13 +244,13 @@ const UpdateUser = async (req, res) => {
 
           // restore Object in database,not update timestamps because it is restoration from olds values fields in database
           let userRestored = await userUpdated.save({ timestamps: false });
-          print({ userRestored });
+          console.log({ userRestored });
           return userRestored;
         }
       );
 
       if (response?.status === 200) {
-        print({ response: response.data?.message });
+        console.log({ response: response.data?.message });
         return res
           .status(200)
           .json({ message: "User has been updated successfully!!!" });
@@ -281,9 +273,9 @@ const UpdateUser = async (req, res) => {
       }
       // restore Object in database,not update timestamps because it is restoration from olds values fields in database
       let userRestored = await userUpdated.save({ timestamps: false });
-      print({ userRestored });
+      console.log({ userRestored });
     }
-    print({ error }, "x");
+    console.log({ error }, "x");
     // if error occured,remove user created if exists in database
     res.status(500).json({ message: "Error occured during delete request!!" });
   }
@@ -337,7 +329,7 @@ const deleteUser = async (req, res) => {
 
     let userDeleted = await user.save();
 
-    print({ userDeleted });
+    console.log({ userDeleted });
 
     if (userDeleted?.deletedAt) {
       // add new user create in historical
@@ -364,13 +356,13 @@ const deleteUser = async (req, res) => {
 
           // restore Object in database,not update timestamps because it is restoration from olds values fields in database
           let userRestored = await userDeleted.save({ timestamps: false });
-          print({ userRestored });
+          console.log({ userRestored });
           return userRestored;
         }
       );
 
       if (response?.status === 200) {
-        print({ response: response.data?.message });
+        console.log({ response: response.data?.message });
         return res
           .status(200)
           .json({ message: "User has been delete successfully!!!" });
@@ -393,7 +385,7 @@ const deleteUser = async (req, res) => {
 
       // restore Object in database,not update timestamps because it is restoration from olds values fields in database
       let userRestored = await userDeleted.save({ timestamps: false });
-      print({ userRestored });
+      console.log({ userRestored });
       return userRestored;
     }
     console.log(error);
@@ -435,7 +427,7 @@ const deleteRole = async (req, res) => {
     }
 
     if (roleDeleted?.deletedAt) {
-      print({ roleDeleted });
+      console.log({ roleDeleted });
       return res
         .status(200)
         .json({ message: "role has been delete successfully!!!" });
@@ -524,7 +516,7 @@ const disconnectUser = async (req, res) => {
     });
   }
 
-  print({ userUpdated });
+  console.log({ userUpdated });
 
   if (!userUpdated?.isOnline) {
     return res.status(200).json({

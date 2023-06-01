@@ -1,4 +1,3 @@
-const print = require("../log/print");
 const orderServices = require("../services/orderServices");
 const roles = require("../models/roles");
 const updateOrderValues = require("../methods/updateValues");
@@ -18,7 +17,7 @@ const createOrder = async (req, res) => {
 
     let orderCreated = await orderServices.createOrder(body);
 
-    print({ orderCreated }, "*");
+    console.log({ orderCreated }, "*");
 
     if (orderCreated?._id) {
       let response = await addElementToHistorical(
@@ -38,7 +37,7 @@ const createOrder = async (req, res) => {
           let elementDeleted = await orderServices.deleteTrustlyOrder({
             _id: orderCreated._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
           return elementDeleted;
         }
       );
@@ -55,7 +54,7 @@ const createOrder = async (req, res) => {
         .json({ message: "Order has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of order!!!" });
@@ -96,7 +95,7 @@ const updateOrder = async (req, res) => {
     // update order in database
     orderUpdated = await order.save();
 
-    print({ orderUpdated });
+    console.log({ orderUpdated });
 
     if (orderUpdated?._id) {
       let response = await addElementToHistorical(
@@ -125,7 +124,7 @@ const updateOrder = async (req, res) => {
           let orderRestored = await orderUpdated.save({
             timestamps: false,
           });
-          print({ orderRestored });
+          console.log({ orderRestored });
           return orderRestored;
         }
       );
@@ -154,10 +153,10 @@ const updateOrder = async (req, res) => {
       let orderRestored = await orderUpdated.save({
         timestamps: false,
       });
-      print({ orderRestored });
+      console.log({ orderRestored });
     }
 
-    print(error.message);
+    console.log(error.message);
     res.status(500).json({
       message: "Error(s) occured during the update order!!!",
     });
@@ -232,7 +231,7 @@ const deleteOrder = async (req, res) => {
       */
     orderCopy = Object.assign({}, order._doc);
 
-    print({ orderCopy });
+    console.log({ orderCopy });
 
     //update deleteAt and cretor fields from order
 
@@ -266,7 +265,7 @@ const deleteOrder = async (req, res) => {
           let orderRestored = await orderDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ orderRestored });
+          console.log({ orderRestored });
           return orderRestored;
         }
       );
@@ -289,10 +288,10 @@ const deleteOrder = async (req, res) => {
       let orderRestored = await orderDeleted.save({
         timestamps: false,
       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      print({ orderRestored });
+      console.log({ orderRestored });
     }
 
-    print(error, "x");
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error(s) occured during the deletion of order!!!" });

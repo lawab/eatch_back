@@ -1,5 +1,3 @@
-const print = require("../log/print");
-
 /**
     
  * @param {Function} addElementToHistorical [callback that call historical service to store element into historical]
@@ -30,7 +28,7 @@ const addElementToHistorical = async (addElementToHistorical, errorHanhler) => {
  */
 const closeRequest = (response, res, invoice = null, errorMessage = "") => {
   if (response?.status === 200) {
-    print({ response: response.data?.message });
+    console.log({ response: response.data?.message });
     return res.status(200).json(invoice);
   } else {
     return res.status(401).json({ message: errorMessage });

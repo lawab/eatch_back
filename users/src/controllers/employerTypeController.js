@@ -1,7 +1,6 @@
 const employerServices = require("../services/employerServices");
 const userServices = require("../services/userServices");
 
-const print = require("../log/print");
 const roles = require("../models/roles");
 const { fieldsValidator } = require("../models/validators");
 const { fieldsRequired } = require("../models/employertype/employerType");
@@ -47,7 +46,7 @@ const createEmployerType = async (req, res) => {
 
     // save new employerType in database
     let newEmployerType = await employerServices.createEmployerType(body);
-    print({ newEmployerType });
+    console.log({ newEmployerType });
     if (newEmployerType?._id) {
       res
         .status(200)
@@ -102,7 +101,7 @@ const UpdateEmployerType = async (req, res) => {
         ...body,
       }
     );
-    print({ newEmployerType });
+    console.log({ newEmployerType });
 
     if (newEmployerType?._id) {
       res
@@ -153,7 +152,7 @@ const deleteEmployerType = async (req, res) => {
     }
 
     if (employerTypeDeleted?.deletedAt) {
-      print({ employerTypeDeleted });
+      console.log({ employerTypeDeleted });
       return res
         .status(200)
         .json({ message: "employerType has been delete successfully!!!" });

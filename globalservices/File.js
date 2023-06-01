@@ -3,6 +3,7 @@ const path = require("path");
 const { jsonFilesPath } = require("../globalConfig");
 /**
  * class to manage files
+ * @author <uchockomeny@gmail.com>
  */
 module.exports = class File {
   dest = "";

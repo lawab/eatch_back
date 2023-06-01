@@ -1,4 +1,3 @@
-const print = require("../log/print");
 const logisticServices = require("../services/logisticServices");
 const roles = require("../models/roles");
 const {
@@ -62,7 +61,7 @@ const createLogistic = async (req, res) => {
 
     newElement = await logisticServices.createLogistic(body);
 
-    print({ newElement }, "*");
+    console.log({ newElement }, "*");
 
     if (newElement?._id) {
       let response = await addElementToHistorical(
@@ -82,7 +81,7 @@ const createLogistic = async (req, res) => {
           let elementDeleted = await logisticServices.deleteTrustlyElement({
             _id: newElement._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
           return elementDeleted;
         }
       );
@@ -103,9 +102,9 @@ const createLogistic = async (req, res) => {
       let elementDeleted = await logisticServices.deleteTrustlyElement({
         _id: newElement._id,
       });
-      print({ elementDeleted });
+      console.log({ elementDeleted });
     }
-    print(error, "x");
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of logistic!!!" });
@@ -166,7 +165,7 @@ const updateLogistic = async (req, res) => {
     // copy document
     logisticCopy = Object.assign({}, logistic._doc);
 
-    print({ logisticCopy });
+    console.log({ logisticCopy });
 
     // update all valid fields before save it in database
     for (let key in body) {
@@ -181,7 +180,7 @@ const updateLogistic = async (req, res) => {
     // update field in database
     logisticUpdated = await logistic.save();
 
-    print({ logisticUpdated }, "*");
+    console.log({ logisticUpdated }, "*");
 
     if (logisticUpdated?._id) {
       let response = await addElementToHistorical(
@@ -206,7 +205,7 @@ const updateLogistic = async (req, res) => {
           let logisticRestored = await logisticUpdated.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ logisticRestored });
+          console.log({ logisticRestored });
           return logisticRestored;
         }
       );
@@ -227,7 +226,7 @@ const updateLogistic = async (req, res) => {
         let logisticRestored = await logisticUpdated.save({
           timestamps: false,
         }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-        print({ logisticRestored });
+        console.log({ logisticRestored });
         return logisticRestored;
       }
       res.status(401).json({
@@ -235,7 +234,7 @@ const updateLogistic = async (req, res) => {
       });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     res.status(500).json({
       message: "Erros occured during the update logistic!!!",
     });
@@ -277,7 +276,7 @@ const deleteLogistic = async (req, res) => {
 
     logisticCopy = Object.assign({}, logistic._doc); // cppy documment before update it
 
-    print({ logisticCopy });
+    console.log({ logisticCopy });
 
     logistic.deletedAt = Date.now();
     logistic._creator = creator;
@@ -285,7 +284,7 @@ const deleteLogistic = async (req, res) => {
     // find and delete logistic
     logisticDeleted = await logistic.save();
 
-    print({ logisticDeleted });
+    console.log({ logisticDeleted });
     // logistic exits and had deleted successfully
     if (logisticDeleted?.deletedAt) {
       let response = await addElementToHistorical(
@@ -309,7 +308,7 @@ const deleteLogistic = async (req, res) => {
           let logisticRestored = await logisticDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ logisticRestored });
+          console.log({ logisticRestored });
           return logisticRestored;
         }
       );
@@ -332,7 +331,7 @@ const deleteLogistic = async (req, res) => {
       let logisticRestored = await logisticDeleted.save({
         timestamps: false,
       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      print({ logisticRestored });
+      console.log({ logisticRestored });
     }
     console.log(error.message);
     return res
