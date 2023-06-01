@@ -8,6 +8,9 @@ const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
+const {
+  addProductFromJsonFile,
+} = require("../../../globalservices/generateJsonFile");
 
 // create one Menu
 const createMenu = async (req, res) => {
@@ -35,6 +38,13 @@ const createMenu = async (req, res) => {
             },
             req.token
           );
+
+          let { content, categories, menus } = await addProductFromJsonFile(
+            bodyUpdated.restaurant._id,
+            req.token
+          );
+
+          console.log({ content: JSON.parse(content), categories, menus });
 
           return addResponse;
         },
