@@ -59,7 +59,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
         let category = {};
         category["_id"] = menu["_id"];
         category["title"] = menu["menu_title"];
-        category["price"] = menu["price"];
+        category["price"] = menu["price"].toString();
         category["image"] = menu["image"];
         category["deletedAt"] = "null";
         category["createdAt"] = menu["createdAt"];

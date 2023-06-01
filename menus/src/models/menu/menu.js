@@ -109,6 +109,10 @@ const menuSchemaObject = {
     type: restaurantType,
   },
   price: { type: Number, required: true },
+  devise: {
+    type: String,
+    default: "MAD",
+  },
   products: {
     required: true,
     type: [{ type: productType }],
