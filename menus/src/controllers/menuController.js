@@ -191,8 +191,8 @@ const deleteMenu = async (req, res) => {
   let MenuDeleted = null;
   let menuCopy = null;
   try {
-    // let body = req.body;
-    let body = JSON.parse(req.headers.body);
+    let body = req.body;
+    // let body = JSON.parse(req.headers.body);
 
     // check if creator have authorization
     let creator = await menuServices.getUserAuthor(body?._creator, req.token);
@@ -236,7 +236,7 @@ const deleteMenu = async (req, res) => {
     if (MenuDeleted?.deletedAt) {
       let response = await addElementToHistorical(
         async () => {
-          return await menuServices.addMenuToHistorical(
+          let response = await menuServices.addMenuToHistorical(
             MenuDeleted._creator._id,
             {
               menus: {
@@ -246,6 +246,14 @@ const deleteMenu = async (req, res) => {
             },
             req.token
           );
+
+          let { content, categories, menus } = await addProductFromJsonFile(
+            MenuDeleted.restaurant._id,
+            req.token
+          );
+          console.log({ content, categories, menus });
+
+          return response;
         },
         async () => {
           // restore only fields would had changed in database
