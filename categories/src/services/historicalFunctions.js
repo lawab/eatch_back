@@ -1,4 +1,4 @@
-const print = require("../log/print");
+const print = require("../../../globalservices/log/print");
 
 /**
  

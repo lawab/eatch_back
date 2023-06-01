@@ -2,7 +2,9 @@ const categoryService = require("../services/categoryServices");
 const api_consumer = require("../services/api_consumer");
 const category = require("../models/category");
 const { addElementToHistorical } = require("../services/historicalFunctions");
-const { addProductFromJsonFile } = require("../services/generateJsonFile");
+const {
+  addProductFromJsonFile,
+} = require("../../../globalservices/generateJsonFile");
 
 //Create Category in Data Base
 const createCategory = async (req, res) => {

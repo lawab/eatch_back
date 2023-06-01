@@ -1,5 +1,5 @@
 const File = require("./File");
-const api_consumer = require("../services/api_consumer");
+const productServices = require("../products/src/services/productServices");
 /**
  *
  * @param {String} restaurantId [id of restaurant ]
@@ -11,7 +11,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
     const FILENAME = "categories.json";
     // get all catégories in database
     let categories =
-      (await api_consumer.getRemoteProductsByCategoriesForOneRestaurant(
+      (await productServices.getProductsByCategoriesForOneRestaurant(
         restaurantId,
         token
       )) || [];
@@ -41,8 +41,11 @@ const addProductFromJsonFile = async (restaurantId, token) => {
             p["deletedAt"] = "null";
             p["createdAt"] = product.createdAt;
             p["updatedAt"] = product.updatedAt;
-            p["quantity"] = Math.floor(Math.random() * 50);
+            p["quantity"] = Math.floor(Math.random() * 50).toString();
+            return p;
           });
+
+        console.log({ newproducts });
 
         category["products"] = [...newproducts];
 

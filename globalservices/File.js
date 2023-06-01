@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { jsonFilesPath } = require("../../../globalConfig");
+const { jsonFilesPath } = require("../globalConfig");
 /**
  * class to manage files
  */
