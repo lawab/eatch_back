@@ -18,7 +18,7 @@
           "deletedAt": "null",
           "createdAt": "2023-05-31T21:58:06.575Z",
           "updatedAt": "2023-06-01T12:14:27.181Z",
-          "quantity": "48"
+          "quantity": "41"
         }
       ]
     },
@@ -40,7 +40,7 @@
           "deletedAt": "null",
           "createdAt": "2023-05-31T21:52:06.282Z",
           "updatedAt": "2023-05-31T22:03:55.090Z",
-          "quantity": "34"
+          "quantity": "39"
         },
         {
           "_id": "647890c07cc2b83b4df76e3f",
@@ -52,7 +52,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T12:36:16.088Z",
           "updatedAt": "2023-06-01T12:36:16.088Z",
-          "quantity": "28"
+          "quantity": "35"
         },
         {
           "_id": "647892377cc2b83b4df76e53",
@@ -64,7 +64,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T12:42:31.357Z",
           "updatedAt": "2023-06-01T12:42:31.357Z",
-          "quantity": "21"
+          "quantity": "3"
         }
       ]
     },
@@ -86,7 +86,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T16:30:24.590Z",
           "updatedAt": "2023-06-01T16:30:24.590Z",
-          "quantity": "4"
+          "quantity": "49"
         },
         {
           "_id": "6478c7cac73be1cd44382420",
@@ -98,7 +98,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T16:31:06.975Z",
           "updatedAt": "2023-06-01T16:31:06.975Z",
-          "quantity": "41"
+          "quantity": "23"
         },
         {
           "_id": "6478fa76b246cecd5b00e4d3",
@@ -110,7 +110,7 @@
           "deletedAt": "null",
           "createdAt": "2023-06-01T20:07:18.364Z",
           "updatedAt": "2023-06-01T20:07:18.364Z",
-          "quantity": "1"
+          "quantity": "30"
         }
       ]
     }
@@ -187,12 +187,12 @@
     },
     {
       "_id": "6479050d77cd4971e828c47e",
-      "title": "super menu 6",
+      "title": "super menu 7",
       "price": "50",
       "image": "/datas/avatar.png",
       "deletedAt": "null",
       "createdAt": "2023-06-01T20:52:30.019Z",
-      "updatedAt": "2023-06-01T20:52:30.019Z",
+      "updatedAt": "2023-06-01T21:05:59.735Z",
       "products": [
         {
           "_id": "6477c1864b48cdcac498f95f",

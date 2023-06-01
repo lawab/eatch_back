@@ -90,8 +90,8 @@ const updateMenu = async (req, res) => {
   let menuCopy = null;
   try {
     // get body request
-    // let body = req.body;
-    let body = JSON.parse(req.headers.body);
+    let body = req.body;
+    // let body = JSON.parse(req.headers.body);
 
     let menu = await menuServices.findOneMenu({
       _id: req.params?.id,
@@ -124,7 +124,7 @@ const updateMenu = async (req, res) => {
     if (menusaved?._id) {
       let response = await addElementToHistorical(
         async () => {
-          return await menuServices.addMenuToHistorical(
+          let response = await menuServices.addMenuToHistorical(
             menusaved._creator._id,
             {
               menus: {
@@ -134,6 +134,14 @@ const updateMenu = async (req, res) => {
             },
             req.token
           );
+
+          let { content, categories, menus } = await addProductFromJsonFile(
+            bodyUpdated.restaurant._id,
+            req.token
+          );
+          console.log({ content, categories, menus });
+
+          return response;
         },
         async () => {
           for (const field in menuCopy) {
