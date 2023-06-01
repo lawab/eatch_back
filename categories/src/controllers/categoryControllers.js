@@ -20,8 +20,8 @@ const createCategory = async (req, res) => {
   console.log(req.file);
   console.log("*********************************************");
 
-  let body = JSON.parse(req.headers?.body);
-  // let body = req.body;
+  // let body = JSON.parse(req.headers?.body);
+  let body = req.body;
 
   const newCategory = {
     title: body?.title,
@@ -31,7 +31,7 @@ const createCategory = async (req, res) => {
   };
   let category = null;
 
-  console.log("USER: " + newCategory.user_id, { newCategory });
+  // console.log("USER: " + newCategory.user_id, { newCategory });
   try {
     const user = await api_consumer.getUserById(newCategory.user_id, req.token);
 
@@ -40,9 +40,8 @@ const createCategory = async (req, res) => {
       req.token
     );
 
-    console.log("THE RESTAURANT:");
-    console.log({ restaurant });
-    console.log("THE USER:");
+    // console.log("THE RESTAURANT:");
+    // console.log({ restaurant });
 
     //console.log(user)
     const creator = {
@@ -55,7 +54,7 @@ const createCategory = async (req, res) => {
 
     newCategory._creator = creator;
     newCategory["restaurant"] = restaurant;
-    console.log(newCategory);
+    // console.log(newCategory);
 
     category = await categoryService.createCategory(newCategory);
 
@@ -236,7 +235,6 @@ const getCategory = async (req, res) => {
     const category = await categoryService.getCategoryById(
       req.params.categoryId
     );
-    console.log({ categoryFound: category });
     res.status(200).json(category);
   } catch (err) {
     console.log(err);

@@ -1,5 +1,23 @@
 const File = require("./File");
-const productServices = require("../products/src/services/productServices");
+const { APP_URL_PRODUCT } = require("./remoteServices");
+const { default: axios } = require("axios");
+
+const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
+  try {
+    let { data: categories } = await axios.get(
+      `${APP_URL_PRODUCT}/fetch/categories/${restaurantId}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return categories;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 /**
  *
  * @param {String} restaurantId [id of restaurant ]
@@ -11,10 +29,8 @@ const addProductFromJsonFile = async (restaurantId, token) => {
     const FILENAME = "categories.json";
     // get all catégories in database
     let categories =
-      (await productServices.getProductsByCategoriesForOneRestaurant(
-        restaurantId,
-        token
-      )) || [];
+      (await getProductsByCategoriesForOneRestaurant(restaurantId, token)) ||
+      [];
 
     let newCategories = categories
       .filter((cat) => !cat.deletedAt)
@@ -61,6 +77,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
 
     return content;
   } catch (error) {
+    console.log({ errorjson: error });
     throw new Error(error.message);
   }
 };

@@ -60,6 +60,7 @@ const addToHistorical = async (id = null, bodyUpdate = {}, token) => {
       },
     }
   );
+  console.log({ historicalResponse: response });
   return response;
 };
 

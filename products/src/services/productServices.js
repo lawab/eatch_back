@@ -226,26 +226,31 @@ const getRecette = async (recetteID, token = null) => {
 // };
 
 const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
-  let categories = await getCategories(token);
-  let productsByCategoryAndRestaurant = [];
+  try {
+    // get all categories
+    let categories = await getCategories(token);
+    let productsByCategoryAndRestaurant = [];
 
-  for (let index = 0; index < categories.length; index++) {
-    const category = categories[index];
+    for (let index = 0; index < categories.length; index++) {
+      const category = categories[index];
 
-    if (category) {
-      productsFound = await findProducts({
-        "category._id": category._id,
-        "restaurant._id": restaurantId,
-      });
+      if (category) {
+        productsFound = await findProducts({
+          "category._id": category._id,
+          "restaurant._id": restaurantId,
+        });
 
-      productsByCategoryAndRestaurant.push({
-        ...category,
-        products: productsFound,
-      });
+        productsByCategoryAndRestaurant.push({
+          ...category,
+          products: productsFound,
+        });
+      }
     }
-  }
 
-  return productsByCategoryAndRestaurant;
+    return productsByCategoryAndRestaurant;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 module.exports = {
