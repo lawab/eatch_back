@@ -5,9 +5,11 @@ const UpdateForeignFields = require("../controllers/UpdateForeignFields");
 //Create restaurant in Data Base
 const createRestaurant = async (req, res) => {
   try {
+    let body = JSON.parse(req.headers.body);
+    //let body = req.body;
     //VERIFICATION DE LIDENTITER DE CELUI QUI CREER LE RESTAURANT
     let creator = await RestaurantServices.getUserAuthor(
-      req.body?._creator,
+      body?._creator,
       req.token
     );
     if (!creator?._id) {
@@ -16,16 +18,15 @@ const createRestaurant = async (req, res) => {
       });
     }
 
-    let body = JSON.parse(req.headers.body);
     //let body = req.body;
-    let info = {
+    let infos = {
       town: body?.town,
       address: body?.address,
       logo: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     };
     let restaurantBody = {
       restaurant_name: body?.restaurant_name,
-      info: info,
+      infos: infos,
       _creator: body?._creator,
     };
 
@@ -86,8 +87,10 @@ const deleteRestaurant = async (req, res) => {
 
 const updateRestaurant = async (req, res) => {
   try {
+    let body = JSON.parse(req.headers.body);
+    //let body = req.body;
     let creator = await RestaurantServices.getUserAuthor(
-      req.body?._creator,
+      body?._creator,
       req.token
     );
     if (!creator?._id) {
@@ -96,16 +99,15 @@ const updateRestaurant = async (req, res) => {
       });
     }
 
-    let body = JSON.parse(req.headers.body);
     //let body = req.body;
-    let info = {
+    let infos = {
       town: body?.town,
       address: body?.address,
       logo: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     };
     let restaurantBody = {
       restaurant_name: body?.restaurant_name,
-      info: info,
+      infos: infos,
       _creator: body?._creator,
     };
 

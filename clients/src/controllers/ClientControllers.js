@@ -1,3 +1,4 @@
+const cryptoJS = require("crypto-js");
 const { fieldsRequired } = require("../models/Client");
 const { fieldsValidator } = require("../models/validators");
 const roles = require("../models/roles");
@@ -31,12 +32,29 @@ const createClient = async (req, res) => {
       req.token
     );
     data["restaurant"] = restaurant;
+
+    // set password encrypt
+
+    (data["password"] = cryptoJS.AES.encrypt(
+      data.password,
+      process.env.PASS_SEC
+    ).toString()),
+      // set clientname
+      (data["username"] = [data.firstname, data.lastname].join(" "));
+
+    // set creator
+    // body["_creator"] = creator;
+
+    // set user avatar
+    data["avatar"] = req.file
+      ? "/datas/" + req.file?.filename
+      : "/datas/avatar.png";
+
+    console.log("###########################");
+
+    console.log("###########################");
     let clientCreated = await ClientServices.createClient(data);
-
-    console.log("###########################");
     console.log({ createClient: clientCreated?._id });
-    console.log("###########################");
-
     if (clientCreated?._id) {
       return res
         .status(200)
@@ -56,15 +74,14 @@ const createClient = async (req, res) => {
 };
 const deleteClient = async (req, res) => {
   try {
-    let creator = await ClientServices.getUserAuthor(
+    /*let creator = await ClientServices.getclientAuthor(
       req.body?._creator,
       req.token
     );
     if (!creator?._id) {
       return res.status(401).json({
         message: "invalid data send!!!",
-      });
-    }
+      });*/
 
     let deleteClient = await ClientServices.deleteOne(
       {
@@ -105,15 +122,17 @@ const deleteClient = async (req, res) => {
 const updateClient = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
-    // let body = req.body;
+    //let body = req.body;
     const id = req.params.id;
-
+    console.log("*************************************");
+    console.log(body);
     let restaurant = await ClientServices.getRestaurant(
       body?.restaurant,
       req.token
     );
     body["restaurant"] = restaurant;
-
+    console.log("*************************************");
+    console.log(body);
     let client = await ClientServices.updateClient(id, body);
     console.log(client);
     if (client) {
@@ -171,6 +190,36 @@ const fetchClientByRestaurant = async (req, res) => {
   }
 };
 
+const disconnectClient = async (req, res) => {
+  console.log(req.params);
+  let clientUpdated = await ClientServices.updateClient(
+    {
+      _id: req.params?.id,
+    },
+    {
+      isOnline: false,
+    }
+  );
+
+  if (!clientUpdated) {
+    return res.status(401).json({
+      message: "unable to disconnect user because it not exists",
+    });
+  }
+
+  console.log({ clientUpdated });
+
+  if (!clientUpdated?.isOnline) {
+    return res.status(200).json({
+      message: "client disconnected successfully",
+    });
+  } else {
+    return res.status(401).json({
+      message: "client has not be disconnected successfully!!!",
+    });
+  }
+};
+
 //EXPORTS ALL CONTROLLER'S SERVICES
 module.exports = {
   createClient,
@@ -179,4 +228,5 @@ module.exports = {
   fetchClient,
   fetchClients,
   fetchClientByRestaurant,
+  disconnectClient,
 };

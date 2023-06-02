@@ -33,7 +33,7 @@ restaurantRouter.put(
 );
 
 //get one restaurant
-restaurantRouter.get("/fetch/one/:id", authmiddleware, fetchOneRestaurant);
+restaurantRouter.get("/fetch/one/:id", fetchOneRestaurant);
 
 //get all restaurant
 restaurantRouter.get("/fetch/all", authmiddleware, fetchRestaurants);

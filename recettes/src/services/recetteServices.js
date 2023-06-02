@@ -134,6 +134,26 @@ const getRestaurant = async (id = null, token = null) => {
   );
   return restaurant;
 };
+
+/**
+ *
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addRecetteToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
 module.exports = {
   createRecette,
   findOneRecette,
@@ -145,4 +165,5 @@ module.exports = {
   getClients,
   getMaterials,
   getRestaurant,
+  addRecetteToHistorical,
 };

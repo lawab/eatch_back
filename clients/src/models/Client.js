@@ -17,11 +17,6 @@ const productType = {
     maxlength: 50,
     required: true,
   },
-  quantity: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
   price: {
     type: Number,
     required: true,
@@ -101,6 +96,7 @@ const clientSchemaObject = {
 
   email: {
     type: String,
+    unique: true,
     validate: {
       validator: function (V) {
         return isEmail(V);
@@ -109,6 +105,23 @@ const clientSchemaObject = {
     maxlength: 50,
   },
   phone_number: { type: String },
+
+  // username: {
+  //type: String,
+  // required: true,
+  // unique: true,
+  // },
+
+  password: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+
+  avatar: {
+    type: String,
+    default: "/datas/avatar.png",
+  },
 
   isOnline: { type: Boolean, default: false },
 

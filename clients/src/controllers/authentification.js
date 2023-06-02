@@ -1,4 +1,4 @@
-const { default: Client } = require("../models/Client");
+const { Client } = require("../models/Client");
 const cryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const { isEmail } = require("validator"); // LOGIN WITH JWT
@@ -16,7 +16,7 @@ const login = async function (req, res) {
         return res.status(401).json({ message: "Wrong credentials!" });
       } else {
         const hashedPassword = cryptoJS.AES.decrypt(
-          user.password,
+          client.password,
           process.env.PASS_SEC
         );
         const password = hashedPassword.toString(cryptoJS.enc.Utf8);
@@ -26,15 +26,13 @@ const login = async function (req, res) {
         }
       }
 
-      const accessToken = jwt.sign(
-        { id: user._id, isAdmin: user.role },
-        process.env.JWT_SEC,
-        { expiresIn: "3d" }
-      );
+      const accessToken = jwt.sign({ id: Client._id }, process.env.JWT_SEC, {
+        expiresIn: "3d",
+      });
 
       client.isOnline = true; // enable that user is online
-      await user.save();
-      res.status(200).json({ user, accessToken });
+      await client.save();
+      res.status(200).json({ client, accessToken });
       console.log("LOGIN SUCCESSFULY!");
     }
   } catch (e) {
