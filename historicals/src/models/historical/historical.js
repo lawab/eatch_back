@@ -218,6 +218,25 @@ const productType = {
   deletedAt: { type: Date, default: null },
 };
 
+// recette type
+
+// const recetteType = {
+//   _id: { type: mongoose.Types.ObjectId, required: true },
+//   title: { type: String },
+//   image: { type: String },
+//   description: { type: String },
+//   engredients: [
+//     {
+//       material: { type: mongoose.Types.ObjectId },
+//       grammage: { type: Number },
+//     },
+//   ],
+//   _creator: {
+//     type: mongoose.Types.ObjectId,
+//   },
+//   deletedAt: { type: Date, default: null },
+// };
+
 // orders type
 const OrderType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
@@ -265,11 +284,29 @@ const OrderType = {
     enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
   },
   products: {
-    required: true,
     type: [
       {
         type: {
           _id: { type: mongoose.Types.ObjectId, required: true },
+          recette: {
+            required: true,
+            type: {
+              _id: { type: mongoose.Types.ObjectId, required: true },
+              title: { type: String },
+              image: { type: String },
+              description: { type: String },
+              engredients: [
+                {
+                  material: { type: mongoose.Types.ObjectId },
+                  grammage: { type: Number },
+                },
+              ],
+              _creator: {
+                type: mongoose.Types.ObjectId,
+              },
+              deletedAt: { type: Date, default: null },
+            },
+          },
           pusharePrice: {
             type: Number,
           },
@@ -319,6 +356,40 @@ const OrderType = {
             default: 0,
           },
         },
+      },
+    ],
+  },
+  menus: {
+    type: [
+      {
+        _id: { type: mongoose.Types.ObjectId, required: true },
+        menu_title: { type: String },
+        restaurant: {
+          type: {
+            _id: { type: mongoose.Types.ObjectId, required: true },
+            restaurant_name: String,
+            infos: {
+              town: { type: String },
+              address: { type: String },
+              logo: { type: String, default: "/datas/avatar.png" },
+            },
+          },
+        },
+        price: { type: Number, required: true },
+        devise: {
+          type: String,
+          default: "MAD",
+        },
+        products: {
+          required: true,
+          type: [{ type: productType }],
+        },
+        _creator: {
+          type: mongoose.Types.ObjectId,
+        },
+        description: { type: String, minlength: 1, default: "description" },
+        image: { type: String, default: "/datas/avatar.png" },
+        deletedAt: { type: Date, default: null },
       },
     ],
   },
