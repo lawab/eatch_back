@@ -85,34 +85,24 @@ const getUserAuthor = async (id = null, token = null) => {
   );
   return creator;
 };
+
 /**
  *
- * @param {*} id [id to find client in database from eatch_clients microservice]
- * @param {*} token [token to valid the session of author before to fetch him in database]
- * @returns {Promise} [return the current client (if exists) send by eatch_clients microservice]
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
  */
-const getClients = async (id = null, token = null) => {
-  let { data: client } = await axios.get(
-    `${process.env.APP_URL_CLIENT}/fetch/restaurant/${id}`,
+const addRetaurantToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
     {
       headers: {
         authorization: `Bearer ${token}`,
       },
     }
   );
-  return client;
-};
-
-const getProducts = async (ids = [], token = null) => {
-  let { data: products } = await axios.get(
-    `${process.env.APP_URL_PRODUCTS}/fetch/all/${JSON.stringify(ids)}`,
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return products;
+  return response;
 };
 
 module.exports = {
@@ -123,6 +113,7 @@ module.exports = {
   updateRestaurant,
   findRestaurant,
   getUserAuthor,
-  getClients,
-  getProducts,
+  addRetaurantToHistorical,
+  //getClients,
+  //getProducts,
 };

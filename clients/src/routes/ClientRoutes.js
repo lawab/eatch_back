@@ -6,8 +6,10 @@ const {
   fetchClients,
   updateClient,
   fetchClientByRestaurant,
+  disconnectClient,
 } = require("../controllers/ClientControllers");
 const uploadFileService = require("../services/uploadFile");
+const auth = require("../controllers/authentification");
 const { authmiddleware } = require("../middlewares/authmiddleware");
 var ClientRouter = express.Router();
 const upload = uploadFileService.uploadMiddleFile();
@@ -15,10 +17,15 @@ const upload = uploadFileService.uploadMiddleFile();
 //Create Client
 ClientRouter.post("/create", upload.single("file"), createClient);
 //delete Client
-ClientRouter.delete("/delete/:id", authmiddleware, deleteClient);
+ClientRouter.put("/delete/:id", authmiddleware, deleteClient);
 
 //update Client
-ClientRouter.put("/update/:id", authmiddleware, updateClient);
+ClientRouter.put("/update/:id", upload.single("file"), updateClient);
+// LOGIN ROUTE
+ClientRouter.post("/login", auth.login);
+
+//************DISCONNECT ONE client********************
+ClientRouter.put("/disconnect/:id", authmiddleware, disconnectClient);
 
 //get Client
 ClientRouter.get("/fetch/one/:id", authmiddleware, fetchClient);

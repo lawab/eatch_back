@@ -1,19 +1,32 @@
 const RestaurantServices = require("../services/RestaurantServices");
 const roles = require("../models/roles");
-const { default: mongoose } = require("mongoose");
+//const { default: mongoose } = require("mongoose");
 const UpdateForeignFields = require("../controllers/UpdateForeignFields");
 //Create restaurant in Data Base
 const createRestaurant = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
-    let info = {
+    //let body = req.body;
+    //VERIFICATION DE LIDENTITER DE CELUI QUI CREER LE RESTAURANT
+    let creator = await RestaurantServices.getUserAuthor(
+      body?._creator,
+      req.token
+    );
+    if (!creator?._id) {
+      return res.status(401).json({
+        message: "invalid data send!!!",
+      });
+    }
+
+    //let body = req.body;
+    let infos = {
       town: body?.town,
       address: body?.address,
       logo: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     };
     let restaurantBody = {
       restaurant_name: body?.restaurant_name,
-      info: info,
+      infos: infos,
       _creator: body?._creator,
     };
 
@@ -23,18 +36,28 @@ const createRestaurant = async (req, res) => {
         .status(200)
         .json({ message: "restaurant has been created successfully " });
     } else {
-      res.status(500).json({ message: "restaurant has been not created" });
+      res.status(401).json({ message: "restaurant has been not created" });
     }
   } catch (err) {
     console.log(err);
     res
-      .status(400)
+      .status(500)
       .json({ message: "Error encounterd creating restaurant!!!" });
   }
 };
 
 const deleteRestaurant = async (req, res) => {
   try {
+    let creator = await RestaurantServices.getUserAuthor(
+      req.body?._creator,
+      req.token
+    );
+    if (!creator?._id) {
+      return res.status(401).json({
+        message: "invalid data send!!!",
+      });
+    }
+
     let deleteRestaurant = await RestaurantServices.deleteOne(
       {
         _id: req.params?.id,
@@ -56,32 +79,35 @@ const deleteRestaurant = async (req, res) => {
         .status(200)
         .json({ message: "restaurant has been delete sucessfully" });
     }
-
-    let restaurant = await RestaurantServices.deleRestaurant(restaurantBody);
-    if (restaurant) {
-      res
-        .status(200)
-        .json({ message: "restaurant has been deleted successfully " });
-    } else {
-      res.status(500).json({ message: "restaurant has been not deleted" });
-    }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "Error encounterd delete restaurant!!!" });
+    res.status(500).json({ message: "Error encounterd delete restaurant!!!" });
   }
 };
 
 const updateRestaurant = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
-    let info = {
+    //let body = req.body;
+    let creator = await RestaurantServices.getUserAuthor(
+      body?._creator,
+      req.token
+    );
+    if (!creator?._id) {
+      return res.status(401).json({
+        message: "invalid data send!!!",
+      });
+    }
+
+    //let body = req.body;
+    let infos = {
       town: body?.town,
       address: body?.address,
       logo: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     };
     let restaurantBody = {
       restaurant_name: body?.restaurant_name,
-      info: info,
+      infos: infos,
       _creator: body?._creator,
     };
 
@@ -96,52 +122,77 @@ const updateRestaurant = async (req, res) => {
         .status(200)
         .json({ message: "restaurant has been update successfully " });
     } else {
-      res.status(500).json({ message: "restaurant has been not updated" });
+      res.status(401).json({ message: "restaurant has been not updated" });
     }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "Error encounterd updated restaurant!!!" });
+    res.status(500).json({ message: "Error encounterd updated restaurant!!!" });
   }
 };
 
 const fetchRestaurants = async (req, res) => {
   try {
-    let restaurant = await RestaurantServices.findRestaurants();
-    if (restaurant) {
-      res.status(200).json(restaurant);
+    /*let creator = await RestaurantServices.getUserAuthor(
+      req.body?._creator,
+      req.token
+    );
+    if (!creator?._id) {
+      return res.status(401).json({
+        message: "invalid data send!!!",
+      });
+    }*/
+
+    let restaurants = await RestaurantServices.findRestaurants();
+    if (restaurants) {
+      res.status(200).json(restaurants);
     } else {
-      res.status(500).json({ message: "restaurant has been not fetch" });
+      res.status(401).json({ message: "restaurant has been not fetch" });
     }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "Error encounterd fetch restaurant!!!" });
+    res.status(500).json({ message: "Error encounterd fetch restaurant!!!" });
   }
 };
 
 const fetchOneRestaurant = async (req, res) => {
   try {
-    let restaurant = await RestaurantServices.findRestaurant();
+    let restaurant = await RestaurantServices.findRestaurant({
+      _id: req.params?.id,
+    });
     if (restaurant) {
       res.status(200).json(restaurant);
     } else {
-      res.status(500).json({ message: "restaurant has been not fetch" });
+      res.status(401).json({ message: "restaurant has been not fetch" });
     }
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: "Error encounterd fetch restaurant!!!" });
+    res.status(500).json({ message: "Error encounterd fetch restaurant!!!" });
   }
 };
 
 // get Clients  in database
-const fetchClients = async (req, res) => {
+/*const fetchClients = async (req, res) => {
   try {
-    let Client = await RestaurantServices.getClients(req.params?.id, req.token);
-    res.status(200).json(Client);
+    let creator = await RestaurantServices.getUserAuthor(
+      req.body?._creator,
+      req.token
+    );
+    if (!creator?._id) {
+      return res.status(401).json({
+        message: "invalid data send!!!",
+      });
+    }
+
+    let clients = await RestaurantServices.getClients(
+      req.params?.id,
+      req.token
+    );
+    res.status(200).json(clients);
   } catch (error) {
     console.log(error.message);
-    res.status(400).json({ message: "Error occured during get request!!!" });
+    res.status(500).json({ message: "Error occured during get request!!!" });
   }
-};
+};*/
 
 //EXPORTS ALL CONTROLLER'S SERVICES
 module.exports = {
@@ -150,5 +201,5 @@ module.exports = {
   updateRestaurant,
   fetchRestaurants,
   fetchOneRestaurant,
-  fetchClients,
+  //fetchClients,
 };
