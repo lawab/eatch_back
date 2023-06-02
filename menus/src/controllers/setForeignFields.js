@@ -37,41 +37,41 @@ module.exports = async (body, req, token) => {
 
     body["restaurant"] = restaurant; //set restaurant value found in database
 
-    // let products = await menuServices.getProducts(body?.products, token);
-    // console.log({ products });
+    let products = await menuServices.getProducts(body?.products, token);
+    console.log({ products });
 
-    // if (
-    //   !products?.length ||
-    //   products?.length !== body?.products?.length ||
-    //   products.filter((p) => !p).length
-    // ) {
-    //   throw new Error(errorMessage("products"));
-    // }
-
-    // get products in databsase
-    let products = await menuServices.getProducts(
-      JSON.parse(body?.products),
-      token
-    );
     if (
       !products?.length ||
-      products?.length !== JSON.parse(body?.products)?.length ||
       products?.length !== body?.products?.length ||
       products.filter((p) => !p).length
     ) {
       throw new Error(errorMessage("products"));
     }
 
+    // get products in databsase
+    // let productParsed = JSON.parse(body?.products);
+
+    // let products = await menuServices.getProducts(productParsed, token);
+    // console.log({ productsFound: products });
+    // if (
+    //   !products?.length ||
+    //   products?.length !== productParsed?.length ||
+    //   products?.length !== productParsed?.length ||
+    //   products.filter((p) => !p).length
+    // ) {
+    //   throw new Error(errorMessage("products"));
+    // }
+
     body["products"] = products; //set product value found in database
 
-    //   get category in databsase
-    let category = await menuServices.getCategory(body?.category, token);
+    // //   get category in databsase
+    // let category = await menuServices.getCategory(body?.category, token);
 
-    if (!category) {
-      throw new Error(errorMessage("category"));
-    }
+    // if (!category) {
+    //   throw new Error(errorMessage("category"));
+    // }
 
-    body["category"] = category;
+    // body["category"] = category;
 
     // set user avatar
     body["image"] = req.file

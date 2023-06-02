@@ -1,13 +1,12 @@
 const { default: mongoose } = require("mongoose");
-
+const orderServices = require("../services/orderServices");
 /**
  *
- * @param {Object} orderServices [product microservice to manage product in database]
  * @param {Object} body [Body Object from express]
  * @param {Object} req [req Object from express]
  * @returns {Promise<Array<Object>}
  */
-module.exports = async (orderServices, body, req) => {
+module.exports = async (body, req) => {
   try {
     let errorMessage = (field) => `invalid ${field}`;
     let token = req.token;
@@ -40,30 +39,41 @@ module.exports = async (orderServices, body, req) => {
       body["client"] = client;
     }
 
-    // set ids list from products
-    let productsIds = body?.products;
+    if (body?.products) {
+      // set ids list from products
+      let productsIds = body?.products;
 
-    if (!productsIds?.length) {
-      throw new Error(errorMessage("products"));
+      if (!productsIds?.length) {
+        throw new Error(errorMessage("products"));
+      }
+
+      // get list of products
+      let products = await orderServices.getProducts(productsIds, token);
+
+      console.log({ products });
+      let invalidProducts = products.filter((el) => !el);
+
+      // verify that products has been set successfully
+      if (
+        !products?.length ||
+        products?.length !== body?.products?.length ||
+        invalidProducts?.length
+      ) {
+        throw new Error(errorMessage("products"));
+      }
+      console.log({ products });
+
+      body["products"] = products;
     }
 
-    // get list of products
-    let products = await orderServices.getProducts(productsIds, token);
-
-    let invalidProducts = products.filter((el) => !el?._id);
-
-    // verify that products has been set successfully
-    if (
-      !products?.length ||
-      products?.length !== body?.products?.length ||
-      invalidProducts?.length
-    ) {
-      throw new Error(errorMessage("products"));
+    if (body?.menus) {
+      let menus = await orderServices.getMenus(body?.menus, token);
+      if (!menus.filter((menu) => !menu) || !menus.length) {
+        throw new Error(errorMessage("menus"));
+      }
+      console.log({ menus });
+      body["menus"] = menus;
     }
-
-    console.log({ products });
-
-    body["products"] = products;
 
     // body["products"] = products.map((product) => {
     //   let productFound = body.products.find((p) => p._id === product._id);

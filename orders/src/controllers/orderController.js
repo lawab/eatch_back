@@ -12,8 +12,9 @@ const createOrder = async (req, res) => {
   try {
     let bodyContent = req.body;
 
+    console.log({ bodyContent });
     // set all values required
-    body = await setOrderValues(orderServices, bodyContent, req);
+    body = await setOrderValues(bodyContent, req);
 
     let orderCreated = await orderServices.createOrder(body);
 
@@ -87,7 +88,7 @@ const updateOrder = async (req, res) => {
     orderCopy = Object.assign({}, order._doc);
 
     // update products only because it is a user that update his order
-    body = await updateOrderValues(orderServices, body, req);
+    body = await updateOrderValues(body, req);
 
     // update products in order model found in database
     order["products"] = body["products"];

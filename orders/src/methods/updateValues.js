@@ -1,3 +1,5 @@
+const orderServices = require("../services/orderServices");
+
 /**
  * @author ulrich <uchokomeny@gmail.com>
  * @param {Object} res [Object Response from express to send response to client if necessary]
@@ -6,7 +8,7 @@
  * @param {String} token [token to authenticate user session]
  * @returns {Promise<Array<Object>}
  */
-module.exports = async (orderServices, body, req) => {
+module.exports = async (body, req) => {
   try {
     let errorMessage = (field) => `invalid ${field}`;
 
@@ -38,6 +40,15 @@ module.exports = async (orderServices, body, req) => {
       }
 
       body["products"] = products;
+    }
+
+    if (body?.menus) {
+      let menus = await orderServices.getMenus(body?.menus, token);
+      if (!menus.filter((menu) => !menu) || !menus.length) {
+        throw new Error(errorMessage("menus"));
+      }
+      console.log({ menus });
+      body["menus"] = menus;
     }
 
     return body;

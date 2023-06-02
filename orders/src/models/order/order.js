@@ -21,12 +21,15 @@ const productType = {
     title: { type: String },
     image: { type: String },
     description: { type: String },
-    engredients: [
-      {
-        material: { type: mongoose.Types.ObjectId },
-        grammage: { type: Number },
-      },
-    ],
+    engredients: {
+      required: true,
+      type: [
+        {
+          material: { type: mongoose.Types.ObjectId },
+          grammage: { type: Number },
+        },
+      ],
+    },
     _creator: {
       type: mongoose.Types.ObjectId,
     },
@@ -103,7 +106,7 @@ const clientType = {
 
 const menuType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  menu_title: { type: String, minlength: 1, required: true },
+  menu_title: { type: String },
   restaurant: {
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
@@ -124,10 +127,6 @@ const menuType = {
     required: true,
     type: [{ type: productType }],
   },
-  category: {
-    type: categoryType,
-  },
-  menutype: { type: String, default: "" },
   _creator: {
     type: mongoose.Types.ObjectId,
   },
@@ -156,7 +155,12 @@ const OrderschemaObject = {
     },
   },
   menus: {
-    type: menuType,
+    type: [menuType],
+    validator(menus) {
+      let invalidMenus = menus.filter((el) => !el._id);
+
+      return invalidMenus.lenght > 0;
+    },
   },
   products: {
     required: true,

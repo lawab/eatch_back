@@ -65,16 +65,16 @@ module.exports = async (body, req, token) => {
       body["products"] = products; //set products values found in database
     }
 
-    if (body?.category) {
-      //   get category in databsase
-      let category = await menuServices.getCategory(body?.category, token);
+    // if (body?.category) {
+    //   //   get category in databsase
+    //   let category = await menuServices.getCategory(body?.category, token);
 
-      if (!category) {
-        throw new Error(errorMessage("category"));
-      }
+    //   if (!category) {
+    //     throw new Error(errorMessage("category"));
+    //   }
 
-      body["category"] = category;
-    }
+    //   body["category"] = category;
+    // }
 
     // update avatar if exists
     if (req.file) {

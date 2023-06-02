@@ -125,6 +125,19 @@ const getProducts = async (ids = [], token = null) => {
   return products;
 };
 
+const getMenus = async (ids = null, token = null) => {
+  console.log({ ids });
+  let { data: menus } = await axios.get(
+    `${process.env.APP_URL_MENU}/fetch/all/${JSON.stringify(ids)}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return menus;
+};
+
 /**
  *
  * @param {String} id [id from creator who created user]
@@ -166,4 +179,5 @@ module.exports = {
   getProducts,
   addOrderToHistorical,
   deleteTrustlyOrder,
+  getMenus,
 };

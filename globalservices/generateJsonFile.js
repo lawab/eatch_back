@@ -65,22 +65,22 @@ const addProductFromJsonFile = async (restaurantId, token) => {
         category["createdAt"] = menu["createdAt"];
         category["updatedAt"] = menu["updatedAt"];
 
-        let newproducts = products.map((product) => {
-          let p = {};
-          p["_id"] = product._id;
-          p["price"] = product.price.toString();
-          p["productName"] = product.productName.toString();
-          p["promotion"] = product.promotion.toString();
-          p["devise"] = product.devise.toString();
-          p["image"] = product.image.toString();
-          p["deletedAt"] = "null";
-          // p["createdAt"] = product.createdAt;
-          // p["updatedAt"] = product.updatedAt;
-          // p["quantity"] = Math.floor(Math.random() * 50).toString();
-          return p;
-        });
+        // let newproducts = products.map((product) => {
+        //   let p = {};
+        //   p["_id"] = product._id;
+        //   p["price"] = product.price.toString();
+        //   p["productName"] = product.productName.toString();
+        //   p["promotion"] = product.promotion.toString();
+        //   p["devise"] = product.devise.toString();
+        //   p["image"] = product.image.toString();
+        //   p["deletedAt"] = "null";
+        //   // p["createdAt"] = product.createdAt;
+        //   // p["updatedAt"] = product.updatedAt;
+        //   // p["quantity"] = Math.floor(Math.random() * 50).toString();
+        //   return p;
+        // });
 
-        category["products"] = [...newproducts];
+        // category["products"] = [...newproducts];
 
         return category;
       });
@@ -121,15 +121,17 @@ const addProductFromJsonFile = async (restaurantId, token) => {
         return category;
       });
 
+    newCategories.push({
+      title: "menu",
+      menus: newMenus,
+    });
+
     let file = new File();
     console.log({ categories: newCategories, menus: newMenus });
 
     let content = await file.writeToFile(
       FILENAME,
-      JSON.stringify({
-        categories: newCategories,
-        menus: newMenus,
-      })
+      JSON.stringify(newCategories)
     );
 
     return { content, categories: newCategories, menus: newMenus };

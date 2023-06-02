@@ -16,8 +16,8 @@ const {
 const createMenu = async (req, res) => {
   let menu = null;
   try {
-    // let body = req.body;
-    let body = JSON.parse(req.headers.body);
+    let body = req.body;
+    // let body = JSON.parse(req.headers.body);
     console.log({ body });
     let bodyUpdated = await setForeignFields(body, req, req.token);
 
@@ -310,20 +310,26 @@ const fetchMenu = async (req, res) => {
 // get Menus
 const fetchMenus = async (req, res) => {
   try {
-    console.log({ ids: req.params?.ids });
-    if (req.params?.ids) {
-      let ids = JSON.parse(req.params?.ids);
-      let Menus = await menuServices.findMenus({
-        _id: { $in: ids },
-      });
-      res.status(200).json(Menus);
+    let menus = [];
+    let ids = req.params?.ids ? JSON.parse(req.params?.ids) : [];
+    console.log({ ids });
+    if (ids.length) {
+      for (let index = 0; index < ids.length; index++) {
+        const id = ids[index];
+        let menu = await menuServices.findMenu({
+          _id: id,
+        });
+        menus.push(menu);
+      }
+      console.log({ menus }, "~");
+      res.status(200).json(menus);
     } else {
-      let Menus = await menuServices.findMenus();
-      res.status(200).json(Menus);
+      let menus = await menuServices.findMenus();
+      res.status(200).json(menus);
     }
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: "Error occured during get request!!!" });
+    console.log(error.message, "x");
+    throw new Error(error);
   }
 };
 

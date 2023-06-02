@@ -11,10 +11,31 @@ const restaurantType = {
     logo: { type: String, default: "/datas/avatar.png" },
   },
 };
+
+const recetteType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+  title: { type: String },
+  image: { type: String },
+  description: { type: String },
+  engredients: {
+    required: true,
+    type: [
+      {
+        material: { type: mongoose.Types.ObjectId },
+        grammage: { type: Number },
+      },
+    ],
+  },
+  deletedAt: { type: Date, default: null },
+};
 const productType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   pusharePrice: {
     type: Number,
+  },
+  recette: {
+    required: true,
+    type: recetteType,
   },
   costPrice: {
     type: Number,
@@ -84,24 +105,24 @@ const userSchemaObject = {
   },
 };
 
-const categoryType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
-  title: String,
-  image: String,
-  _creator: {
-    _id: { type: String },
-    role: { type: String },
-    email: { type: String },
-    firstName: { type: String },
-    lastName: { type: String },
-  },
-  restaurant: {
-    _id: { type: String },
-    restaurant_name: { type: String },
-    logo: { type: String },
-  },
-  deletedAt: { type: Date, default: null },
-};
+// const categoryType = {
+//   _id: { type: mongoose.Types.ObjectId, required: true },
+//   title: String,
+//   image: String,
+//   _creator: {
+//     _id: { type: String },
+//     role: { type: String },
+//     email: { type: String },
+//     firstName: { type: String },
+//     lastName: { type: String },
+//   },
+//   restaurant: {
+//     _id: { type: String },
+//     restaurant_name: { type: String },
+//     logo: { type: String },
+//   },
+//   deletedAt: { type: Date, default: null },
+// };
 
 const menuSchemaObject = {
   restaurant: {
@@ -117,10 +138,10 @@ const menuSchemaObject = {
     required: true,
     type: [{ type: productType }],
   },
-  category: {
-    required: true,
-    type: categoryType,
-  },
+  // category: {
+  //   required: true,
+  //   type: categoryType,
+  // },
   menutype: { type: String, default: "" },
   _creator: { required: true, type: userSchemaObject },
   description: { type: String, minlength: 1, default: "description" },
