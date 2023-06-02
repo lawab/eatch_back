@@ -234,6 +234,72 @@ const getInvoice = async (id = null, token = null) => {
   }
 };
 
+/**
+ *
+ * @param {String} id [ObjectId to find promotion in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getPromotion = async (id = null, token = null) => {
+  try {
+    let { data: promotion } = await axios.get(
+      `${process.env.APP_URL_PROMOTION}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return promotion;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
+ *
+ * @param {String} id [ObjectId to find logistic in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getLogistic = async (id = null, token = null) => {
+  try {
+    let { data: logistic } = await axios.get(
+      `${process.env.APP_URL_LOGISTIC}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return logistic;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/**
+ *
+ * @param {String} id [ObjectId to find category in database]
+ * @param {String} token  [token to authenticated user before continuous treatment of his request ]
+ * @returns {Promise<Object>}
+ */
+const getCategorie = async (id = null, token = null) => {
+  try {
+    let { data: category } = await axios.get(
+      `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return category;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   updateHistorical,
   findOneHIstorical,
@@ -241,6 +307,7 @@ module.exports = {
   findHIstorical,
 
   // all methods to call all necessaires service and retrive data
+
   getUser,
   getClient,
   getRestaurant,
@@ -249,4 +316,7 @@ module.exports = {
   getOrder,
   getMenu,
   getInvoice,
+  getPromotion,
+  getLogistic,
+  getCategorie,
 };

@@ -1,36 +1,46 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const restaurantSchemaObject = {
+const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: { type: String },
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
+    town: { type: String },
+    address: { type: String },
     logo: { type: String, default: "/datas/avatar.png" },
   },
 };
 const materialObject = {
   restaurant: {
     required: true,
-    type: restaurantSchemaObject,
+    type: restaurantType,
   },
   _creator: { type: mongoose.Types.ObjectId, required: true },
   lifetime: {
     required: true,
     type: Date,
-    default: Date.now,
+    default: null,
   },
   image: { type: String, default: "/datas/avatar.png" },
   mp_name: { required: true, type: String, maxlength: 50 },
-  quantity: { type: Number, default: 0, required: true },
+  quantity: {
+    type: Number,
+    default: 0,
+    required: true,
+    validate: {
+      validator(quantity) {
+        return quantity >= 0;
+      },
+    },
+    min: 0,
+  },
   consumer_quantity: { type: Number, default: 0 },
   current_quantity: { type: Number, default: 0 },
-  deletedAt: { type: Date, default: null },
   unity: {
     type: String,
     default: "g",
   },
+  deletedAt: { type: Date, default: null },
 };
 const fieldsRequired = Object.keys(materialObject);
 const materialSchema = new Schema(materialObject, { timestamps: true });

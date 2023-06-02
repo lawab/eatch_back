@@ -7,7 +7,7 @@ const authmiddleware = (req, res, next) => {
   let token = array.length == 2 ? array[1] : null;
 
   if (req.headers?.body) {
-    req.body = JSON.parse(req.headers?.body);
+    req.body = req.headers?.body;
   }
   if (!token) {
     return res.status(401).json({ message: "user is not authenticated" });

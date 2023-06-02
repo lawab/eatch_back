@@ -1,6 +1,5 @@
 const { fieldsRequired } = require("../models/historical/historical");
 const { fieldsValidator } = require("../models/historical/validators");
-const print = require("../log/print");
 const historicalServices = require("../services/historicalServices");
 const roles = require("../models/roles");
 const setValuesBody = require("./setValuesBody");
@@ -9,38 +8,6 @@ const { actionTypes, orderStatus } = require("../models/statusTypes");
 const updateHistorical = async (req, res) => {
   try {
     let body = req.body;
-
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
-
-    // get author since microservice users
-    let creator = await historicalServices.getUser(
-      req.params?._creator,
-      req.token
-    );
-
-    print({ creator });
-
-    // if creator not exists in database
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "invalid data send you must authenticated to create a new historique",
-      });
-    }
-
-    // if user has authorization to create new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you cannot create the invoice because you don't have authorization,please see your administrator,thanks!!!",
-      });
-    }
 
     // save all value into database
     let historical = await historicalServices.findHIstorical({
@@ -57,7 +24,7 @@ const updateHistorical = async (req, res) => {
     // valid and set all value into body
     body = await setValuesBody(historicalServices, body, req.token);
 
-    print({ body });
+    console.log({ body });
 
     if (!body) {
       return res.status(401).json({
@@ -72,7 +39,7 @@ const updateHistorical = async (req, res) => {
 
     let updatedHistoricalResponse = await historical.save();
 
-    print({ updatedHistoricalResponse }, "*");
+    console.log({ updatedHistoricalResponse }, "*");
 
     if (updatedHistoricalResponse?._id) {
       res
@@ -84,7 +51,7 @@ const updateHistorical = async (req, res) => {
         .json({ message: "HIstorical has been not updated successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of historical!!!" });
@@ -110,7 +77,7 @@ const fetchHistoricalsByField = async (req, res) => {
     let fields = Object.values(req?.params);
     // verify fields on body
     let { validate } = fieldsValidator(fields, fieldsRequired);
-    print({ params: req?.params, fields });
+    console.log({ params: req?.params, fields });
     // if body have invalid fields
     if (!validate) {
       return res.status(401).json({ message: "invalid data!!!" });
@@ -132,7 +99,7 @@ const fetchHistoricalByFieldWithAction = async (req, res) => {
     let field = req?.params?.field;
     let action = req.params?.action;
     // verify fields on body
-    print({
+    console.log({
       params: req?.params,
     });
     // if body have invalid fields

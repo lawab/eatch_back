@@ -1,5 +1,4 @@
 const { default: mongoose } = require("mongoose");
-const print = require("../log/print");
 const { fieldsRequired } = require("../models/historical/historical");
 const { actionTypes } = require("../models/statusTypes");
 
@@ -20,12 +19,15 @@ module.exports = async (historicalservices, body = {}, token) => {
     let keyMethod = `get${keyService}`;
     let method = historicalservices[keyMethod];
 
+    console.log({ value, method, key, body });
+
     let valueFound = await method(value?._id, token);
+
+    console.log({ valueFound });
 
     if (!valueFound?._id || !actionTypes.hasOwnProperty(value?.action)) {
       throw new Error(`invalid ${key} send`);
     }
-    print({ value, valueFound });
     body[key] = {
       ...valueFound,
       action: value?.action,
@@ -33,7 +35,7 @@ module.exports = async (historicalservices, body = {}, token) => {
 
     return body;
   } catch (error) {
-    print(error.message, "x");
+    console.log(error.message, "x");
     throw new Error(error.message);
   }
 };

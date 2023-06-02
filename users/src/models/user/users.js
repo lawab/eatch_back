@@ -2,18 +2,23 @@ const mongoose = require("mongoose");
 const Role = require("../roles");
 const validator = require("validator");
 const Schema = mongoose.Schema;
-const restaurantSchemaObject = {
+
+const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: String,
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
-    logo: { type: String, default: "/datas/avatar.png" },
+    town: String,
+    address: String,
+    logo: String,
   },
 };
+
 const UserSchemaObject = {
   restaurant: {
-    type: restaurantSchemaObject,
+    type: restaurantType,
+    required: function () {
+      return this.role === Role.SUPER_ADMIN ? false : true;
+    },
   },
   firstName: {
     required: true,
@@ -28,24 +33,19 @@ const UserSchemaObject = {
   email: {
     type: String,
     unique: true,
-    required: function () {
-      return validator.isEmail(this.email);
-    },
+    required: true,
     validate: {
       validator: function (email) {
-        return validator.isEmail(this.email);
+        return validator.isEmail(email);
       },
     },
   },
   username: {
     type: String,
-    required: true,
-    unique: true,
   },
   password: {
     type: String,
     required: true,
-    unique: true,
   },
   role: {
     type: String,
@@ -78,8 +78,17 @@ const UserSchemaObject = {
 
   deletedAt: { type: Date, default: null },
 };
+
 const UserSchema = new Schema(UserSchemaObject, {
   timestamps: true,
+});
+
+UserSchema.pre("save", function (next) {
+  console.log("pre save");
+  if (this.firstName && this.lastName) {
+    this.username = [this.firstName, this.lastName].join(" ");
+  }
+  next();
 });
 
 module.exports.default = mongoose.model("User", UserSchema);

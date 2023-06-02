@@ -37,8 +37,8 @@ const deleteOne = async (query = {}, bodyUpdate = {}) => {
  * @param {Object} query [query to get products in database]
  * @returns {Promise}
  */
-const findProducts = async (query = null) => {
-  const products = await Product.find(query);
+const findProducts = async (query = null, projection = {}) => {
+  const products = await Product.find(query, projection);
   return products;
 };
 /**
@@ -106,10 +106,13 @@ const getRestaurant = async (id = null, token = null) => {
  *
  * @param {Number} id [id to find categories in database from eatch_category microservice]
  * @param {String} token [token to valid the session of user]
- * @returns {Promise<[Object]>} [return the current categories send by eatch_category microservice]
+ * @returns {Promise<[Object]>} [return the current category send by eatch_category microservice]
  */
 const getCategory = async (id = null, token = null) => {
-  let { data: categories } = await axios.get(
+  console.log("test", id, {
+    url: `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
+  });
+  let { data: category } = await axios.get(
     `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
     {
       headers: {
@@ -117,8 +120,9 @@ const getCategory = async (id = null, token = null) => {
       },
     }
   );
-  return categories;
+  return category;
 };
+
 /**
  *
  * @param {Array<String>} ids [list of ObjectID from materials will fetch in eatch_materials microservice]
@@ -166,6 +170,89 @@ const deleteTrustlyProduct = async (query = {}) => {
   return product;
 };
 
+/**
+ *
+ * @param {String} token [token to valid the session of user]
+ * @returns {Promise<[Object]>} [return the current categories send by eatch_category microservice]
+ */
+const getCategories = async (token = null) => {
+  let { data: categories } = await axios.get(
+    `${process.env.APP_URL_CATEGORY}/fetch/all`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return categories;
+};
+
+/**
+ * @param {String} recetteID [id from recette that we want to retrive]
+ * @param {String} token [token to valid the session of user]
+ * @returns {Promise<[Object]>} [return the current categories send by eatch_category microservice]
+ */
+const getRecette = async (recetteID, token = null) => {
+  let { data: recette } = await axios.get(
+    `${process.env.APP_URL_RECETTE}/fetch/one/${recetteID}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return recette;
+};
+
+// const getProductsByCategoriesWithAllCategories = async () => {
+//   let categories = await getCategories(token);
+
+//   let productsByCategoryAndRestaurant = [];
+
+//   for (let index = 0; index < categories.length; index++) {
+//     const category = categories[index];
+
+//     if (category) {
+//       productsFound = await findProducts({
+//         "category._id": category._id,
+//       });
+
+//       productsByCategoryAndRestaurant.push({
+//         ...category,
+//         products: productsFound,
+//       });
+//     }
+//   }
+// };
+
+const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
+  try {
+    // get all categories
+    let categories = await getCategories(token);
+    let productsByCategoryAndRestaurant = [];
+
+    for (let index = 0; index < categories.length; index++) {
+      const category = categories[index];
+
+      if (category) {
+        productsFound = await findProducts({
+          "category._id": category._id,
+          "restaurant._id": restaurantId,
+        });
+
+        productsByCategoryAndRestaurant.push({
+          ...category,
+          products: productsFound,
+        });
+      }
+    }
+
+    return productsByCategoryAndRestaurant;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 module.exports = {
   createProduct,
   findOneProduct,
@@ -179,4 +266,7 @@ module.exports = {
   getMaterials,
   addProductToHistorical,
   deleteTrustlyProduct,
+  getCategories,
+  getProductsByCategoriesForOneRestaurant,
+  getRecette,
 };

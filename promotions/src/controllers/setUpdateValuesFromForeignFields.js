@@ -1,4 +1,3 @@
-const print = require("../log/print");
 const promotionServices = require("../services/promotionServices");
 
 /**
@@ -11,32 +10,28 @@ module.exports = async (body, token) => {
   try {
     let errorMessage = (field) => `invalid ${field}`;
 
-    if (body?.restaurant) {
-      // get restaurant required field
-      let restaurant = await promotionServices.getRestaurant(
-        body?.restaurant,
-        token
-      );
+    // get restaurant required field
+    let restaurant = await promotionServices.getRestaurant(
+      body?.restaurant,
+      token
+    );
 
-      if (!restaurant?._id) {
-        throw new Error(errorMessage("restaurant"));
-      }
-
-      body["restaurant"] = restaurant; //set restaurant found in database
+    if (!restaurant?._id) {
+      throw new Error(errorMessage("restaurant"));
     }
 
-    if (body?.order) {
-      // get restaurant required field
-      let order = await promotionServices.getOrder(body?.order, token);
+    body["restaurant"] = restaurant; //set restaurant found in database
 
-      if (!order?._id) {
-        throw new Error(errorMessage("order"));
-      }
+    // get restaurant required field
+    let order = await promotionServices.getOrder(body?.order, token);
 
-      body["order"] = order; //set order found in database
+    if (!order?._id) {
+      throw new Error(errorMessage("order"));
     }
 
-    print({ body });
+    body["order"] = order; //set order found in database
+
+    // console.log({ body });
 
     return body;
   } catch (error) {

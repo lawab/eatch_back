@@ -1,8 +1,6 @@
 const { fieldsRequired } = require("../models/comment/comment");
 const { fieldsValidator } = require("../models/comment/validators");
-const print = require("../log/print");
 const commentServices = require("../services/commentServices");
-const roles = require("../models/roles");
 const { default: mongoose } = require("mongoose");
 // create one comment in database
 const createComment = async (req, res) => {
@@ -20,7 +18,7 @@ const createComment = async (req, res) => {
     // get client since microservice clients
     let client = await commentServices.getClient(body?.client, req.token);
 
-    print({ client });
+    console.log({ client });
 
     // if client not exists in database
     if (!client?._id) {
@@ -36,7 +34,7 @@ const createComment = async (req, res) => {
 
     let comment = await commentServices.createComment(body);
 
-    print({ commentCreated: comment?._id }, "*");
+    console.log({ commentCreated: comment?._id }, "*");
 
     if (comment?._id) {
       res
@@ -48,7 +46,7 @@ const createComment = async (req, res) => {
         .json({ message: "Comment has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of comment!!!" });
@@ -89,7 +87,10 @@ const updateComment = async (req, res) => {
 
     let commentUpdated = await comment.save({ validateModifiedOnly: true });
 
-    print({ commentUpdated, client, message: commentUpdated?.message }, "*");
+    console.log(
+      { commentUpdated, client, message: commentUpdated?.message },
+      "*"
+    );
 
     if (commentUpdated?._id) {
       res
@@ -101,7 +102,7 @@ const updateComment = async (req, res) => {
       });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     res.status(500).json({
       message: "Erros occured during the update comment!!!",
     });
@@ -136,7 +137,7 @@ const deleteComment = async (req, res) => {
     }
     // comment exits and had deleted successfully
     if (commentDeleted?.deletedAt) {
-      print({ commentDeleted });
+      console.log({ commentDeleted });
       return res
         .status(200)
         .json({ message: "comment has been deleted sucessfully" });

@@ -103,6 +103,35 @@ const getRestaurant = async (id = null, token = null) => {
   return restaurant;
 };
 
+/**
+ *
+ * @param {String} id [id from creator who created logistic]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addElementToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+/**
+ *
+ * @param {Object} query [query to find logistic in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyElement = async (query = {}) => {
+  const logistic = await Logistic.deleteOne(query);
+  return logistic;
+};
+
 module.exports = {
   createLogistic,
   findOneLogistic,
@@ -112,4 +141,6 @@ module.exports = {
   getUserAuthor,
   findLogistic,
   getRestaurant,
+  addElementToHistorical,
+  deleteTrustlyElement,
 };

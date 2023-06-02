@@ -138,6 +138,35 @@ const getClient = async (id = null, token = null) => {
   return client;
 };
 
+/**
+ *
+ * @param {String} id [id from creator who created user]
+ * @param {Object} bodyUpdate [body to update historical]
+ * @returns {Promise<Object>}
+ */
+const addPromotionToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  let response = await axios.put(
+    `${process.env.APP_URL_HISTORICAL}/update/${id}`,
+    bodyUpdate,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response;
+};
+
+/**
+ *
+ * @param {Object} query [query to find promotion in documents list. Default value is {}]
+ * @returns {Promise}
+ */
+const deleteTrustlyPromotion = async (query = {}) => {
+  const promotion = await Promotion.deleteOne(query);
+  return promotion;
+};
+
 module.exports = {
   createPromotion,
   findOnePromotion,
@@ -149,4 +178,6 @@ module.exports = {
   getRestaurant,
   getOrder,
   getClient,
+  addPromotionToHistorical,
+  deleteTrustlyPromotion,
 };

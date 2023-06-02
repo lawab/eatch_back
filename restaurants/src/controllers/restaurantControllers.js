@@ -4,17 +4,6 @@ const { default: mongoose } = require("mongoose");
 const UpdateForeignFields = require("../controllers/UpdateForeignFields");
 //Create restaurant in Data Base
 const createRestaurant = async (req, res) => {
-  console.log("*********************************************")
-  console.log(req.headers);
-  console.log("*********************************************")
-
-  console.log("*********************************************")
-  console.log(req.body);
-  console.log("*********************************************")
-
-  console.log("*********************************************")
-  console.log(req.file);
-  console.log("*********************************************")
   try {
     let body = JSON.parse(req.headers.body);
     let info = {

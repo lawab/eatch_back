@@ -6,6 +6,10 @@ const {
   updateProduct,
   fetchProducts,
   fetchProductsByRestaurant,
+  incrementQuantityFromProducts,
+  decrementQuantityFromProducts,
+  fetchProductsByRestaurantAndCategory,
+  fetchMaterialsFromProdcuts,
 } = require("../controllers/productController");
 const uploadFileService = require("../services/uploadFile");
 const { authmiddleware } = require("../middlewares/authmiddleware");
@@ -39,7 +43,19 @@ productRouter.get(
   authmiddleware,
   fetchProductsByRestaurant
 );
+//get products by restaurant and category
+productRouter.get(
+  "/fetch/categories/:restaurantId",
+  authmiddleware,
+  fetchProductsByRestaurantAndCategory
+);
 
+//get products by restaurant and category
+productRouter.get(
+  "/fetch/all/materials/:ids",
+  authmiddleware,
+  fetchMaterialsFromProdcuts
+);
 //update product
 productRouter.put(
   "/update/:id",
@@ -47,6 +63,12 @@ productRouter.put(
   upload.single("file"),
   updateProduct
 );
+
+//increment quantity from product
+productRouter.put("/increment", authmiddleware, incrementQuantityFromProducts);
+
+//decrement quantity from product
+productRouter.put("/decrement", authmiddleware, decrementQuantityFromProducts);
 
 //Export route to be used on another place
 module.exports = productRouter;

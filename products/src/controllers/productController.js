@@ -1,110 +1,90 @@
-const { fieldsRequired } = require("../models/product/product");
-const { fieldsValidator } = require("../models/product/validators");
-
 const productServices = require("../services/productServices");
 const roles = require("../models/roles");
-const setForeignFieldsRequired = require("./setForeignFieldsRequired");
-const updateForeignFields = require("./updateForeignFields");
-const print = require("../log/print");
+const updateForeignFields = require("../methods/updateForeignFields");
 const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
+const setProductValues = require("../methods/setProductValues");
+const {
+  addProductFromJsonFile,
+} = require("../../../globalservices/generateJsonFile");
 
 // create one product in database
 const createProduct = async (req, res) => {
+  let newproduct = null;
   try {
+    // let body = JSON.parse(req.headers?.body);
+
     let body = req.body;
-    const message = "invalid data!!!";
 
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
+    console.log({ body });
 
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message });
-    }
+    let bodyUpdated = await setProductValues(body, req, req.token);
 
-    // get creator since microservice users
-    let creator = await productServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
+    // console.log({ body });
 
-    print({ creator: creator?._id });
+    newproduct = await productServices.createProduct(bodyUpdated);
 
-    if (!creator?._id) {
-      return res.status(401).json({ message });
-    }
+    console.log({ newproduct });
 
-    // if product has authorization to create new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message: "you cannot create the product please see you admin,thanks!!!",
-      });
-    }
-
-    // product has authorization
-
-    // set restaurant,category and materials fields required
-    body = await setForeignFieldsRequired(
-      {
-        restaurant_id: body?.restaurant,
-        category_id: body?.category,
-        materila_ids: body?.materials,
-      },
-      req.token,
-      body
-    );
-
-    // add image from product
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
-
-    let newproduct = await productServices.createProduct(body);
-
-    print({ newproduct });
-
-    if (newproduct?._id) {
+    if (newproduct) {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
-          let addResponse = await productServices.addProductToHistorical(
-            creator?._id,
+          let response = await productServices.addProductToHistorical(
+            newproduct._creator._id,
             {
               products: {
-                _id: newproduct?._id,
+                _id: newproduct._id,
                 action: "CREATED",
               },
             },
             req.token
           );
 
-          return addResponse;
+          let { content, categories, menus } = await addProductFromJsonFile(
+            bodyUpdated.restaurant._id,
+            req.token
+          );
+
+          console.log({ content: JSON.parse(content), categories, menus });
+
+          return response;
         },
         async () => {
           let elementDeleted = await productServices.deleteTrustlyProduct({
             _id: newproduct?._id,
           });
-          print({ elementDeleted });
+          console.log({ elementDeleted });
           return elementDeleted;
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Product has been created successfully!!!",
-        "Product has  been not creadted successfully,please try again later,thanks!!!"
-      );
+      if (response?.status === 200) {
+        console.log({ response: response.data?.message });
+        return res
+          .status(200)
+          .json({ message: "Product has been created successfully!!!" });
+      } else {
+        return res.status(401).json({
+          message:
+            "Product has  been not creadted successfully,please try again later,thanks!!!",
+        });
+      }
     } else {
       res
         .status(401)
         .json({ message: "product has been not created successfully!!!" });
     }
   } catch (error) {
-    console.log(error);
+    console.log({ error });
+    if (newproduct) {
+      await productServices.deleteTrustlyProduct({
+        _id: newproduct._id,
+      });
+    }
+
     return res
       .status(500)
       .json({ message: "Error occured during a creation of product!!!" });
@@ -113,27 +93,11 @@ const createProduct = async (req, res) => {
 
 // update product in database
 const updateProduct = async (req, res) => {
+  let productCopy = null;
+  let productUpdated = null;
+
   try {
     let body = req.body;
-    // get the author to update product
-    let creator = await productServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    if (!creator?._id || !validate) {
-      return res.status(401).json({
-        message: "Invalid data send!!!",
-      });
-    }
-
-    // if product has authorization to update new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message: "you cannot create the product please see you admin,thanks!!!",
-      });
-    }
 
     // find product which must be update
     let product = await productServices.findProduct({
@@ -146,50 +110,41 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    let productCopy = Object.assign({}, product._doc); // cppy documment before update it
+    // cppy documment before update it
+    let productCopy = Object.assign({}, product._doc);
 
-    body["_creator"] = creator; // set user that make update in database
-
-    // update foreign fields and update body request before save in database
-    body = await updateForeignFields(productServices, body, req.token);
-    print(
-      {
-        restaurant: body.restaurant,
-        product: product._id,
-        materials: body.materials,
-      },
-      "*"
-    );
+    let bodyUpdated = await updateForeignFields(body, req, req.token);
 
     // update all valid fields before save it in database
     for (let key in body) {
-      product[key] = body[key];
+      product[key] = bodyUpdated[key];
     }
 
-    // update avatar if exists
-    product["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : product["image"];
-
     // update product in database
-    let productUpdated = await product.save({ validateModifiedOnly: true });
+    productUpdated = await product.save();
 
-    print({ productUpdated }, "U");
+    console.log({ productUpdated }, "~");
 
-    if (productUpdated?._id) {
+    if (productUpdated) {
       // add new product create in historical
       let response = await addElementToHistorical(
         async () => {
           let response = await productServices.addProductToHistorical(
-            creator?._id,
+            productUpdated._creator._id,
             {
               products: {
-                _id: productUpdated?._id,
+                _id: productUpdated._id,
                 action: "UPDATED",
               },
             },
             req.token
           );
+          let content = await addProductFromJsonFile(
+            bodyUpdated.restaurant._id,
+            req.token
+          );
+
+          console.log({ content: JSON.parse(content) });
 
           return response;
         },
@@ -199,11 +154,12 @@ const updateProduct = async (req, res) => {
               productUpdated[field] = productCopy[field];
             }
           }
+
+          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
           let productRestored = await productUpdated.save({
-            validateModifiedOnly: true,
             timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ productRestored });
+          });
+          console.log({ productRestored });
           return productRestored;
         }
       );
@@ -220,6 +176,21 @@ const updateProduct = async (req, res) => {
       });
     }
   } catch (error) {
+    if (productCopy && productUpdated) {
+      for (const field in productCopy) {
+        if (Object.hasOwnProperty.call(productCopy, field)) {
+          productUpdated[field] = productCopy[field];
+        }
+      }
+
+      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      let productRestored = await productUpdated.save({
+        validateModifiedOnly: true,
+        timestamps: false,
+      });
+      console.log({ productRestored });
+    }
+
     console.log(error);
     res.status(500).json({
       message: "Erros occured during the update product!!!",
@@ -229,23 +200,26 @@ const updateProduct = async (req, res) => {
 
 // delete one product in database
 const deleteProduct = async (req, res) => {
+  let productCopy = null;
+  let productDeleted = null;
+
   try {
-    let body = req.body;
+    // let body = req.body;
+    const body = JSON.parse(req.headers.body);
+    console.log({ body, productId: req.params.id });
     // check if creator has authorization
     let creator = await productServices.getUserAuthor(
       body?._creator,
       req.token
     );
-    if (!creator?._id) {
-      return res.status(401).json({
-        message: "invalid data send!!!",
-      });
-    }
 
     // if product has authorization to update new product
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
-        message: "you cannot create the product please see you admin,thanks!!!",
+        message: "you cannot delete the product please see you admin,thanks!!!",
       });
     }
 
@@ -255,28 +229,37 @@ const deleteProduct = async (req, res) => {
       deletedAt: null,
     });
 
-    if (!product?._id) {
+    if (!product) {
       return res.status(401).json({
         message:
           "unable to delete product because he not exists or already deleted in database!!!",
       });
     }
 
+    // fetch restaurant since microservice restaurant
+    let restaurant = await productServices.getRestaurant(
+      body?.restaurant,
+      req.token
+    );
+
+    if (!restaurant?._id) {
+      throw new Error("restaurant not found!!");
+    }
     /* copy values and fields from product found in database before updated it. 
        it will use to restore product updated if connection with historical failed
       */
-    let productCopy = Object.assign({}, product._doc);
+    productCopy = Object.assign({}, product._doc);
 
-    print({ productCopy });
+    console.log({ productCopy });
 
     //update deleteAt and cretor fields from product
 
     product.deletedAt = Date.now(); // set date of deletion
     product._creator = creator?._id; // the current product who do this action
 
-    let productDeleted = await product.save();
+    productDeleted = await product.save();
 
-    print({ productDeleted });
+    console.log({ productDeleted });
 
     // product exits and had deleted successfully
     if (productDeleted?.deletedAt) {
@@ -294,18 +277,23 @@ const deleteProduct = async (req, res) => {
             req.token
           );
 
+          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          console.log({
+            content: JSON.parse(content),
+          });
+
           return response;
         },
         async () => {
-          for (const field in productCopy) {
-            if (Object.hasOwnProperty.call(productCopy, field)) {
-              productDeleted[field] = productCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          productDeleted["deletedAt"] = productCopy["deletedAt"];
+          productDeleted["updatedAt"] = productCopy["updatedAt"];
+          productDeleted["createdAt"] = productCopy["createdAt"];
+
           let productRestored = await productDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          print({ productRestored });
+          console.log({ productRestored });
           return productRestored;
         }
       );
@@ -314,13 +302,26 @@ const deleteProduct = async (req, res) => {
         response,
         res,
         "product has been delete successfully!!!",
-        "product has not been deleete successfully,please try again later,thanks!!!"
+        "product has not been delete successfully,please try again later,thanks!!!"
       );
     } else {
       return res.status(500).json({ message: "deletion of product failed" });
     }
   } catch (error) {
-    console.log(error.message);
+    if (productCopy && productDeleted) {
+      // restore only fields would had changed in database
+      productDeleted["deletedAt"] = productCopy["deletedAt"];
+      productDeleted["updatedAt"] = productCopy["updatedAt"];
+      productDeleted["createdAt"] = productCopy["createdAt"];
+
+      let productRestored = await productDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      console.log({ productRestored });
+      return productRestored;
+    }
+
+    console.log(error);
     return res
       .status(500)
       .json({ message: "Error occured during the deletion of product!!!" });
@@ -341,20 +342,26 @@ const fetchProduct = async (req, res) => {
 // get products in database
 const fetchProducts = async (req, res) => {
   try {
+    let products = [];
     let ids = req.params?.ids ? JSON.parse(req.params?.ids) : [];
+    console.log({ ids });
     if (ids.length) {
-      let products = await productServices.findProducts({
-        _id: { $in: ids },
-      });
-      print({ products }, "~");
+      for (let index = 0; index < ids.length; index++) {
+        const id = ids[index];
+        let product = await productServices.findOneProduct({
+          _id: id,
+        });
+        products.push(product);
+      }
+      console.log({ products }, "~");
       res.status(200).json(products);
     } else {
       let products = await productServices.findProducts();
       res.status(200).json(products);
     }
   } catch (error) {
-    print(error.message, "x");
-    res.status(500).json({ message: "Error occured during get request!!!" });
+    console.log(error.message, "x");
+    throw new Error(error);
   }
 };
 
@@ -371,6 +378,158 @@ const fetchProductsByRestaurant = async (req, res) => {
   }
 };
 
+// fetch products by restaurant in database
+const fetchMaterialsFromProdcuts = async (req, res) => {
+  try {
+    let engredients = [];
+    let ids = req.params?.ids ? JSON.parse(req.params?.ids) : [];
+
+    if (ids.length) {
+      // get array of array engredients
+      for (let index = 0; index < ids.length; index++) {
+        const id = ids[index];
+        let product = await productServices.findOneProduct({
+          _id: id,
+        });
+        engredients.push(product.recette.engredients);
+      }
+
+      // get all array of array materials
+      let materials = engredients.map((e) => {
+        let material = [];
+        for (let index = 0; index < e.length; index++) {
+          const element = e[index];
+          material.push(element.material);
+        }
+        return material;
+      });
+
+      let values = [];
+      // merge all values of array material in one array
+      for (let index = 0; index < materials.length; index++) {
+        const element = materials[index];
+        values = [...values, ...element];
+      }
+
+      let remoteMaterials = await productServices.getMaterials(
+        values,
+        req.token
+      );
+
+      // merge all values of array material in one array
+      // for (let index = 0; index < remoteMaterials.length; index++) {
+      //   const element = remoteMaterials[index];
+      //   if (element.quantity <= 0) {
+      //     throw new Error(
+      //       "Material had been finish please update material and try again"
+      //     );
+      //   }
+      // }
+
+      // console.log({ materials: values }, "~");
+      return res.status(200).json(remoteMaterials);
+    } else {
+      return res.status(401).json({ message: "invalid data send!!!" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during get request!!!" });
+  }
+};
+
+// fetch products by restaurant in database
+const fetchProductsByRestaurantAndCategory = async (req, res) => {
+  try {
+    let categories =
+      await productServices.getProductsByCategoriesForOneRestaurant(
+        req.params?.restaurantId,
+        req.token
+      );
+
+    res.status(200).json(categories);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during get request!!!" });
+  }
+};
+
+const incrementQuantityFromProducts = async (req, res) => {
+  try {
+    let productsIndexes = req.body.products?.map((pd) => pd._id);
+
+    let productsUpdated = await incrementOrDecrementProductQuantity(
+      productsIndexes,
+      1
+    );
+
+    console.log({ productsUpdated, productsIndexes });
+
+    if (productsUpdated.length === products.length) {
+      res.status(200).json(productsUpdated);
+    } else {
+      res.status(401).json({ message: "unable to updated products" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error occured during get request!!!" });
+  }
+};
+
+const decrementQuantityFromProducts = async (req, res) => {
+  try {
+    let productsIndexes = req.body.products?.map((pd) => pd._id);
+
+    let productsValided = await productServices.findProducts({
+      _id: { $in: productsIndexes },
+    });
+
+    console.log({ productsValided });
+
+    // validaton of quantities from all product before save it in database
+    for (let index = 0; index < productsValided.length; index++) {
+      const element = productsValided[index];
+      if (element.quantity - 1 < 0) {
+        throw new Error(
+          "unable to make invoice because some quantity(ies) of products are so less of 0"
+        );
+      }
+    }
+
+    let productsUpdated = await incrementOrDecrementProductQuantity(
+      productsIndexes,
+      -1
+    );
+
+    console.log({ productsUpdated, productsIndexes });
+
+    if (productsUpdated.length === productsIndexes.length) {
+      res.status(200).json(productsUpdated);
+    } else {
+      res.status(401).json({ message: "unable to updated products" });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+async function incrementOrDecrementProductQuantity(productsIndexes, value) {
+  let productsValues = [];
+  for (let index = 0; index < productsIndexes.length; index++) {
+    let productDb = await productServices.findOneProduct({
+      _id: productsIndexes[index],
+    });
+
+    productDb.quantity = productDb.quantity + value;
+
+    let pdUpdated = await productDb.save();
+
+    productsValues.push(pdUpdated);
+  }
+
+  return productsValues;
+}
+
 module.exports = {
   createProduct,
   deleteProduct,
@@ -378,4 +537,8 @@ module.exports = {
   updateProduct,
   fetchProduct,
   fetchProductsByRestaurant,
+  incrementQuantityFromProducts,
+  decrementQuantityFromProducts,
+  fetchProductsByRestaurantAndCategory,
+  fetchMaterialsFromProdcuts,
 };

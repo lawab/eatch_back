@@ -1,9 +1,11 @@
-const { Promotion } = require("../models/promotion/promotion");
-const print = require("../log/print");
 const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
 const setValuesFromRequiredForeignFields = require("./setValuesFromRequiredForeignFields");
 const setUpdateValuesFromForeignFields = require("./setUpdateValuesFromForeignFields");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one promotion in database
 const createPromotion = async (req, res) => {
@@ -41,19 +43,46 @@ const createPromotion = async (req, res) => {
     // verify that document with [field] exists
     let newPromotion = await promotionServices.createPromotion(body);
 
+    console.log({ newPromotion });
     // if field already exists,document must be found on database,or null in ortherwise
     if (newPromotion?._id) {
-      print({ newPromotion });
-      return res.status(200).json({
-        message: "Promotion has been created successfully!!!",
-      });
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await promotionServices.addPromotionToHistorical(
+            creator._id,
+            {
+              promotions: {
+                _id: newPromotion?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let elementDeleted = await promotionServices.deleteTrustlyPromotion({
+            _id: newPromotion?._id,
+          });
+          console.log({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Promotion has been created successfully!!!",
+        "Promotion has  been not created successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(401)
         .json({ message: "Promotion has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of promotion!!!" });
@@ -91,28 +120,78 @@ const updatePromotion = async (req, res) => {
       body["image"] = req.file?.filename;
     }
 
+    let promotion = await promotionServices.findOnePromotion({
+      _id: req.params?.id,
+    });
+
+    if (!promotion) {
+      return res.status(401).json({
+        message:
+          "your cannot update promotion element because it not exists!!!",
+      });
+    }
+
+    let promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
+
+    console.log({ promotionCopy });
+
     body = await setUpdateValuesFromForeignFields(body, req.token);
 
-    let promotionUpdated = await Promotion.updateOne(
-      { _id: req.params?.id },
-      {
-        ...body,
+    // update promotion values
+
+    for (const field in body) {
+      if (Object.hasOwnProperty.call(body, field)) {
+        promotion[field] = body[field];
       }
-    );
+    }
 
-    print({ promotionUpdated }, "*");
+    let promotionUpdated = await promotion.save();
 
-    if (promotionUpdated?.modifiedCount) {
-      res
-        .status(200)
-        .json({ message: "Promotion has been updated successfully!!" });
+    console.log({ promotionUpdated }, "~");
+
+    if (promotionUpdated?._id) {
+      let response = await addElementToHistorical(
+        async () => {
+          let addResponse = await promotionServices.addPromotionToHistorical(
+            creator._id,
+            {
+              promotions: {
+                _id: promotionUpdated?._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          for (const field in promotionCopy) {
+            if (Object.hasOwnProperty.call(promotionCopy, field)) {
+              promotionUpdated[field] = promotionCopy[field];
+            }
+          }
+          let promotionRestored = await promotionUpdated.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          console.log({ promotionRestored });
+          return promotionRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Promotion has been updated successfully!!!",
+        "Promotion has been not updated successfully,please try again later,thanks!!!"
+      );
     } else {
       res.status(401).json({
         message: "Promotion has been not updated successfully!!",
       });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     res.status(500).json({
       message: "Error occured during the update promotion!!!",
     });
@@ -142,29 +221,67 @@ const deletePromotion = async (req, res) => {
       });
     }
 
-    // find and delete promotion
-    let promotionDeleted = await promotionServices.deleteOne(
-      {
-        _id: req.params?.id,
-        deletedAt: null,
-      },
-      { deletedAt: Date.now(), _creator: creator } //set date of deletion and user who delete promotion,no drop promotion
-    );
+    let promotion = await promotionServices.findOnePromotion({
+      _id: req.params?.id,
+      deletedAt: null,
+    });
 
-    // if promotion not exits or had already deleted
-    if (!promotionDeleted?._id) {
+    if (!promotion) {
       return res.status(401).json({
         message:
           "unable to delete a promotion because it not exists or already be deleted!!!",
       });
     }
 
+    let promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
+
+    console.log({ promotionCopy });
+
+    promotion.deletedAt = Date.now();
+    promotion._creator = creator;
+
+    // find and delete promotion
+    let promotionDeleted = await promotion.save();
+
+    console.log({ promotionDeleted });
+
     // promotion exits and had deleted successfully
     if (promotionDeleted?.deletedAt) {
-      print({ promotionDeleted });
-      return res
-        .status(200)
-        .json({ message: "promotion has been deleted sucessfully" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await promotionServices.addPromotionToHistorical(
+            creator?._id,
+            {
+              promotions: {
+                _id: promotionDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          for (const field in promotionCopy) {
+            if (Object.hasOwnProperty.call(promotionCopy, field)) {
+              promotionDeleted[field] = promotionCopy[field];
+            }
+          }
+          let promotionRestored = await promotionDeleted.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          console.log({ promotionRestored });
+          return promotionRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Promotion has been delete successfully!!!",
+        "Promotion has not been delete successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(500).json({ message: "deletion of promotion failed" });
     }
@@ -255,7 +372,7 @@ const addClientToPromotion = async (req, res) => {
     );
 
     if (clientAdded?._id) {
-      print({ clientAdded });
+      console.log({ clientAdded });
       res
         .status(200)
         .json({ message: "client has been added to promotion successfully!!" });
@@ -265,7 +382,7 @@ const addClientToPromotion = async (req, res) => {
       });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     res.status(500).json({
       message: "Error occured during added client to promotion!!!",
     });

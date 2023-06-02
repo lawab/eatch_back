@@ -1,108 +1,170 @@
-const print = require("../log/print");
 const invoiceServices = require("../services/invoiceServices");
-const roles = require("../models/roles");
-const getInvoicePrice = require("./getInvoicePrice");
+const {
+  getInvoicePrice,
+  setMaterialsByOccurences,
+} = require("./getInvoicePrice");
 const orderStatus = require("../models/invoice/orderStatus");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
+const setInvoiceValues = require("../methods/setInvoiceValues");
 
 // create one Invoice
 const createInvoice = async (req, res) => {
+  // global variable to do fallback if error occured during execution
+  let orderUpdated = null;
+  let orderCopy = null;
+  let materialsCopy = null;
+  let materialsByOccurences = null;
   try {
-    let idOrder = req.params?.id;
     let body = req.body;
-    // if body have invalid fields
-    if (!idOrder) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
+    let idOrder = req.params?.id;
 
-    // get creator since microservice users
-    let creator = await invoiceServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-
-    print({ creator: creator?._id }, "*");
-
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "invalid data send,you must authenticated to create a invoice!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you have not authorization to create invoice,please see you administrator",
-      });
-    }
-
-    // get restaurant before save invoice
-
-    let restaurant = await invoiceServices.getRestaurant(
-      body?.restaurant,
-      req.token
-    );
-
-    if (!restaurant) {
-      return res.status(401).json({
-        message:
-          "unable to create invoice because restaurant not know,please see your administrator,thanks!!!",
-      });
-    }
-
-    body["restaurant"] = restaurant; //set restaurant value found in database
-
-    body["_creator"] = creator; //set creator value found in database
+    let bodyUpdated = await setInvoiceValues(body, req.token, req);
 
     // get order in databsase
     let order = await invoiceServices.getOrder(idOrder, req.token);
 
-    print({ order }, "*");
-    if (!order?._id) {
+    console.log({ order }, "*");
+    if (!order || order.deletedAt) {
       return res.status(401).json({
-        message: "unable to create invoice because order not exists!!!",
+        message:
+          "unable to create invoice because order not exists or has been deleted!!!",
       });
     }
 
+    // if order has already paid or body content invalid status or body status is not send with done value
     if (
-      ![orderStatus.WAITED, orderStatus.TREATMENT, orderStatus.PAID].includes(
-        order.status
-      )
+      order.status === orderStatus.DONE ||
+      !Object.keys(orderStatus).includes(body?.status) ||
+      body?.status !== orderStatus.DONE
     ) {
       return res.status(401).json({
-        message: "unable to create invoice because order had already paid!!!",
+        message:
+          "unable to create invoice because order had already paid or has invalid status!!!",
       });
     }
 
+    orderCopy = Object.assign({}, order);
+
     //update status order since order microservice
-    let orderUpdated = await invoiceServices.updateOrder(
-      order?._id,
-      { status: orderStatus.DONE, _creator: creator?._id },
+
+    orderUpdated = await invoiceServices.updateOrderRemote(
+      order._id,
+      {
+        status: orderStatus.DONE,
+        _creator: bodyUpdated._creator._id,
+      },
       req.token
-    ); //update status from order
+    );
 
-    order["status"] = orderStatus.DONE; //set status order to done
+    if (!orderUpdated) {
+      return res.status(401).json({
+        message: "create invoice failed !!!",
+      });
+    }
 
-    print(orderUpdated);
+    // return res.status(200).json({ materialsUpdated });
+    // set order value found in database
+    bodyUpdated["order"] = orderUpdated;
 
-    body["order"] = order; //set order value found in database
-    body["total"] = getInvoicePrice(order?.products); // set total frpice to current invoice
-    body["image"] = req.file
+    // set total price to current invoice
+    bodyUpdated["total"] = getInvoicePrice(orderUpdated?.products);
+
+    //set image for current invoice
+    bodyUpdated["image"] = req.file
       ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png"; //set image for current invoice
-    let invoice = await invoiceServices.createInvoice(body);
+      : "/datas/avatar.png";
 
-    print({ invoice }, "*");
+    // get list of products to set decrement quantity value
+    let productIds = orderUpdated.products.map((pd) => {
+      return { _id: pd._id };
+    });
+
+    let materials = await invoiceServices.getRemoteMaterialsFromProducts(
+      productIds,
+      req.token
+    );
+
+    materialsCopy = Object.assign({}, materials);
+
+    if (!materials) {
+      throw new Error("unable to generate invoice,please try again");
+    }
+
+    materialsByOccurences = setMaterialsByOccurences(materials);
+
+    let invoice = await invoiceServices.createInvoice(bodyUpdated);
+
+    console.log({ invoice }, "*");
 
     if (invoice?._id) {
-      res.status(200).json(invoice);
+      let response = await addElementToHistorical(
+        async () => {
+          let materialsUpdated = await invoiceServices.decrementRemoteMaterials(
+            {
+              materials: materialsByOccurences,
+            },
+            req.token
+          );
+          console.log({ materialsUpdated });
+          let addResponse = await invoiceServices.addInvoiceToHistorical(
+            invoice._creator._id,
+            {
+              invoices: {
+                _id: invoice?._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+
+          return addResponse;
+        },
+        async () => {
+          let materialsRestored = await invoiceServices.restoreRemoteMaterials(
+            {
+              materials: materialsByOccurences,
+            },
+            req.token
+          );
+
+          let elementDeleted = await invoiceServices.deleteTrustlyInvoice({
+            _id: invoice?._id,
+          });
+
+          console.log({ elementDeleted, materialsRestored });
+
+          // reset order because creation of invoice failed or orther error occured
+          return await resetOrder(orderUpdated, orderCopy, req);
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        invoice,
+        "Invoice has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
       res
         .status(200)
         .json({ message: "Invoice has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    if (orderUpdated?._id) {
+      await resetOrder(orderUpdated, orderCopy, req);
+    }
+    if (materialsByOccurences) {
+      await invoiceServices.restoreRemoteMaterials(
+        {
+          materials: materialsByOccurences,
+        },
+        req.token
+      );
+    }
+    console.log(error.message, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of Invoice!!!" });
@@ -117,7 +179,7 @@ const fetchInvoice = async (req, res) => {
     });
     res.status(200).json(invoice);
   } catch (error) {
-    print(error.message);
+    console.log(error.message);
     res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
@@ -144,7 +206,16 @@ const fetchInvoicesByRestaurant = async (req, res) => {
     res.status(500).json({ message: "Error occured during get request!!!" });
   }
 };
-
+async function resetOrder(orderUpdated, orderCopy, req) {
+  let orderRestored = await invoiceServices.updateOrderRemote(
+    orderUpdated?._id,
+    orderCopy,
+    req.token
+  );
+  // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+  console.log({ orderRestored });
+  return orderRestored;
+}
 module.exports = {
   createInvoice,
   fetchInvoices,

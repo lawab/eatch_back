@@ -1,45 +1,61 @@
-const { fieldsRequired } = require("../models/order/order");
-const { fieldsValidator } = require("../models/order/validators");
-const print = require("../log/print");
 const orderServices = require("../services/orderServices");
 const roles = require("../models/roles");
-const updateForeignFields = require("./updateForeignFields");
-const setForeignFieldsValue = require("./setForeignFieldsValue");
+const updateOrderValues = require("../methods/updateValues");
+const setOrderValues = require("../methods/setOrderValues");
+const {
+  addElementToHistorical,
+  closeRequest,
+} = require("../services/historicalFunctions");
 
 // create one order in database
 const createOrder = async (req, res) => {
   try {
-    let body = req.body;
+    let bodyContent = req.body;
 
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
-
-    body = await setForeignFieldsValue(orderServices, body, req.token);
-
-    // add image from order
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
+    console.log({ bodyContent });
+    // set all values required
+    body = await setOrderValues(bodyContent, req);
 
     let orderCreated = await orderServices.createOrder(body);
-    print({ orderCreated }, "*");
+
+    console.log({ orderCreated }, "*");
 
     if (orderCreated?._id) {
-      return res
-        .status(200)
-        .json({ message: "order has been created successfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          return await orderServices.addOrderToHistorical(
+            orderCreated._id,
+            {
+              orders: {
+                _id: orderCreated._id,
+                action: "CREATED",
+              },
+            },
+            req.token
+          );
+        },
+        async () => {
+          let elementDeleted = await orderServices.deleteTrustlyOrder({
+            _id: orderCreated._id,
+          });
+          console.log({ elementDeleted });
+          return elementDeleted;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Order has been created successfully!!!",
+        "Order has  been not creadted successfully,please try again later,thanks!!!"
+      );
     } else {
-      return res
-        .status(200)
-        .json({ message: "order has been not created successfully!!!" });
+      res
+        .status(401)
+        .json({ message: "Order has been not created successfully!!!" });
     }
   } catch (error) {
-    print(error, "x");
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error occured during a creation of order!!!" });
@@ -48,35 +64,14 @@ const createOrder = async (req, res) => {
 
 // update order in database
 const updateOrder = async (req, res) => {
+  let orderUpdated = null;
+  let orderCopy = null;
+
   try {
     // get body request
     let body = req.body;
 
-    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    if (!validate) {
-      return res.status(401).json({
-        message: "invalid data send!!!",
-      });
-    }
-
-    // get the author who update order
-    let creator = await orderServices.getUserAuthor(body?._creator, req.token);
-
-    if (!creator?._id) {
-      return res.status(401).json({
-        message: "you must authenticated to update current order!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "you don't have authorization to update current order,please see your administrator",
-      });
-    }
-
-    // get ordder that should be update
+    // get order that should be update
     let order = await orderServices.findOrder({
       _id: req.params?.id,
     });
@@ -87,40 +82,120 @@ const updateOrder = async (req, res) => {
       });
     }
 
-    body["_creator"] = creator; // set user that make update in database
+    console.log({ order });
 
-    body = await updateForeignFields(orderServices, body, req.token);
+    // copy documment before update it
+    orderCopy = Object.assign({}, order._doc);
 
-    // update all valid fields before save it in database
-    for (let key in body) {
-      order[key] = body[key];
-    }
+    // update products only because it is a user that update his order
+    body = await updateOrderValues(body, req);
 
-    // update avatar if exists
-    order["image"] = req.file ? "/datas/" + req.file?.filename : order["image"];
+    // update products in order model found in database
+    order["products"] = body["products"];
+
     // update order in database
-    let orderUpdated = await order.save({ validateModifiedOnly: true });
+    orderUpdated = await order.save();
 
-    print({ orderUpdated });
+    console.log({ orderUpdated });
 
     if (orderUpdated?._id) {
-      return res
-        .status(200)
-        .json({ message: "Order has been updated successfully!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          return await orderServices.addOrderToHistorical(
+            orderUpdated._creator._id,
+            {
+              orders: {
+                _id: orderUpdated._id,
+                action: "UPDATED",
+              },
+            },
+            req.token
+          );
+        },
+        async () => {
+          for (const field in orderCopy) {
+            if (Object.hasOwnProperty.call(orderCopy, field)) {
+              orderUpdated[field] = orderCopy[field];
+            }
+          }
+          /*
+            restore Object in database,not update timestamps 
+            because it is restoration from olds values fields in database
+          */
+          let orderRestored = await orderUpdated.save({
+            timestamps: false,
+          });
+          console.log({ orderRestored });
+          return orderRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Order has been updated successfully!!!",
+        "Order has not been Updated successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(401).json({
         message: "Order update failed: order not exits in database!!",
       });
     }
   } catch (error) {
-    console.log(error);
+    if (orderUpdated && orderCopy) {
+      for (const field in orderCopy) {
+        if (Object.hasOwnProperty.call(orderCopy, field)) {
+          orderUpdated[field] = orderCopy[field];
+        }
+      }
+
+      //restore Object in database,not update timestamps
+      //because it is restoration from olds values fields in database
+      let orderRestored = await orderUpdated.save({
+        timestamps: false,
+      });
+      console.log({ orderRestored });
+    }
+
+    console.log(error.message);
     res.status(500).json({
-      message: "Erros occured during the update order!!!",
+      message: "Error(s) occured during the update order!!!",
     });
   }
 };
+//update remote order
+const updateOrderRemote = async (req, res) => {
+  try {
+    console.log(req.body);
+    let body = req.body?.data;
+    let orderUpdated = await orderServices.updateOrder(
+      {
+        _id: req.params?.id,
+      },
+      body
+    );
+
+    console.log({ orderUpdated });
+    return res.status(200).json(orderUpdated);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "error occured please try again!!!" });
+  }
+};
+
+const deleteOrderRemote = async (req, res) => {
+  let response = await orderServices.deleteTrustlyOrder({
+    _id: req.params?.id,
+  });
+
+  return res.status(200).json(response);
+};
 // delete one order in database
 const deleteOrder = async (req, res) => {
+  let orderCopy = null;
+  let orderDeleted = null;
   try {
     let body = req.body;
     // check if creator has authorization
@@ -139,33 +214,85 @@ const deleteOrder = async (req, res) => {
       });
     }
 
-    // find and delete order
-    let orderDeleted = await orderServices.deleteOne(
-      {
-        _id: req.params?.id,
-        deletedAt: null,
-      },
-      { _creator: creator._id, deletedAt: Date.now() } //set user creator and the date of deletion,no drop order
-    );
+    // get ordder that should be delete
+    let order = await orderServices.findOrder({
+      _id: req.params?.id,
+      deletedAt: null,
+    });
 
-    // if order not exits or had already deleted
-    if (!orderDeleted?._id) {
+    if (!order) {
       return res.status(401).json({
         message:
           "you cannot delete order because it not exists or already deleted!!!",
       });
     }
+
+    /* copy values and fields from order found in database before updated it. 
+       it will use to restore order updated if connection with historical failed
+      */
+    orderCopy = Object.assign({}, order._doc);
+
+    console.log({ orderCopy });
+
+    //update deleteAt and cretor fields from order
+
+    order.deletedAt = Date.now(); // set date of deletion
+    order._creator = creator?._id; // the current order who do this action
+
+    orderDeleted = await order.save();
+    console.log({ orderDeleted });
     // order exits and had deleted successfully
     if (orderDeleted?.deletedAt) {
-      print({ orderDeleted: orderDeleted });
-      return res
-        .status(200)
-        .json({ message: "order has been delete sucessfully!!!" });
+      let response = await addElementToHistorical(
+        async () => {
+          let response = await orderServices.addOrderToHistorical(
+            creator?._id,
+            {
+              orders: {
+                _id: orderDeleted?._id,
+                action: "DELETED",
+              },
+            },
+            req.token
+          );
+
+          return response;
+        },
+        async () => {
+          // restore only fields would had changed in database
+          orderDeleted["deletedAt"] = orderCopy["deletedAt"];
+          orderDeleted["updatedAt"] = orderCopy["updatedAt"];
+          orderDeleted["createdAt"] = orderCopy["createdAt"];
+          let orderRestored = await orderDeleted.save({
+            timestamps: false,
+          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+          console.log({ orderRestored });
+          return orderRestored;
+        }
+      );
+
+      return closeRequest(
+        response,
+        res,
+        "Order has been delete successfully!!!",
+        "Order has not been delete successfully,please try again later,thanks!!!"
+      );
     } else {
       return res.status(500).json({ message: "deletion order failed" });
     }
   } catch (error) {
-    print(error, "x");
+    if (orderDeleted && orderCopy) {
+      // restore only fields would had changed in database
+      orderDeleted["deletedAt"] = orderCopy["deletedAt"];
+      orderDeleted["updatedAt"] = orderCopy["updatedAt"];
+      orderDeleted["createdAt"] = orderCopy["createdAt"];
+      let orderRestored = await orderDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      console.log({ orderRestored });
+    }
+
+    console.log(error, "x");
     return res
       .status(500)
       .json({ message: "Error(s) occured during the deletion of order!!!" });
@@ -214,4 +341,6 @@ module.exports = {
   updateOrder,
   fetchOrder,
   fetchOrdersByRestaurant,
+  updateOrderRemote,
+  deleteOrderRemote,
 };

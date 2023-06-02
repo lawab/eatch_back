@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 
 const restaurantType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  restaurant_name: String,
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
+    town: String,
+    address: String,
     logo: { type: String, default: "/datas/avatar.png" },
   },
 };
@@ -44,23 +44,9 @@ const productType = {
   productName: {
     type: String,
     maxlength: 50,
-    required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    default: 0,
   },
   price: {
     type: Number,
-    required: true,
-  },
-  category: {
-    type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
-      category_name: { type: String, maxlength: 50 },
-    },
-    required: true,
   },
   promotion: {
     type: Boolean,
@@ -88,18 +74,17 @@ const productType = {
   },
 };
 const OrderType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   order_title: {
     type: String,
     default: null,
   },
   is_tracking: { type: Boolean, default: false },
-  client: { type: clientType, required: true },
+  client: { type: clientType },
   restaurant: {
-    required: true,
     type: restaurantType,
   },
   products: {
-    required: true,
     type: [{ type: productType }],
   },
   status: {
@@ -117,7 +102,7 @@ const OrderType = {
 
 const promotionSchemaObject = {
   promotion_name: { type: String, required: true },
-  clients: { type: [{ type: clientType }] },
+  clients: { type: [clientType] },
   end_date: { type: Date, required: false, default: null }, //must remove default value for production
   order: { type: OrderType, required: true },
   restaurant: {

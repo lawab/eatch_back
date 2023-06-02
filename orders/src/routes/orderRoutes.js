@@ -6,6 +6,8 @@ const {
   updateOrder,
   fetchOrder,
   fetchOrdersByRestaurant,
+  updateOrderRemote,
+  deleteOrderRemote,
 } = require("../controllers/orderController");
 const uploadFileService = require("../services/uploadFile");
 const { authmiddleware } = require("../middlewares/authmiddleware");
@@ -17,6 +19,7 @@ orderRouter.post("/create", authmiddleware, upload.single("file"), createOrder);
 
 //delete product
 orderRouter.delete("/delete/:id", authmiddleware, deleteOrder);
+orderRouter.delete("/delete/remomte/:id", authmiddleware, deleteOrderRemote);
 
 //get product
 orderRouter.get("/fetch/one/:id", authmiddleware, fetchOrder);
@@ -38,6 +41,8 @@ orderRouter.put(
   upload.single("file"),
   updateOrder
 );
+
+orderRouter.put("/update/remote/:id", authmiddleware, updateOrderRemote);
 
 //Export route to be used on another place
 module.exports = orderRouter;
