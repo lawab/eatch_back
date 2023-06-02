@@ -11,8 +11,8 @@ const updateUserValues = require("../methods/updateUserValues");
 const createUser = async (req, res) => {
   let newuser = null;
   try {
-    let body = req.body;
-    // let body = JSON.parse(req.headers?.body);
+    // let body = req.body;
+    let body = JSON.parse(req.headers?.body);
 
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
@@ -81,6 +81,7 @@ const createUser = async (req, res) => {
 
 //Create new role of user in Data Base
 const createUserRole = async (req, res) => {
+  z;
   try {
     let body = req.body;
 
@@ -193,8 +194,8 @@ const UpdateUser = async (req, res) => {
   let userUpdated = null;
 
   try {
-    // let body = JSON.parse(req.headers?.body);
-    let body = req.body;
+    let body = JSON.parse(req.headers?.body);
+    // let body = req.body;
 
     let bodyUpdate = await updateUserValues(body, req);
 
@@ -286,9 +287,9 @@ const deleteUser = async (req, res) => {
   let userCopy = null;
   let userDeleted = null;
   try {
-    // let body = JSON.parse(req.headers?.body);
+    let body = JSON.parse(req.headers?.body);
 
-    const body = req.body;
+    // const body = req.body;
 
     let creator = await userService.findUser({
       _id: body?._creator,

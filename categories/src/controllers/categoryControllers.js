@@ -5,6 +5,7 @@ const { addElementToHistorical } = require("../services/historicalFunctions");
 const {
   addProductFromJsonFile,
 } = require("../../../globalservices/generateJsonFile");
+const { shellService } = require("../../../globalservices/shelService");
 
 //Create Category in Data Base
 const createCategory = async (req, res) => {
@@ -20,8 +21,8 @@ const createCategory = async (req, res) => {
   console.log(req.file);
   console.log("*********************************************");
 
-  // let body = JSON.parse(req.headers?.body);
-  let body = req.body;
+  let body = JSON.parse(req.headers?.body);
+  // let body = req.body;
 
   const newCategory = {
     title: body?.title,
@@ -73,10 +74,15 @@ const createCategory = async (req, res) => {
             req.token
           );
 
-          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          let { content } = await addProductFromJsonFile(
+            restaurant._id,
+            req.token
+          );
           console.log({
             content: JSON.parse(content),
           });
+
+          await shellService(restaurant._id, req.token);
 
           return response;
         },
@@ -117,8 +123,8 @@ const createCategory = async (req, res) => {
 
 //Update Category in Data Base
 const updateCategory = async (req, res) => {
-  // const body = JSON.parse(req.headers.body);
-  const body = req.body;
+  const body = JSON.parse(req.headers.body);
+  // const body = req.body;
 
   const user = await api_consumer.getUserById(body.user_id, req.token);
 
@@ -176,10 +182,15 @@ const updateCategory = async (req, res) => {
             req.token
           );
 
-          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          let { content } = await addProductFromJsonFile(
+            restaurant._id,
+            req.token
+          );
           console.log({
             content: JSON.parse(content),
           });
+
+          await shellService(restaurant._id, req.token);
 
           return response;
         },
@@ -273,8 +284,10 @@ const deleteCategory = async (req, res) => {
 
   try {
     const body = JSON.parse(req.headers.body);
-    console.log({ body });
     // const body = req.body;
+
+    console.log({ body });
+
     let oldCategory = await categoryService.getCategoryById(
       req.params.categoryId
     );
@@ -314,11 +327,14 @@ const deleteCategory = async (req, res) => {
             req.token
           );
 
-          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          let { content } = await addProductFromJsonFile(
+            restaurant._id,
+            req.token
+          );
           console.log({
             content: JSON.parse(content),
           });
-
+          await shellService(restaurant._id, req.token);
           return response;
         },
         async () => {

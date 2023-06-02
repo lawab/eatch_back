@@ -11,6 +11,7 @@ const {
 const {
   addProductFromJsonFile,
 } = require("../../../globalservices/generateJsonFile");
+const { shellService } = require("../../../globalservices/shelService");
 
 // create one Menu
 const createMenu = async (req, res) => {
@@ -39,12 +40,14 @@ const createMenu = async (req, res) => {
             req.token
           );
 
-          let { content, categories, menus } = await addProductFromJsonFile(
+          let { content } = await addProductFromJsonFile(
             bodyUpdated.restaurant._id,
             req.token
           );
 
-          console.log({ content: JSON.parse(content), categories, menus });
+          console.log({ content: JSON.parse(content) });
+
+          await shellService(bodyUpdated.restaurant._id, req.token);
 
           return addResponse;
         },
@@ -135,11 +138,13 @@ const updateMenu = async (req, res) => {
             req.token
           );
 
-          let { content, categories, menus } = await addProductFromJsonFile(
+          let { content } = await addProductFromJsonFile(
             bodyUpdated.restaurant._id,
             req.token
           );
-          console.log({ content, categories, menus });
+          console.log({ content: JSON.parse(content) });
+
+          await shellService(bodyUpdated.restaurant._id, req.token);
 
           return response;
         },
@@ -247,11 +252,13 @@ const deleteMenu = async (req, res) => {
             req.token
           );
 
-          let { content, categories, menus } = await addProductFromJsonFile(
+          let { content } = await addProductFromJsonFile(
             MenuDeleted.restaurant._id,
             req.token
           );
-          console.log({ content, categories, menus });
+          console.log({ content: JSON.parse(content) });
+
+          await shellService(MenuDeleted.restaurant._id, req.token);
 
           return response;
         },
