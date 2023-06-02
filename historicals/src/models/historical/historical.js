@@ -289,7 +289,6 @@ const OrderType = {
         type: {
           _id: { type: mongoose.Types.ObjectId, required: true },
           recette: {
-            required: true,
             type: {
               _id: { type: mongoose.Types.ObjectId, required: true },
               title: { type: String },

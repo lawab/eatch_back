@@ -37,30 +37,30 @@ module.exports = async (body, req, token) => {
 
     body["restaurant"] = restaurant; //set restaurant value found in database
 
-    let products = await menuServices.getProducts(body?.products, token);
-    console.log({ products });
+    // let products = await menuServices.getProducts(body?.products, token);
+    // console.log({ products });
 
-    if (
-      !products?.length ||
-      products?.length !== body?.products?.length ||
-      products.filter((p) => !p).length
-    ) {
-      throw new Error(errorMessage("products"));
-    }
-
-    // get products in databsase
-    // let productParsed = JSON.parse(body?.products);
-
-    // let products = await menuServices.getProducts(productParsed, token);
-    // console.log({ productsFound: products });
     // if (
     //   !products?.length ||
-    //   products?.length !== productParsed?.length ||
-    //   products?.length !== productParsed?.length ||
+    //   products?.length !== body?.products?.length ||
     //   products.filter((p) => !p).length
     // ) {
     //   throw new Error(errorMessage("products"));
     // }
+
+    // get products in databsase
+    let productParsed = JSON.parse(body?.products);
+
+    let products = await menuServices.getProducts(productParsed, token);
+    console.log({ productsFound: products });
+    if (
+      !products?.length ||
+      products?.length !== productParsed?.length ||
+      products?.length !== productParsed?.length ||
+      products.filter((p) => !p).length
+    ) {
+      throw new Error(errorMessage("products"));
+    }
 
     body["products"] = products; //set product value found in database
 
