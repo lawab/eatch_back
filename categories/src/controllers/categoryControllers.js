@@ -240,53 +240,14 @@ const updateCategory = async (req, res) => {
   }
 };
 
-//Get a Category in Data Base
-const getCategory = async (req, res) => {
-  try {
-    const category = await categoryService.getCategoryById(
-      req.params.categoryId
-    );
-    res.status(200).json(category);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Category not exist in DB!!!" });
-  }
-};
-
-//Get All Categories in Data Base
-const getCategories = async (req, res) => {
-  try {
-    const categories = await categoryService.getCategories();
-    res.status(200).json(categories);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Categories not exist in DB!!!" });
-  }
-};
-
-//Get All Categories By Restaurant in Data Base
-const getCategoriesByRestaurant = async (req, res) => {
-  const restaurant = req.params?.restaurantId;
-  try {
-    const categories = await categoryService.getCategoriesByRestaurantId(
-      restaurant
-    );
-    res.status(200).json(categories);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Categories not exist in DB!!!" });
-  }
-};
-
 const deleteCategory = async (req, res) => {
   let categoryCopied = null;
   let category = null;
 
   try {
+    console.log({ body: req.headers.body });
     const body = JSON.parse(req.headers.body);
     // const body = req.body;
-
-    console.log({ body });
 
     let oldCategory = await categoryService.getCategoryById(
       req.params.categoryId
@@ -383,6 +344,44 @@ const deleteCategory = async (req, res) => {
     }
     console.log(err);
     res.status(500).json({ message: "Categories not exists in DB!!!" });
+  }
+};
+
+//Get a Category in Data Base
+const getCategory = async (req, res) => {
+  try {
+    const category = await categoryService.getCategoryById(
+      req.params.categoryId
+    );
+    res.status(200).json(category);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Category not exist in DB!!!" });
+  }
+};
+
+//Get All Categories in Data Base
+const getCategories = async (req, res) => {
+  try {
+    const categories = await categoryService.getCategories();
+    res.status(200).json(categories);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Categories not exist in DB!!!" });
+  }
+};
+
+//Get All Categories By Restaurant in Data Base
+const getCategoriesByRestaurant = async (req, res) => {
+  const restaurant = req.params?.restaurantId;
+  try {
+    const categories = await categoryService.getCategoriesByRestaurantId(
+      restaurant
+    );
+    res.status(200).json(categories);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Categories not exist in DB!!!" });
   }
 };
 
