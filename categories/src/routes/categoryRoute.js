@@ -20,7 +20,7 @@ categoryRouter.post(
 categoryRouter.patch(
   "/update/:categoryId",
   auth.authmiddleware,
-  upload.single("image"),
+  upload.single("file"),
   controller.updateCategory
 );
 //**************************************** *//
