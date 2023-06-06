@@ -42,25 +42,21 @@ module.exports = async (body, req, token) => {
     }
     body["restaurant"] = restaurant; // update restaurant with value found in database
 
-    // let productsIds = JSON.parse(body?.products);
+    body["products"] = JSON.parse(body?.products);
+
     let productsIds = body?.products;
 
     if (productsIds?.length) {
-      //   get products in databsase
+      //get products in databsase
       let products = await menuServices.getProducts(productsIds, token);
 
       if (
         !products?.length ||
         products?.length !== productsIds?.length ||
-        productsIds.filter((p) => !p).length
+        products.filter((p) => !p).length
       ) {
         throw new Error(errorMessage("products"));
       }
-      // let products = await menuServices.getProducts(JSON.parse(body?.products), token);
-
-      // if (!products?.length || products?.length !== JSON.parse(body?.products)?.length) {
-      //   throw new Error(errorMessage("products"));
-      // }
 
       body["products"] = products; //set products values found in database
     }

@@ -93,9 +93,9 @@ const updateMenu = async (req, res) => {
   let menuCopy = null;
   try {
     // get body request
-    let body = req.body;
-    // let body = JSON.parse(req.headers.body);
-
+    // let body = req.body;
+    let body = JSON.parse(req.headers.body);
+    console.log({body})
     let menu = await menuServices.findOneMenu({
       _id: req.params?.id,
     });

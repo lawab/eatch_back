@@ -1,6 +1,9 @@
 const roles = require("../models/roles");
 const userServices = require("../services/userServices");
+const roleServices = require("../services/roleServices");
+
 const cryptoJS = require("crypto-js");
+
 /**
  *
  * @param {Object} body [Body from request]
@@ -32,6 +35,20 @@ module.exports = async (body, req, token) => {
       body["restaurant"] = restaurant;
     } else {
       throw new Error("restaurant not found!!");
+    }
+
+    // get role in database
+
+    // fetch restaurant since microservice restaurant
+    let role = await roleServices.findRole({
+      _id: body?.role,
+      restaurant: body?.restaurant,
+    });
+
+    if (role) {
+      body["role"] = role.value;
+    } else {
+      throw new Error("Role not found!!");
     }
 
     // set password encrypt

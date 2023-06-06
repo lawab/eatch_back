@@ -1,5 +1,6 @@
 const roles = require("../models/roles");
 const userServices = require("../services/userServices");
+const roleServices = require("../services/roleServices");
 
 module.exports = async (body, req) => {
   try {
@@ -26,6 +27,19 @@ module.exports = async (body, req) => {
       throw new Error(
         "your cannot update user because you don't have an authorization,please see your administrator!!!"
       );
+    }
+
+    if (body?.role) {
+      // fetch restaurant since microservice restaurant
+      let role = await roleServices.findRole({
+        value: body?.role,
+        restaurant: body?.restaurant,
+      });
+      if (role) {
+        body["role"] = role.value;
+      } else {
+        throw new Error("Role not found!!");
+      }
     }
 
     // set user that make update in database

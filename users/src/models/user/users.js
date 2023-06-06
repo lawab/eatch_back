@@ -50,14 +50,6 @@ const UserSchemaObject = {
   role: {
     type: String,
     required: true,
-    default: Role.SUPER_ADMIN,
-    enum: [
-      Role.SUPER_ADMIN,
-      Role.RH,
-      Role.COMPTABLE,
-      Role.MANAGER,
-      Role.EMPLOYEE,
-    ],
   },
   employer_type: {
     type: String,
