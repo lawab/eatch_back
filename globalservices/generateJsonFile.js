@@ -143,6 +143,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
 
     newCategories.push({
       title: "menu",
+      image: "/datas/menu.png",
       menus: newMenus,
     });
 
