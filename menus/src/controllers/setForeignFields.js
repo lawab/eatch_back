@@ -53,9 +53,9 @@ module.exports = async (body, req, token) => {
 
     let products = await menuServices.getProducts(productParsed, token);
     console.log({ productsFound: products });
+
     if (
       !products?.length ||
-      products?.length !== productParsed?.length ||
       products?.length !== productParsed?.length ||
       products.filter((p) => !p).length
     ) {
