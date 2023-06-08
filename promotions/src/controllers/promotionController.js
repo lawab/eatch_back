@@ -1,11 +1,11 @@
 const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
-const UpdateValuesPromotion = require("../methods/UpdateValuesPromotion");
 const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
 const setPromotionValues = require("../methods/setPromotionValues");
+const updateValuesPromotion = require("../methods/updateValuesPromotion");
 
 // create one promotion in database
 const createPromotion = async (req, res) => {
@@ -78,35 +78,13 @@ const createPromotion = async (req, res) => {
 };
 // update promotion in database
 const updatePromotion = async (req, res) => {
+  let promotionUpdated = null;
+  let promotionCopy = null;
+
   try {
     let body = req.body;
 
-    let creator = await promotionServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to update this promotion element because creator not exists!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "your cannot update promotion element because you don't have an authorization,please see your administrator",
-      });
-    }
-
-    //set creator found in database
-    body["_creator"] = creator;
-
-    // set promotion avatar if exists
-    if (req.file) {
-      body["image"] = req.file?.filename;
-    }
+    bodyUpdate = await updateValuesPromotion(req, body, req.token);
 
     let promotion = await promotionServices.findOnePromotion({
       _id: req.params?.id,
@@ -119,21 +97,21 @@ const updatePromotion = async (req, res) => {
       });
     }
 
-    let promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
-
-    console.log({ promotionCopy });
-
-    body = await setUpdateValuesFromForeignFields(body, req.token);
-
+    // copy promotion value to do fallback if error occured
+    promotionCopy = Object.assign({}, promotion._doc);
+    console.log({ client: promotion["client"] });
     // update promotion values
-
-    for (const field in body) {
-      if (Object.hasOwnProperty.call(body, field)) {
-        promotion[field] = body[field];
+    for (const field in bodyUpdate) {
+      if (Object.hasOwnProperty.call(bodyUpdate, field)) {
+        if (field === "client") {
+          promotion["clients"] = [...promotion["clients"], bodyUpdate[field]];
+        } else {
+          promotion[field] = bodyUpdate[field];
+        }
       }
     }
 
-    let promotionUpdated = await promotion.save();
+    promotionUpdated = await promotion.save();
 
     console.log({ promotionUpdated }, "~");
 
@@ -141,7 +119,7 @@ const updatePromotion = async (req, res) => {
       let response = await addElementToHistorical(
         async () => {
           let addResponse = await promotionServices.addPromotionToHistorical(
-            creator._id,
+            promotionUpdated._creator._id,
             {
               promotions: {
                 _id: promotionUpdated?._id,
@@ -167,15 +145,20 @@ const updatePromotion = async (req, res) => {
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Promotion has been updated successfully!!!",
-        "Promotion has been not updated successfully,please try again later,thanks!!!"
-      );
+      if (response.status === 200) {
+        return res
+          .status(200)
+          .json({ message: "Promotion has been update successfully!!!" });
+      } else {
+        return res.status(500).json({
+          message:
+            "Updating of promotion failled,please try again later,thanks!!!",
+        });
+      }
     } else {
       res.status(401).json({
-        message: "Promotion has been not updated successfully!!",
+        message:
+          "Updating of promotion failled,please try again later,thanks!!!",
       });
     }
   } catch (error) {
