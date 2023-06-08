@@ -1,47 +1,23 @@
 const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
-const setValuesFromRequiredForeignFields = require("./setValuesFromRequiredForeignFields");
-const setUpdateValuesFromForeignFields = require("./setUpdateValuesFromForeignFields");
+const UpdateValuesPromotion = require("../methods/UpdateValuesPromotion");
 const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
+const setPromotionValues = require("../methods/setPromotionValues");
 
 // create one promotion in database
 const createPromotion = async (req, res) => {
+  let newPromotion = null;
   try {
     let body = req.body;
 
-    let creator = await promotionServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
+    console.log({ body });
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to create this promotion because creator not exists!!!",
-      });
-    }
+    let bodyUpdate = await setPromotionValues(req, body, req.token);
 
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "your cannot create promotion element because you don't have an authorization,please see your administrator",
-      });
-    }
-
-    body["_creator"] = creator; //set creator found in database
-
-    // set promotion avatar
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
-
-    body = await setValuesFromRequiredForeignFields(body, req.token);
-
-    // verify that document with [field] exists
-    let newPromotion = await promotionServices.createPromotion(body);
+    newPromotion = await promotionServices.createPromotion(bodyUpdate);
 
     console.log({ newPromotion });
     // if field already exists,document must be found on database,or null in ortherwise
@@ -49,10 +25,10 @@ const createPromotion = async (req, res) => {
       let response = await addElementToHistorical(
         async () => {
           let addResponse = await promotionServices.addPromotionToHistorical(
-            creator._id,
+            newPromotion._creator._id,
             {
               promotions: {
-                _id: newPromotion?._id,
+                _id: newPromotion._id,
                 action: "CREATED",
               },
             },
@@ -63,25 +39,37 @@ const createPromotion = async (req, res) => {
         },
         async () => {
           let elementDeleted = await promotionServices.deleteTrustlyPromotion({
-            _id: newPromotion?._id,
+            _id: newPromotion._id,
           });
           console.log({ elementDeleted });
           return elementDeleted;
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Promotion has been created successfully!!!",
-        "Promotion has  been not created successfully,please try again later,thanks!!!"
-      );
+      if (response.status === 200) {
+        return res
+          .status(200)
+          .json({ message: "Promotion has been created successfully!!!" });
+      } else {
+        return res.status(500).json({
+          message:
+            "creation of promotion failled,please try again later,thanks!!!",
+        });
+      }
     } else {
-      res
-        .status(401)
-        .json({ message: "Promotion has been not created successfully!!!" });
+      return res.status(500).json({
+        message:
+          "creation of promotion failled,please try again later,thanks!!!",
+      });
     }
   } catch (error) {
+    if (newPromotion) {
+      let elementDeleted = await promotionServices.deleteTrustlyPromotion({
+        _id: newPromotion?._id,
+      });
+      console.log({ elementDeleted });
+      return elementDeleted;
+    }
     console.log(error, "x");
     return res
       .status(500)

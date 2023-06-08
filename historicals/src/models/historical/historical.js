@@ -114,17 +114,21 @@ const productType = {
       },
     ],
   },
-  materials: {
-    type: [
-      {
-        _id: { type: mongoose.Types.ObjectId },
-        mp_name: { required: true, type: String },
-        quantity: { type: Number, default: 0 },
-        lifetime: {
-          type: Date,
+  recette: {
+    required: true,
+    type: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      title: { type: String },
+      image: { type: String },
+      description: { type: String },
+      engredients: [
+        {
+          material: { type: mongoose.Types.ObjectId },
+          grammage: { type: Number },
         },
-      },
-    ],
+      ],
+      deletedAt: { type: Date, default: null },
+    },
   },
   restaurant: {
     required: true,
@@ -197,7 +201,6 @@ const productType = {
   },
   devise: {
     type: String,
-    default: "MAD",
   },
   cookingtime: {
     type: String,
@@ -205,7 +208,6 @@ const productType = {
 
   image: {
     type: String,
-    default: "/data/uploads/mcf.png",
   },
   liked: {
     type: Number,
@@ -217,25 +219,6 @@ const productType = {
   },
   deletedAt: { type: Date, default: null },
 };
-
-// recette type
-
-// const recetteType = {
-//   _id: { type: mongoose.Types.ObjectId, required: true },
-//   title: { type: String },
-//   image: { type: String },
-//   description: { type: String },
-//   engredients: [
-//     {
-//       material: { type: mongoose.Types.ObjectId },
-//       grammage: { type: Number },
-//     },
-//   ],
-//   _creator: {
-//     type: mongoose.Types.ObjectId,
-//   },
-//   deletedAt: { type: Date, default: null },
-// };
 
 // orders type
 const OrderType = {
@@ -432,11 +415,11 @@ const menuType = {
     required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
-      restaurant_name: { type: String, required: true },
+      restaurant_name: { type: String },
       infos: {
-        town: { type: String, required: true },
-        address: { type: String, required: true },
-        logo: { type: String, default: "/datas/avatar.png" },
+        town: { type: String },
+        address: { type: String },
+        logo: { type: String },
       },
     },
   },
@@ -444,61 +427,85 @@ const menuType = {
     required: true,
     type: [
       {
-        type: {
-          _id: { type: mongoose.Types.ObjectId, required: true },
-          pusharePrice: {
-            type: Number,
-          },
-          costPrice: {
-            type: Number,
-          },
-          sellingPrice: {
-            type: Number,
-          },
-          productName: {
-            type: String,
-            maxlength: 50,
-            required: true,
-          },
-          price: {
-            type: Number,
-            required: true,
-          },
-          category: {
-            type: {
-              _id: { type: mongoose.Types.ObjectId, required: true },
-              title: { type: String },
+        _id: { type: mongoose.Types.ObjectId, required: true },
+        pusharePrice: {
+          type: Number,
+        },
+        recette: {
+          required: true,
+          type: {
+            _id: { type: mongoose.Types.ObjectId, required: true },
+            title: { type: String },
+            image: { type: String },
+            description: { type: String },
+            engredients: {
+              required: true,
+              type: [
+                {
+                  material: { type: mongoose.Types.ObjectId },
+                  grammage: { type: Number },
+                },
+              ],
             },
-            required: true,
-          },
-          promotion: {
-            type: Boolean,
-            default: false,
-          },
-          description: {
-            type: String,
-          },
-          devise: {
-            type: String,
-            default: "MAD",
-          },
-          image: {
-            type: String,
-            default: "/data/uploads/mcf.png",
-          },
-          liked: {
-            type: Number,
-            default: 0,
-          },
-
-          likedPersonCount: {
-            type: Number,
-            default: 0,
+            deletedAt: { type: Date, default: null },
           },
         },
+        costPrice: {
+          type: Number,
+        },
+        sellingPrice: {
+          type: Number,
+        },
+        productName: {
+          type: String,
+          maxlength: 50,
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        category: {
+          type: {
+            _id: { type: mongoose.Types.ObjectId, required: true },
+            title: { type: String },
+            image: String,
+            _creator: {
+              _id: { type: String },
+              role: { type: String },
+              email: { type: String },
+              firstName: { type: String },
+              lastName: { type: String },
+            },
+            restaurant: {
+              _id: { type: String },
+              restaurant_name: { type: String },
+              logo: { type: String },
+            },
+            deletedAt: { type: Date, default: null },
+          },
+          required: true,
+        },
+        promotion: {
+          type: Boolean,
+          default: false,
+        },
+        description: {
+          type: String,
+        },
+        devise: {
+          type: String,
+        },
+        image: {
+          type: String,
+        },
+        deletedAt: { type: Date, default: null },
       },
     ],
   },
+  description: { type: String, minlength: 1, default: "description" },
+  menu_title: { type: String, minlength: 1, required: true },
+  image: { type: String },
   _creator: {
     required: true,
     type: mongoose.Types.ObjectId,
@@ -508,9 +515,6 @@ const menuType = {
     required: true,
     enum: [actionTypes.CREATED, actionTypes.UPDATED, actionTypes.DELETED],
   },
-  description: { type: String, minlength: 1, default: "description" },
-  menu_title: { type: String, minlength: 1, required: true },
-  image: { type: String, default: "/data/mcf.png" },
   deletedAt: { type: Date, default: null },
 };
 
@@ -686,37 +690,83 @@ const clientType = {
 };
 
 // promotion type
-
 const promotionType = {
   promotion_name: { type: String, required: true },
-  clients: { type: [{ type: clientType }] },
-  end_date: { type: Date, required: false, default: null }, //must remove default value for production
-  order: {
-    required: true,
-    type: {
-      order_title: {
-        type: String,
-        default: null,
-      },
-      is_tracking: { type: Boolean, default: false },
-      client: { type: clientType, required: true },
-      restaurant: {
-        required: true,
-        type: {
-          _id: { type: mongoose.Types.ObjectId, required: true },
-          restaurant_name: { type: String },
-          infos: {
-            town: { type: String },
-            address: { type: String },
-            logo: {
-              type: String,
-              default: "/datas/avatar.png",
-            },
-          },
-          _creator: {
-            type: mongoose.Types.ObjectId,
-          },
+  clients: {
+    type: [
+      {
+        _id: { type: mongoose.Types.ObjectId, required: true },
+        fisrtName: {
+          type: String,
+          maxlenght: 50,
+          default: null,
         },
+        lastName: {
+          type: String,
+          maxlenght: 50,
+          default: null,
+        },
+        isOnline: { type: Boolean, default: false },
+        phoneNumber: {
+          type: String,
+          maxlenght: 50,
+          default: null,
+        },
+      },
+    ],
+  },
+  end_date: { type: Date, required: false, default: null }, //must remove default value for production
+  percent: { type: Number, default: 0 },
+  product: {
+    type: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      pusharePrice: {
+        type: Number,
+      },
+      costPrice: {
+        type: Number,
+      },
+      sellingPrice: {
+        type: Number,
+      },
+      productName: {
+        type: String,
+        maxlength: 50,
+      },
+      price: {
+        type: Number,
+      },
+      promotion: {
+        type: Boolean,
+        default: false,
+      },
+      description: {
+        type: String,
+      },
+      devise: {
+        type: String,
+        default: "MAD",
+      },
+      image: {
+        type: String,
+      },
+      liked: {
+        type: Number,
+        default: 0,
+      },
+
+      likedPersonCount: {
+        type: Number,
+        default: 0,
+      },
+    },
+  },
+  menu: {
+    type: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      price: { type: Number, required: true },
+      devise: {
+        type: String,
       },
       products: {
         required: true,
@@ -736,23 +786,9 @@ const promotionType = {
               productName: {
                 type: String,
                 maxlength: 50,
-                required: true,
-              },
-              quantity: {
-                type: Number,
-                required: true,
-                default: 0,
               },
               price: {
                 type: Number,
-                required: true,
-              },
-              category: {
-                type: {
-                  _id: { type: mongoose.Types.ObjectId, required: true },
-                  title: { type: String },
-                },
-                required: true,
               },
               promotion: {
                 type: Boolean,
@@ -767,13 +803,11 @@ const promotionType = {
               },
               image: {
                 type: String,
-                default: "/data/uploads/mcf.png",
               },
               liked: {
                 type: Number,
                 default: 0,
               },
-
               likedPersonCount: {
                 type: Number,
                 default: 0,
@@ -781,17 +815,16 @@ const promotionType = {
             },
           },
         ],
+        validate: {
+          validator(products = []) {
+            return products.length > 0 ? true : false;
+          },
+        },
       },
-      status: {
-        type: String,
-        enum: [
-          orderStatus.DONE,
-          orderStatus.TREATMENT,
-          orderStatus.PAID,
-          orderStatus.WAITED,
-        ],
-        default: orderStatus.WAITED,
-      },
+      _creator: { required: true, type: mongoose.Types.ObjectId },
+      description: { type: String, minlength: 1, default: "description" },
+      menu_title: { type: String, minlength: 1, required: true },
+      image: { type: String, default: "/datas/avatar.png" },
       deletedAt: { type: Date, default: null },
     },
   },
@@ -821,7 +854,6 @@ const promotionType = {
 };
 
 // logistic type
-
 const logisticType = {
   restaurant: {
     required: true,

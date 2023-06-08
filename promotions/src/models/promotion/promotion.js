@@ -74,6 +74,7 @@ const productType = {
   },
 };
 const menuType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
   price: { type: Number, required: true },
   devise: {
     type: String,
@@ -88,7 +89,7 @@ const menuType = {
       },
     },
   },
-  _creator: { required: true, type: userSchemaObject },
+  _creator: { required: true, type: mongoose.Types.ObjectId },
   description: { type: String, minlength: 1, default: "description" },
   menu_title: { type: String, minlength: 1, required: true },
   image: { type: String, default: "/datas/avatar.png" },
