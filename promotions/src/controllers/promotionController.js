@@ -170,6 +170,8 @@ const updatePromotion = async (req, res) => {
 };
 // delete one promotion in database
 const deletePromotion = async (req, res) => {
+  let promotionCopy;
+  let promotionDeleted = null;
   try {
     let body = req.body;
 
@@ -178,14 +180,10 @@ const deletePromotion = async (req, res) => {
       req.token
     );
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to delete this promotion element because creator not exists!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
           "your cannot delete promotion element because you don't have an authorization,please see your administrator",
@@ -204,7 +202,7 @@ const deletePromotion = async (req, res) => {
       });
     }
 
-    let promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
+    promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
 
     console.log({ promotionCopy });
 
@@ -212,7 +210,7 @@ const deletePromotion = async (req, res) => {
     promotion._creator = creator;
 
     // find and delete promotion
-    let promotionDeleted = await promotion.save();
+    promotionDeleted = await promotion.save();
 
     console.log({ promotionDeleted });
 
@@ -234,11 +232,11 @@ const deletePromotion = async (req, res) => {
           return response;
         },
         async () => {
-          for (const field in promotionCopy) {
-            if (Object.hasOwnProperty.call(promotionCopy, field)) {
-              promotionDeleted[field] = promotionCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
+          promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
+          promotionDeleted["createdAt"] = promotionCopy["createdAt"];
+
           let promotionRestored = await promotionDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
@@ -247,16 +245,30 @@ const deletePromotion = async (req, res) => {
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Promotion has been delete successfully!!!",
-        "Promotion has not been delete successfully,please try again later,thanks!!!"
-      );
-    } else {
-      return res.status(500).json({ message: "deletion of promotion failed" });
+      if (response.status === 200) {
+        return res
+          .status(200)
+          .json({ message: "Promotion has been deleted successfully!!!" });
+      } else {
+        return res.status(500).json({
+          message:
+            "Deleting of promotion failled,please try again later,thanks!!!",
+        });
+      }
     }
   } catch (error) {
+    if (promotionDeleted && promotionCopy) {
+      // restore only fields would had changed in database
+      promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
+      promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
+      promotionDeleted["createdAt"] = promotionCopy["createdAt"];
+
+      let promotionRestored = await promotionDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      console.log({ promotionRestored });
+      return promotionRestored;
+    }
     console.log(error.message);
     return res.status(500).json({
       message: "Error occured during the deletion of promotion!!!",
