@@ -11,7 +11,8 @@ const updateValuesPromotion = require("../methods/updateValuesPromotion");
 const createPromotion = async (req, res) => {
   let newPromotion = null;
   try {
-    let body = req.body;
+    // let body = req.body;
+    let body = JSON.parse(req.headers.body);
 
     console.log({ body });
 
@@ -82,7 +83,8 @@ const updatePromotion = async (req, res) => {
   let promotionCopy = null;
 
   try {
-    let body = req.body;
+    // let body = req.body;
+    let body = JSON.parse(req.headers.body);
 
     bodyUpdate = await updateValuesPromotion(req, body, req.token);
 
@@ -173,7 +175,8 @@ const deletePromotion = async (req, res) => {
   let promotionCopy;
   let promotionDeleted = null;
   try {
-    let body = req.body;
+    // let body = req.body;
+    let body = JSON.parse(req.headers.body);
 
     let creator = await promotionServices.getUserAuthor(
       body?._creator,
