@@ -40,13 +40,14 @@ module.exports = async (body, req, token) => {
     // get role in database
 
     // fetch restaurant since microservice restaurant
-    let role = await roleServices.findRole({
-      _id: body?.role,
-      restaurant: body?.restaurant,
-    });
+    // let role = await roleServices.findRole({
+    //   _id: body?.role,
+    //   restaurant: body?.restaurant,
+    // });
 
-    if (role) {
-      body["role"] = role.value;
+    let role = body?.role;
+    if (Object.values(roles).includes(role)) {
+      body["role"] = role;
     } else {
       throw new Error("Role not found!!");
     }
