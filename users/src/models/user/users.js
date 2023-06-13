@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Role = require("../roles");
 const validator = require("validator");
+const roles = require("../roles");
 const Schema = mongoose.Schema;
 
 const restaurantType = {
@@ -50,6 +51,14 @@ const UserSchemaObject = {
   role: {
     type: String,
     required: true,
+    default: roles.SUPER_ADMIN,
+    enum: [
+      roles.SUPER_ADMIN,
+      roles.COMPTABLE,
+      roles.MANAGER,
+      roles.RH,
+      roles.LABORANTIN,
+    ],
   },
   employer_type: {
     type: String,

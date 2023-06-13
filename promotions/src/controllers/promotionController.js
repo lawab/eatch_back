@@ -176,6 +176,7 @@ const deletePromotion = async (req, res) => {
   let promotionDeleted = null;
   try {
     // let body = req.body;
+    console.log({body:req.headers.body})
     let body = JSON.parse(req.headers.body);
 
     let creator = await promotionServices.getUserAuthor(
