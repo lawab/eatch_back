@@ -30,16 +30,22 @@ module.exports = async (body, req) => {
     }
 
     if (body?.role) {
-      // fetch restaurant since microservice restaurant
-      let role = await roleServices.findRole({
-        value: body?.role,
-        restaurant: body?.restaurant,
-      });
-      if (role) {
-        body["role"] = role.value;
+      let role = body?.role;
+      if (Object.values(roles).includes(role)) {
+        body["role"] = role;
       } else {
         throw new Error("Role not found!!");
       }
+      // fetch restaurant since microservice restaurant
+      // let role = await roleServices.findRole({
+      //   value: body?.role,
+      //   restaurant: body?.restaurant,
+      // });
+      // if (role) {
+      //   body["role"] = role.value;
+      // } else {
+      //   throw new Error("Role not found!!");
+      // }
     }
 
     // set user that make update in database
