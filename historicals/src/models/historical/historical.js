@@ -8,7 +8,6 @@ const { isEmail } = require("validator");
 const userType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant: {
-    required: true,
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
       restaurant_name: { type: String },
@@ -17,6 +16,39 @@ const userType = {
         address: { type: String },
         logo: { type: String, default: "/datas/avatar.png" },
       },
+    },
+  },
+  laboratory: {
+    type: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      labo_name: { type: String, required: true, maxlength: 50 },
+      address: { type: String, required: true, maxlength: 50 },
+      email: {
+        type: String,
+      },
+      materials: [
+        {
+          material: { type: String, require: false, maxlength: 50 },
+          mp_name: { type: String, require: false, maxlength: 50 },
+          stock: { type: Number, require: false, maxlength: 50 },
+        },
+      ],
+
+      providers: [
+        {
+          owner: { type: Object },
+          restaurant: { type: Object },
+          material: { type: Object },
+          grammage: { type: Number, require: false },
+          date_provider: { type: Date, require: false },
+        },
+      ],
+
+      _creator: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+      },
+      deletedAt: { type: Date, default: null },
     },
   },
   password: {

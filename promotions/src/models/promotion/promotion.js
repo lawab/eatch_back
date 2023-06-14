@@ -101,6 +101,7 @@ const promotionSchemaObject = {
     required: true,
     type: restaurantType,
   },
+  description:{type:String,default:""},
   promotion_name: { type: String, required: true },
   clients: { type: [clientType] },
   end_date: { type: Date, required: false, default: null }, //must remove default value for production

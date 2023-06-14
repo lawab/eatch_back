@@ -14,13 +14,44 @@ const restaurantType = {
   },
 };
 
+const laboratoryType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+  labo_name: { type: String, required: true, maxlength: 50 },
+  address: { type: String, required: true, maxlength: 50 },
+  email: {
+    type: String,
+  },
+  materials: [
+    {
+      material: { type: String, require: false, maxlength: 50 },
+      mp_name: { type: String, require: false, maxlength: 50 },
+      stock: { type: Number, require: false, maxlength: 50 },
+    },
+  ],
+
+  providers: [
+    {
+      owner: { type: Object },
+      restaurant: { type: Object },
+      material: { type: Object },
+      grammage: { type: Number, require: false },
+      date_provider: { type: Date, require: false },
+    },
+  ],
+
+  _creator: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+  },
+  deletedAt: { type: Date, default: null },
+};
 const UserSchemaObject = {
   restaurant: {
     type: restaurantType,
-    required: function () {
-      return this.role === Role.SUPER_ADMIN ? false : true;
-    },
   },
+
+  laboratory: { type: laboratoryType },
+
   firstName: {
     required: true,
     type: String,

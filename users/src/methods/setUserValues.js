@@ -28,13 +28,33 @@ module.exports = async (body, req, token) => {
       );
     }
 
-    // fetch restaurant since microservice restaurant
-    let restaurant = await userServices.getRestaurant(body?.restaurant, token);
+    if (body?.restaurant) {
+      // fetch restaurant since microservice restaurant
+      let restaurant = await userServices.getRestaurant(
+        body?.restaurant,
+        token
+      );
 
-    if (restaurant?._id) {
-      body["restaurant"] = restaurant;
-    } else {
-      throw new Error("restaurant not found!!");
+      if (restaurant?._id) {
+        body["restaurant"] = restaurant;
+      } else {
+        throw new Error("restaurant not found!!");
+      }
+    }
+
+    if (body?.laboratory) {
+      // fetch laboratory since microservice laboratory
+      let laboratory = await userServices.getLaboratory(
+        body?.laboratory,
+        token
+      );
+      console.log({ laboratory });
+
+      if (laboratory?._id) {
+        body["laboratory"] = laboratory;
+      } else {
+        throw new Error("laboratory not found!!");
+      }
     }
 
     // get role in database
