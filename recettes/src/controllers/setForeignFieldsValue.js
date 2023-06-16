@@ -39,11 +39,11 @@ module.exports = async (recetteServices, body, token) => {
     }
   }
 
-  let _materials = raw_material.filter((engredient) => {
+  let _materials = engredientFiltered.filter((engredient) => {
     return engredient?.material;
   });
 
-  let rawMaterials = raw_material.filter((engredient) => {
+  let rawMaterials = engredientFiltered.filter((engredient) => {
     return engredient?.raw_material;
   });
 
