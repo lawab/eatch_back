@@ -20,11 +20,30 @@ module.exports = async (recetteServices, body, token) => {
 
   let rawEngredients = [];
 
-  let _materials = body?.engredients?.filter((engredient) => {
+  let engredientFiltered = [];
+
+  for (e of body?.engredients) {
+    if (e.type === "material") {
+      engredientFiltered.push({
+        material: e.material,
+        grammage: e.grammage,
+        unity: e?.unity ? e.unity : "g",
+      });
+    }
+    if (e.type === "raw_material") {
+      engredientFiltered.push({
+        raw_material: e.raw_material,
+        grammage: e.grammage,
+        unity: e?.unity ? e.unity : "g",
+      });
+    }
+  }
+
+  let _materials = raw_material.filter((engredient) => {
     return engredient?.material;
   });
 
-  let rawMaterials = body?.engredients?.filter((engredient) => {
+  let rawMaterials = raw_material.filter((engredient) => {
     return engredient?.raw_material;
   });
 
@@ -34,7 +53,7 @@ module.exports = async (recetteServices, body, token) => {
 
   let rawMaterialIds = rawMaterials.map((e) => e?.raw_material);
 
-  if (materialIds.length && materialIds.every((m) => m != null)) {
+  if (materialIds.length) {
     let materials = await recetteServices.getMaterials(materialIds, token);
     console.log({ materials });
     // formation des ingredients
@@ -56,7 +75,7 @@ module.exports = async (recetteServices, body, token) => {
     console.log({ materialsEngrediants });
   }
 
-  if (rawMaterialIds.length && rawMaterialIds.every((rm) => rm != null)) {
+  if (rawMaterialIds.length) {
     let raw_materials = [];
 
     for (const id of rawMaterialIds) {
