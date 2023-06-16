@@ -19,6 +19,7 @@ module.exports = async (recetteServices, body, token) => {
   let materialsEngrediants = [];
 
   let rawEngredients = [];
+
   let engredientFiltered = [];
 
   for (e of body?.engredients) {
@@ -38,11 +39,11 @@ module.exports = async (recetteServices, body, token) => {
     }
   }
 
-  let _materials = raw_material.filter((engredient) => {
+  let _materials = engredientFiltered.filter((engredient) => {
     return engredient?.material;
   });
 
-  let rawMaterials = raw_material.filter((engredient) => {
+  let rawMaterials = engredientFiltered.filter((engredient) => {
     return engredient?.raw_material;
   });
 
@@ -78,7 +79,7 @@ module.exports = async (recetteServices, body, token) => {
     let raw_materials = [];
 
     for (const id of rawMaterialIds) {
-      let raw = await recetteServices.getRaw(id, token);
+      let raw = await recetteServices.getsemiRaw(id, token);
       if (!raw) {
         throw new Error("Invalid raw_material received");
       }

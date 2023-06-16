@@ -79,7 +79,7 @@ module.exports = async (recetteServices, body, token) => {
     let raw_materials = [];
 
     for (const id of rawMaterialIds) {
-      let raw = await recetteServices.getRaw(id, token);
+      let raw = await recetteServices.getsemiRaw(id, token);
       if (!raw) {
         throw new Error("Invalid raw_material received");
       }
