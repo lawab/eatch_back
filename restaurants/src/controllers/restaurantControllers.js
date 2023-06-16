@@ -139,7 +139,7 @@ const validateRequest = async (req, res) => {
     console.log("+++++++++++++++body");
     console.log(body);
     console.log("validate***************");
-    let restaurant = await RestaurantServices.findRestaurant({ _id: req.params.restaurantId })
+    let restaurant = await RestaurantServices.getRestaurantById(req.params.restaurantId)
     if (!restaurant) {
       return res.status(401).json({ message: "restaurant has not been found!!!" });
     }

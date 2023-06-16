@@ -52,6 +52,11 @@ const findRestaurant = async (query = null) => {
   const restaurant = await Restaurant.findOne(query);
   return restaurant;
 };
+
+const getRestaurantById = async (restaurantId) => {
+  const restaurant = await Restaurant.findById(restaurantId);
+  return restaurant;
+};
 /**
  *
  * @param {Object} query [query to update restaurants in database]
@@ -138,9 +143,9 @@ const validateOrAcceptMaterialById = async (restaurantId, requestBody) => {
     let test = false
     let i = 0
     while (test == false && i < providings.length) {
-      if (providings[i]._id == requestBody.body.requestId) {
-        providings[i].validated = requestBody.body.validated
-        providings[i].date_validated = requestBody.body.date_validated
+      if (providings[i]._id == requestBody.requestId) {
+        providings[i].validated = requestBody.validated
+        providings[i].date_validated = requestBody.date_validated
         test = true
         console.log("Restaurant ******BEFORE SAVED***********: ");
         console.log(restaurant);
@@ -167,6 +172,7 @@ module.exports = {
   addRetaurantToHistorical,
   requestMaterialById,
   validateOrAcceptMaterialById,
+  getRestaurantById,
   //getClients,
   //getProducts,
 };

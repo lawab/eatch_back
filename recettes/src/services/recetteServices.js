@@ -142,9 +142,9 @@ const getRestaurant = async (id = null, token = null) => {
  * @returns {Promise} [return the current author send by eatch_users microservice]
  */
 
-const getRaw = async (id = null, token = null) => {
+const getsemiRaw = async (id = null, token = null) => {
   let { data: raw } = await axios.get(
-    `${process.env.APP_URL_RAW_MATERIAL}/fetch/one/${id}`,
+    `${process.env.APP_URL_SEMI_RAW_MATERIAL}/fetch/one/${id}`,
     {
       headers: {
         authorization: `Bearer ${token}`,
@@ -185,5 +185,5 @@ module.exports = {
   getMaterials,
   getRestaurant,
   addRecetteToHistorical,
-  getRaw,
+  getsemiRaw,
 };

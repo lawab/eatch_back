@@ -213,8 +213,8 @@ const addRequestingToLaboratory = async (req, res) => {
 const validateRequestingToLaboratory = async (req, res) => {
   try {
     
-    //let body = JSON.parse(req.headers.body)
-    let body = req.body //TO TEST LOCALLY
+    let body = JSON.parse(req.headers.body)
+    //let body = req.body //TO TEST LOCALLY
     console.log("BBBBBBBBBBBBBBOOOOOOOOOOOOOOOODDDDDDDDYYYYY: ")
     console.log(body)
     let validated = false

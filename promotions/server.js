@@ -7,7 +7,7 @@ const path = require("path");
 const connection = require("./db");
 
 //import routes}
-const logisticRouter = require("./src/routes/logisticRoutes");
+const promotionRouter = require("./src/routes/promotionRoutes");
 
 //bodyParser
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, "./build/web")));
 app.use(cors());
 
 // All router app
-app.use("", logisticRouter);
+app.use("/api/promotions", promotionRouter);
 
 //Public files
 app.use(express.static(path.join(__dirname, "public")));

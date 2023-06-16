@@ -27,9 +27,10 @@ const materialType = {
   deletedAt: { type: Date, default: null },
 };
 const rawType = {
-  _id: { type: String },
-  title: { type: String, require: true, maxlength: 50 },
-  grammage: { type: Number, require: true },
+  title: { type: String, unique: true, require: true, maxlength: 50 },
+  quantity: { type: Number, require: true },
+  unit: { type: String, require: true, maxlength: 10 },
+  lifetime: { type: Date },
   image: { type: String, default: "/datas/avatar.png" },
   _creator: {
     _id: { type: String },
