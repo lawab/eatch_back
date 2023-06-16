@@ -10,6 +10,7 @@ const restaurantSchemaObject = {
   deletedAt: { type: Date, default: null },
 };
 const materialType = {
+  _id: { type: String },
   restaurant: {
     required: true,
     type: restaurantSchemaObject,
