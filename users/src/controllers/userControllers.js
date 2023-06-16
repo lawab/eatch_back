@@ -26,7 +26,7 @@ const createUser = async (req, res) => {
 
     // save new user in database
     newuser = await userService.createUser(bodyUpdate);
-
+    console.log({ newuser });
     if (newuser) {
       // add new user create in historical
       let response = await addElementToHistorical(

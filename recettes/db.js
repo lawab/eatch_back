@@ -4,8 +4,8 @@ module.exports = async function connection() {
   try {
     mongoose.Promise = global.Promise;
     mongoose.connect(process.env.MONG0_URL, {
-      // user: process.env.DBUSERNAME,
-      // pass: process.env.DBPWD,
+      user: process.env.DBUSERNAME,
+      pass: process.env.DBPWD,
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

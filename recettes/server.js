@@ -1,4 +1,5 @@
 require("dotenv").config();
+const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -7,7 +8,7 @@ const path = require("path");
 const connection = require("./db");
 
 //import routes
-const ClientRouter = require("./src/routes/ClientRoutes");
+const recetteRouter = require("./src/routes/recetteRoutes");
 //bodyParser
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -22,7 +23,7 @@ app.use(express.static(path.join(__dirname, "./build/web")));
 app.use(cors());
 
 // All router app
-app.use("/api/Client", ClientRouter);
+app.use("/api/recettes", recetteRouter);
 
 //Public files
 app.use(express.static(path.join(__dirname, "public")));
