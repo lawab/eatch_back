@@ -7,7 +7,7 @@ const updateForeignFields = require("./updateForeignFields");
 // create one recette in database
 const createRecette = async (req, res) => {
   try {
-    let body = JSON.parse(req.params.body);
+    let body = JSON.parse(req.headers.body);
     //let body = req.body;
     // check if creator has authorization
     let creator = await recetteServices.getUserAuthor(
@@ -20,7 +20,10 @@ const createRecette = async (req, res) => {
       });
     }
     body["_creator"] = creator?._id;
+
     body = await setForeignFieldsValue(recetteServices, body, req.token);
+
+    console.log({ engredients: body["engredients"] });
 
     // add image from recette
     body["image"] = req.file
@@ -44,6 +47,70 @@ const createRecette = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Error occured during a creation of recette!!!" });
+  }
+};
+
+// update recette in database
+const updateRecette = async (req, res) => {
+  try {
+    let body = JSON.parse(req.headers.body);
+    // let body = req.body;
+
+    // get the auathor to update recette
+    let creator = await recetteServices.getUserAuthor(
+      body?._creator,
+      req.token
+    );
+    // const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
+
+    if (!creator?._id) {
+      return res.status(401).json({
+        message: "invalid data send!!!",
+      });
+    }
+
+    // if user has authorization to update recette
+    if ([roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+      let recette = await recetteServices.findRecette({
+        _id: req.params?.id,
+      });
+
+      if (!recette) {
+        return res.status(401).json({
+          message: "unable to update recette because it not exists!!!",
+        });
+      }
+      body = await updateForeignFields(recetteServices, body, req.token);
+
+      // update all valid fields before save it in database
+      for (let key in body) {
+        if (fieldsRequired.includes(key)) {
+          recette[key] = body[key];
+          console.log({ key: body[key] });
+        }
+      }
+      // update recette in database
+      let recetteUpdated = await recette.save();
+      console.log({ recetteUpdated });
+      if (recetteUpdated?._id) {
+        res
+          .status(200)
+          .json({ message: "recette has been updated successfully!!" });
+      } else {
+        res.status(401).json({
+          message: "recette update failed: recette not exits in database!!",
+        });
+      }
+    } else {
+      return res.status(401).json({
+        message: "you cannot update the recette please see you admin,thanks!!!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Erros occured during the update recette!!!",
+    });
   }
 };
 // delete one recette in database
@@ -142,69 +209,6 @@ const fetchrecettesByRestaurant = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "Error occured during get request!!!" });
-  }
-};
-// update recette in database
-const updateRecette = async (req, res) => {
-  try {
-    let body = JSON.parse(req.params.body);
-    // let body = req.body;
-
-    // get the auathor to update recette
-    let creator = await recetteServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-    const { validate } = fieldsValidator(Object.keys(body), fieldsRequired);
-
-    if (!creator?._id || !validate) {
-      return res.status(401).json({
-        message: "invalid data send!!!",
-      });
-    }
-
-    // if user has authorization to update recette
-    if ([roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      let recette = await recetteServices.findRecette({
-        _id: req.params?.id,
-      });
-
-      if (!recette) {
-        return res.status(401).json({
-          message: "unable to update recette because it not exists!!!",
-        });
-      }
-      body = await updateForeignFields(recetteServices, body, req.token);
-
-      // update all valid fields before save it in database
-      for (let key in body) {
-        if (fieldsRequired.includes(key)) {
-          recette[key] = body[key];
-          console.log({ key: body[key] });
-        }
-      }
-      // update recette in database
-      let recetteUpdated = await recette.save();
-      console.log({ recetteUpdated });
-      if (recetteUpdated?._id) {
-        res
-          .status(200)
-          .json({ message: "recette has been updated successfully!!" });
-      } else {
-        res.status(401).json({
-          message: "recette update failed: recette not exits in database!!",
-        });
-      }
-    } else {
-      return res.status(401).json({
-        message: "you cannot update the recette please see you admin,thanks!!!",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Erros occured during the update recette!!!",
-    });
   }
 };
 

@@ -137,6 +137,11 @@ const menuSchemaObject = {
   products: {
     required: true,
     type: [{ type: productType }],
+    validate: {
+      validator(products = []) {
+        return products.length > 0 ? true : false;
+      },
+    },
   },
   // category: {
   //   required: true,

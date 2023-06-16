@@ -9,14 +9,15 @@ const setProductValues = require("../methods/setProductValues");
 const {
   addProductFromJsonFile,
 } = require("../../../globalservices/generateJsonFile");
+const { shellService } = require("../../../globalservices/shelService");
 
 // create one product in database
 const createProduct = async (req, res) => {
   let newproduct = null;
   try {
-    // let body = JSON.parse(req.headers?.body);
+    let body = JSON.parse(req.headers?.body);
 
-    let body = req.body;
+    // let body = req.body;
 
     console.log({ body });
 
@@ -43,12 +44,13 @@ const createProduct = async (req, res) => {
             req.token
           );
 
-          let { content, categories, menus } = await addProductFromJsonFile(
+          let { content } = await addProductFromJsonFile(
             bodyUpdated.restaurant._id,
             req.token
           );
 
-          console.log({ content: JSON.parse(content), categories, menus });
+          await shellService(bodyUpdated.restaurant._id, req.token);
+          console.log({ content: JSON.parse(content) });
 
           return response;
         },
@@ -97,7 +99,9 @@ const updateProduct = async (req, res) => {
   let productUpdated = null;
 
   try {
-    let body = req.body;
+    let body = JSON.parse(req.headers?.body);
+
+    // let body = req.body;
 
     // find product which must be update
     let product = await productServices.findProduct({
@@ -139,12 +143,14 @@ const updateProduct = async (req, res) => {
             },
             req.token
           );
-          let content = await addProductFromJsonFile(
+          let { content } = await addProductFromJsonFile(
             bodyUpdated.restaurant._id,
             req.token
           );
 
           console.log({ content: JSON.parse(content) });
+
+          await shellService(bodyUpdated.restaurant._id, req.token);
 
           return response;
         },
@@ -277,10 +283,15 @@ const deleteProduct = async (req, res) => {
             req.token
           );
 
-          let content = await addProductFromJsonFile(restaurant._id, req.token);
+          let { content } = await addProductFromJsonFile(
+            restaurant._id,
+            req.token
+          );
           console.log({
             content: JSON.parse(content),
           });
+
+          await shellService(restaurant._id, req.token);
 
           return response;
         },

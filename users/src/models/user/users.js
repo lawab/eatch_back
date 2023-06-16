@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Role = require("../roles");
 const validator = require("validator");
+const roles = require("../roles");
 const Schema = mongoose.Schema;
 
 const restaurantType = {
@@ -13,13 +14,44 @@ const restaurantType = {
   },
 };
 
+const laboratoryType = {
+  _id: { type: mongoose.Types.ObjectId, required: true },
+  labo_name: { type: String, required: true, maxlength: 50 },
+  address: { type: String, required: true, maxlength: 50 },
+  email: {
+    type: String,
+  },
+  materials: [
+    {
+      material: { type: String, require: false, maxlength: 50 },
+      mp_name: { type: String, require: false, maxlength: 50 },
+      stock: { type: Number, require: false, maxlength: 50 },
+    },
+  ],
+
+  providers: [
+    {
+      owner: { type: Object },
+      restaurant: { type: Object },
+      material: { type: Object },
+      grammage: { type: Number, require: false },
+      date_provider: { type: Date, require: false },
+    },
+  ],
+
+  _creator: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+  },
+  deletedAt: { type: Date, default: null },
+};
 const UserSchemaObject = {
   restaurant: {
     type: restaurantType,
-    required: function () {
-      return this.role === Role.SUPER_ADMIN ? false : true;
-    },
   },
+
+  laboratory: { type: laboratoryType },
+
   firstName: {
     required: true,
     type: String,
@@ -50,13 +82,13 @@ const UserSchemaObject = {
   role: {
     type: String,
     required: true,
-    default: Role.SUPER_ADMIN,
+    default: roles.SUPER_ADMIN,
     enum: [
-      Role.SUPER_ADMIN,
-      Role.RH,
-      Role.COMPTABLE,
-      Role.MANAGER,
-      Role.EMPLOYEE,
+      roles.SUPER_ADMIN,
+      roles.COMPTABLE,
+      roles.MANAGER,
+      roles.RH,
+      roles.LABORANTIN,
     ],
   },
   employer_type: {

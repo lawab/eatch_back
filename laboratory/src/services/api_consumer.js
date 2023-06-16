@@ -2,8 +2,8 @@ const {default: axios} = require('axios');
 const config = require('../configs/config');
 
 const getUserById = async (userId, token) =>{
-    console.log("*******USER ID: "+userId);
-    console.log("*******URL: "+config.url_user+`/fetch/one/${userId}`);
+    //console.log("*******USER ID: "+userId);
+    //console.log("*******URL: "+config.url_user+`/fetch/one/${userId}`);
     try{
         const user = await axios.get(config.url_user+`/fetch/one/${userId}`,
                         {
@@ -114,6 +114,31 @@ const addClassToCourseById = async (courseId, classeId) =>{
     
 }
 
+const validateRequestingByRestaurantId = async (restaurantId, requestBody) => {
+    console.log("*******VALIDATE bbbbODYYYY: ", restaurantId);
+    console.log(requestBody);
+  try {
+    const restaurant = await axios.patch(config.url_restaurant +`/validateRequesting/${restaurantId}`,
+      requestBody
+      // {
+      //   // headers: {
+      //   //     authorization: `Bearer ${token}`
+      //   // }
+      // }
+    );
+    console.log("BEFFFFFOOOORRRRE");  
+      if (!restaurant) {
+        console.log("NNNNNNNNNNNNNOOOOOOOONNNN")
+    }
+    console.log("ADDING REQUEST TO LABORATORY##############: ");
+    // console.log(restaurant.data);
+    return restaurant;
+  } catch (err) {
+    console.log(err.data);
+    return err;
+  }
+};
+
 const getCourseById = async (courseId, token) =>{
     console.log("*******SUBJECT ID: "+courseId);
     console.log("*******URL: "+config.url_course+`/fetch/one/${courseId}`);
@@ -135,11 +160,12 @@ const getCourseById = async (courseId, token) =>{
     
 }
 
-module.exports ={
-    getUserById,
-    addClassToUserById,
-    addClassToCourseById,
-    getCourseById,
-    removeClassToUserById,
-    removeClassToCourseById
-}
+module.exports = {
+  getUserById,
+  addClassToUserById,
+  addClassToCourseById,
+  getCourseById,
+  removeClassToUserById,
+  removeClassToCourseById,
+  validateRequestingByRestaurantId,
+};

@@ -1,5 +1,9 @@
 const File = require("./File");
-const { APP_URL_PRODUCT, APP_URL_MENU } = require("./remoteServices");
+const {
+  APP_URL_PRODUCT,
+  APP_URL_MENU,
+  APP_URL_RESTAURANT,
+} = require("./remoteServices");
 const { default: axios } = require("axios");
 
 const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
@@ -29,6 +33,22 @@ const getMenusForOneRestaurant = async (restaurantId, token) => {
       }
     );
     return menus;
+  } catch (error) {
+    console.log(error);
+    throw new Error(error);
+  }
+};
+const getRestaurant = async (restaurantId, token) => {
+  try {
+    let { data: restaurant } = await axios.get(
+      `${APP_URL_RESTAURANT}/fetch/one/${restaurantId}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return restaurant;
   } catch (error) {
     console.log(error);
     throw new Error(error);
@@ -123,6 +143,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
 
     newCategories.push({
       title: "menu",
+      image: "/datas/menu.png",
       menus: newMenus,
     });
 
@@ -143,4 +164,5 @@ const addProductFromJsonFile = async (restaurantId, token) => {
 
 module.exports = {
   addProductFromJsonFile,
+  getRestaurant,
 };

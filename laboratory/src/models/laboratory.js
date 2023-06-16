@@ -29,33 +29,47 @@ const materialType = {
 const laboSchema = new mongoose.Schema(
   {
     labo_name: { type: String, required: true, maxlength: 50 },
-    adress: { type: String, required: true, maxlength: 50 },
+    address: { type: String, required: true, maxlength: 50 },
+    image: { type: String },
     email: {
       type: String,
-      unique: true,
-      validate: {
-        validator: function (V) {
-          return isEmail(V);
-        },
-      },
-      maxlength: 50,
+      // unique: true,
+      // validate: {
+      //   validator: function (V) {
+      //     return isEmail(V);
+      //   },
+      // },
     },
     raws: { type: [{ type: mongoose.Types.ObjectId, ref: "Raw" }] },
-    materials: [
+    providers: { type: [{ type: mongoose.Types.ObjectId, ref: "Provider" }] },
+    materials: { type: [{ type: mongoose.Types.ObjectId, ref: "Material" }] },
+
+    providings: [
       {
-        material: { type: String, require: false, maxlength: 50 },
-        mp_name: { type: String, require: false, maxlength: 50 },
-        stock: { type: Number, require: false, maxlength: 50 },
+        provider: { type: mongoose.Types.ObjectId, ref: "Provider" },
+        raw: { type: mongoose.Types.ObjectId, ref: "Raw" },
+        grammage: { type: Number, require: false },
+        date_provider: { type: Date, require: false },
       },
     ],
 
-    providers: [
+    manufacturings: [
       {
-        owner: { type: Object },
-        restaurant: { type: Object },
+        material: { type: mongoose.Types.ObjectId, ref: "Material" },
+        qte: { type: Number, require: false },
+        date_manufactured: { type: Date, require: false },
+      },
+    ],
+
+    requestMaterials: [
+      {
+        requestId: { type: mongoose.Types.ObjectId },
         material: { type: Object },
-        grammage: { type: Number, require: false },
-        date_provider: { type: Date, require: false },
+        restaurant: { type: Object },
+        qte: { type: Number, require: false },
+        date_providing: { type: Date, require: false },
+        validated: { type: Boolean, default: false },
+        date_validated: { type: Date, require: false },
       },
     ],
 

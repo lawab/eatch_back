@@ -22,6 +22,12 @@ const findOneLaboratory = async (query = {}) => {
   const laboratory = await Laboratory.findOne(query);
   return laboratory;
 };
+
+//Get category by Id
+const getLaboratoryById = async (laboratoryId) => {
+  const laboratory = await Laboratory.findById(laboratoryId);
+  return laboratory;
+};
 /**
  *
  * @param {Object} query [query to delete one Laboratory in database]
@@ -41,7 +47,12 @@ const deleteOne = async (query = {}, bodyUpdate = {}) => {
  * @returns {Promise}
  */
 const findLaboratories = async (query = null) => {
-  const laboratories = await Laboratory.find(query);
+  const laboratories = await Laboratory.find(query)
+    .populate({ path: "raws" })
+    .populate({ path: "providers" })
+    .populate({ path: "materials" })
+    .populate({ path: "providings" })
+    .populate({ path: "manufacturings" });
   return laboratories;
 };
 /**
@@ -50,7 +61,12 @@ const findLaboratories = async (query = null) => {
  * @returns {Promise}
  */
 const findLaboratory = async (query = null) => {
-  const laboratory = await Laboratory.findOne(query);
+  const laboratory = await Laboratory.findOne(query)
+    .populate({ path: "raws" })
+    .populate({ path: "providers" })
+    .populate({ path: "materials" })
+    .populate({ path: "providings" })
+    .populate({ path: "manufacturings" });
   return laboratory;
 };
 /**
@@ -83,6 +99,7 @@ const addProviderById = async (laboId, bodyProvided = {}) => {
  * @returns {Promise} [return the current author send by eatch_users microservice]
  */
 const getUserAuthor = async (id = null, token = null) => {
+  console.log("########### ID: ",id)
   let { data: creator } = await axios.get(
     `${process.env.APP_URL_USER}/fetch/one/${id}`,
     {
@@ -91,6 +108,7 @@ const getUserAuthor = async (id = null, token = null) => {
       },
     }
   );
+  console.log(creator)
   return creator;
 };
 /**
@@ -155,6 +173,114 @@ const addRawToLaboratoryById = async (laboratoryId, rawId) => {
   return laboratory;
 };
 
+//Add Raw Into Laboratory by Id
+const addMaterialToLaboratoryById = async (laboratoryId, materialId) => {
+  const laboratory = await Laboratory.findById(laboratoryId);
+  if (laboratory) {
+    laboratory.materials
+      ? laboratory.materials.push(materialId)
+      : (laboratory.materials = [materialId]);
+    laboratory.save();
+  }
+  return laboratory;
+};
+
+//Add Provider Into Laboratory by Id
+const addProviderToLaboratoryById = async (laboratoryId, providerId) => {
+  const laboratory = await Laboratory.findById(laboratoryId);
+  if (laboratory) {
+    laboratory.providers
+      ? laboratory.providers.push(providerId)
+      : (laboratory.providers = [providerId]);
+    laboratory.save();
+  }
+  return laboratory;
+};
+
+//Providing Laboratory by Id from Provider Id with Raw materials
+const providingLaboratoryById = async (laboratoryId, provideBody) => {
+  const laboratory = await Laboratory.findById(laboratoryId);
+  provideBody.date_provider = Date.now();
+  if (laboratory) {
+    laboratory.providings
+      ? laboratory.providings.push(provideBody)
+      : (laboratory.providings = [provideBody]);
+    laboratory.save();
+  }
+  return laboratory;
+};
+
+//Manufacturing Laboratory by Id with materials
+const manufacturingLaboratoryById = async (laboratoryId, manufacturingBody) => {
+  const laboratory = await Laboratory.findById(laboratoryId);
+  manufacturingBody.date_manufactured = Date.now();
+  if (laboratory) {
+    laboratory.manufacturings
+      ? laboratory.manufacturings.push(manufacturingBody)
+      : (laboratory.manufacturings = [manufacturingBody]);
+    laboratory.save();
+  }
+  return laboratory;
+};
+
+//Receive Request from Restaurant
+const requestMaterialFromRestaurantById = async (laboratoryId, requestBody) => {
+  // console.log("*****************************************************")
+  // console.log(requestBody.body);
+  // console.log("#####################################################");
+  const laboratory = await Laboratory.findById(laboratoryId);
+  if (laboratory) {
+    if (laboratory.requestMaterials) {
+      console.log("EXIST:")
+      laboratory.requestMaterials.push(requestBody.body);
+    }
+    else {
+      console.log("NOT EXIST:");
+      laboratory.requestMaterials = [requestBody.body];
+    }
+    // laboratory.requestMaterials
+    //   ? laboratory.requestMaterials.push(requestBody)
+    //   : (laboratory.requestMaterials = [requestBody]);
+    laboratory.save();
+    // console.log("################requesttt laboratory");
+    // console.log(laboratory);
+    // console.log("################requesttt laboratory***************");
+    return laboratory;
+  }
+  //  console.log("################Not found***************");
+};
+
+//Validate Request from Restaurant
+const validateRequestFromRestaurantById = async (body) => {
+
+  const laboratory = await Laboratory.findById(body.laboratoryId);
+  if (laboratory) {
+    if (laboratory.requestMaterials) {
+      // console.log("################requesttt laboratory.requestMaterials");
+      let test = false
+      const materials = laboratory.requestMaterials
+      let i = 0;
+      while (test == false && i < materials.length) {
+        if (materials[i].requestId == body.requestId) {
+          materials[i].validated = true;
+          if (body.choice == "refused") {
+            materials[i].validated = false;
+          }
+          materials[i].date_validated = Date.now();
+          test = true;
+          laboratory.save();
+          // console.log("################requesttt laboratory");
+          // console.log(laboratory);
+          // console.log("################requesttt laboratory***************");
+        }
+        i++
+      }
+      return laboratory;
+    }
+    
+  }
+};
+
 module.exports = {
   createLaboratory,
   findOneLaboratory,
@@ -168,5 +294,11 @@ module.exports = {
   addProviderById,
   getMaterials,
   addRawToLaboratoryById,
-  //getProducts,
+  addProviderToLaboratoryById,
+  providingLaboratoryById,
+  getLaboratoryById,
+  addMaterialToLaboratoryById,
+  manufacturingLaboratoryById,
+  requestMaterialFromRestaurantById,
+  validateRequestFromRestaurantById,
 };

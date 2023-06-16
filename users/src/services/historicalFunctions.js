@@ -15,7 +15,8 @@ const addElementToHistorical = async (addElementToHistorical, errorHanhler) => {
     return response;
   } catch (error) {
     await errorHanhler();
-    throw new Error(error.message);
+    console.log(error)
+    throw new Error(error);
   }
 };
 /**

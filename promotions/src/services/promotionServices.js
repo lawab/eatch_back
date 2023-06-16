@@ -102,22 +102,41 @@ const getRestaurant = async (id = null, token = null) => {
   );
   return restaurant;
 };
+
 /**
  *
- * @param {String} id [_id order that we want to get in database]
+ * @param {String} id [_id product that we want to get in database]
  * @param {String} token [token to authenticate user]
- * @returns {Promise<Object>} [Array of orders found in database]
+ * @returns {Promise<Object>} [Object product found in database]
  */
-const getOrder = async (id = null, token = null) => {
-  let { data: orders } = await axios.get(
-    `${process.env.APP_URL_ORDER}/fetch/one/${id}`,
+const getProduct = async (id = null, token = null) => {
+  let { data: product } = await axios.get(
+    `${process.env.APP_URL_PRODUCT}/fetch/one/${id}`,
     {
       headers: {
         authorization: `Bearer ${token}`,
       },
     }
   );
-  return orders;
+  return product;
+};
+
+/**
+ *
+ * @param {String} id [_id menu that we want to get in database]
+ * @param {String} token [token to authenticate user]
+ * @returns {Promise<Object>} [Object menu found in database]
+ */
+const getMenu = async (id = null, token = null) => {
+  let { data: product } = await axios.get(
+    `${process.env.APP_URL_MENU}/fetch/one/${id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return product;
 };
 
 /**
@@ -176,7 +195,8 @@ module.exports = {
   getUserAuthor,
   findPromotion,
   getRestaurant,
-  getOrder,
+  getProduct,
+  getMenu,
   getClient,
   addPromotionToHistorical,
   deleteTrustlyPromotion,

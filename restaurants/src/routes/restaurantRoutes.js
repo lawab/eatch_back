@@ -1,5 +1,4 @@
 const express = require("express");
-const controller = require("../controllers/restaurantControllers");
 const uploadFileService = require("../services/uploadFile");
 const { authmiddleware } = require("../Middelwares/authmiddelware");
 var restaurantRouter = express.Router();
@@ -11,6 +10,8 @@ const {
   fetchRestaurants,
   updateRestaurant,
   fetchOneRestaurant,
+  requestMaterial,
+  validateRequest
   // fetchClients,
 } = require("../controllers/restaurantControllers");
 
@@ -32,6 +33,15 @@ restaurantRouter.put(
   updateRestaurant
 );
 
+//Request semi-material into restaurant
+restaurantRouter.patch(
+  "/requestMaterial",
+  authmiddleware,
+  requestMaterial
+);
+
+//Validate Request semi-material into restaurant
+restaurantRouter.patch("/validateRequesting/:restaurantId", validateRequest);
 //get one restaurant
 restaurantRouter.get("/fetch/one/:id", fetchOneRestaurant);
 

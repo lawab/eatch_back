@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 //Raw Schema Object
 const RawSchemaObject = {
   title: { type: String, unique: true, require: true, maxlength: 50 },
-  grammage: { type: Number, require: true},
+  available: { type: Number, require: true },
+  unit: { type: String, require: true, maxlength: 10 },
   image: { type: String, default: "/datas/avatar.png" },
   _creator: {
     _id: { type: String },
@@ -15,6 +16,7 @@ const RawSchemaObject = {
     lastName: { type: String },
   },
   laboratory: { type: Schema.ObjectId, ref: "Laboratory", required: true },
+  provider: { type: mongoose.Types.ObjectId, ref: "Provider" },
   deletedAt: { type: Date, default: null },
 };
 

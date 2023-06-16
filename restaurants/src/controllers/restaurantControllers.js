@@ -2,6 +2,8 @@ const RestaurantServices = require("../services/RestaurantServices");
 const roles = require("../models/roles");
 //const { default: mongoose } = require("mongoose");
 const UpdateForeignFields = require("../controllers/UpdateForeignFields");
+
+const api_consumer = require('../services/api_consumer');
 //Create restaurant in Data Base
 const createRestaurant = async (req, res) => {
   try {
@@ -130,6 +132,32 @@ const updateRestaurant = async (req, res) => {
   }
 };
 
+const validateRequest = async (req, res) => {
+  try {
+    console.log("IDDDD: ", req.params.restaurantId);
+    const body = req.body
+    console.log("+++++++++++++++body");
+    console.log(body);
+    console.log("validate***************");
+    let restaurant = await RestaurantServices.findRestaurant({ _id: req.params.restaurantId })
+    if (!restaurant) {
+      return res.status(401).json({ message: "restaurant has not been found!!!" });
+    }
+    console.log("************validate###########");
+    console.log("****************",restaurant);
+    const validation = await RestaurantServices.validateOrAcceptMaterialById(req.params.restaurantId, body)
+    if (!validation) {
+      return res
+        .status(401)
+        .json({ message: "request has not been valoidate!!!" });
+    }
+    res.status(200).json({ message: "request has been update successfully " });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error encounterd updated restaurant!!!" });
+  }
+};
+
 const fetchRestaurants = async (req, res) => {
   try {
     /*let creator = await RestaurantServices.getUserAuthor(
@@ -170,6 +198,103 @@ const fetchOneRestaurant = async (req, res) => {
   }
 };
 
+const requestMaterial = async (req, res) => {
+  try {
+    let body = JSON.parse(req.headers.body);
+    console.log("##########***********")
+    //console.log(body)
+    // let restaurant = await RestaurantServices.findRestaurant({
+    //   _id: body.restaurantId,
+    // });
+    // if (!restaurant) {
+    //   console.log("restaurant has been not fetch");
+    //   return res.status(401).json({ "message": "restaurant has been not fetch" });
+    // }
+    const laboratory = await api_consumer.getLaboratoryById(
+      body.laboratoryId, req.token
+    );
+    // console.log("LE LABO")
+    // console.log(laboratory);
+    if (!laboratory?.data) {
+
+       console.log("laboratory has been not fetch");
+      return res.status(401).json({ message: "laboratory has been not fetch" });
+    }
+
+    const material = await api_consumer.getMaterialById(
+      body.materialId,
+      req.token
+    );
+    if (!material?.data) {
+      console.log("material has been not fetch");
+      return res.status(401).json({ message: "material has been not fetch" });
+    }
+    
+    const laboratoryBody = {
+      id: laboratory.data._id,
+      labo_name: laboratory.data.labo_name,
+      adress: laboratory.data.adress,
+      image: laboratory.data.image,
+      email: laboratory.data.email
+    }
+    
+    const requestBody = {
+      material: material.data,
+      laboratory: laboratoryBody,
+      qte: body.qte,
+      date_providing: Date.now(),
+      restaurantId: body.restaurantId,
+    };
+    // console.log("************requestBody********************************");
+    // console.log(requestBody);
+    // console.log("************requestBody********************************");
+    const restaurant = await RestaurantServices.findRestaurant({
+      _id: body.restaurantId,
+    });
+    
+    if (!restaurant) {
+      console.log("restaurant has been not fetch");
+      return res.status(401).json({ message: "material has been not fetch" });
+    }
+    const restaurantInfo = {
+      _id: restaurant._id,
+      restaurant_name: restaurant.restaurant_name,
+      infos: restaurant.infos
+    };
+    
+    const requesting = await RestaurantServices.requestMaterialById(requestBody)
+    if (!requesting) {
+       console.log("Request Not saved");
+       return res
+         .status(401)
+         .json({ message: "Request Not saved" });
+    }
+    const theLast = requesting.providings.slice(-1)
+    // console.log(theLast)
+    // console.log("**************ID: ");
+    // console.log(theLast[0]?._id);
+    // console.log("**************: ");
+    // console.log(theLast?.qte);
+    const requestMaterial = {
+      requestId: theLast[0]?._id,
+      material: material.data,
+      restaurant: restaurantInfo,
+      qte: body.qte,
+      date_providing: Date.now(),
+      validated: false,
+      date_validated: null,
+    };
+    const laboratoryUpdated = await api_consumer.addRequestingById(
+      body.laboratoryId,
+      requestMaterial
+    );
+    res.status(200).json({ message: "Request done well!!!" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Error encounterd fetch restaurant!!!" });
+  }
+};
+
 // get Clients  in database
 /*const fetchClients = async (req, res) => {
   try {
@@ -201,5 +326,7 @@ module.exports = {
   updateRestaurant,
   fetchRestaurants,
   fetchOneRestaurant,
+  requestMaterial,
+  validateRequest,
   //fetchClients,
 };

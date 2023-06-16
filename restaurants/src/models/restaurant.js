@@ -11,6 +11,16 @@ const restoSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: true,
     },
+    providings: [
+      {
+        material: { type: Object},
+        laboratory: { type: Object },
+        qte: { type: Number, require: false },
+        date_providing: { type: Date, require: false },
+        validated: { type: Boolean, default: false },
+        date_validated: { type: Date, require: false, default: null },
+      },
+    ],
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true }

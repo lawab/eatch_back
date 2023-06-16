@@ -1,47 +1,24 @@
 const promotionServices = require("../services/promotionServices");
 const roles = require("../models/roles");
-const setValuesFromRequiredForeignFields = require("./setValuesFromRequiredForeignFields");
-const setUpdateValuesFromForeignFields = require("./setUpdateValuesFromForeignFields");
 const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
+const setPromotionValues = require("../methods/setPromotionValues");
+const updateValuesPromotion = require("../methods/updateValuesPromotion");
 
 // create one promotion in database
 const createPromotion = async (req, res) => {
+  let newPromotion = null;
   try {
-    let body = req.body;
+    // let body = req.body;
+    let body = JSON.parse(req.headers.body);
 
-    let creator = await promotionServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
+    console.log({ body });
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to create this promotion because creator not exists!!!",
-      });
-    }
+    let bodyUpdate = await setPromotionValues(req, body, req.token);
 
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "your cannot create promotion element because you don't have an authorization,please see your administrator",
-      });
-    }
-
-    body["_creator"] = creator; //set creator found in database
-
-    // set promotion avatar
-    body["image"] = req.file
-      ? "/datas/" + req.file?.filename
-      : "/datas/avatar.png";
-
-    body = await setValuesFromRequiredForeignFields(body, req.token);
-
-    // verify that document with [field] exists
-    let newPromotion = await promotionServices.createPromotion(body);
+    newPromotion = await promotionServices.createPromotion(bodyUpdate);
 
     console.log({ newPromotion });
     // if field already exists,document must be found on database,or null in ortherwise
@@ -49,10 +26,10 @@ const createPromotion = async (req, res) => {
       let response = await addElementToHistorical(
         async () => {
           let addResponse = await promotionServices.addPromotionToHistorical(
-            creator._id,
+            newPromotion._creator._id,
             {
               promotions: {
-                _id: newPromotion?._id,
+                _id: newPromotion._id,
                 action: "CREATED",
               },
             },
@@ -63,25 +40,37 @@ const createPromotion = async (req, res) => {
         },
         async () => {
           let elementDeleted = await promotionServices.deleteTrustlyPromotion({
-            _id: newPromotion?._id,
+            _id: newPromotion._id,
           });
           console.log({ elementDeleted });
           return elementDeleted;
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Promotion has been created successfully!!!",
-        "Promotion has  been not created successfully,please try again later,thanks!!!"
-      );
+      if (response.status === 200) {
+        return res
+          .status(200)
+          .json({ message: "Promotion has been created successfully!!!" });
+      } else {
+        return res.status(500).json({
+          message:
+            "creation of promotion failled,please try again later,thanks!!!",
+        });
+      }
     } else {
-      res
-        .status(401)
-        .json({ message: "Promotion has been not created successfully!!!" });
+      return res.status(500).json({
+        message:
+          "creation of promotion failled,please try again later,thanks!!!",
+      });
     }
   } catch (error) {
+    if (newPromotion) {
+      let elementDeleted = await promotionServices.deleteTrustlyPromotion({
+        _id: newPromotion?._id,
+      });
+      console.log({ elementDeleted });
+      return elementDeleted;
+    }
     console.log(error, "x");
     return res
       .status(500)
@@ -90,35 +79,14 @@ const createPromotion = async (req, res) => {
 };
 // update promotion in database
 const updatePromotion = async (req, res) => {
+  let promotionUpdated = null;
+  let promotionCopy = null;
+
   try {
-    let body = req.body;
+    // let body = req.body;
+    let body = JSON.parse(req.headers.body);
 
-    let creator = await promotionServices.getUserAuthor(
-      body?._creator,
-      req.token
-    );
-
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to update this promotion element because creator not exists!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-      return res.status(401).json({
-        message:
-          "your cannot update promotion element because you don't have an authorization,please see your administrator",
-      });
-    }
-
-    //set creator found in database
-    body["_creator"] = creator;
-
-    // set promotion avatar if exists
-    if (req.file) {
-      body["image"] = req.file?.filename;
-    }
+    bodyUpdate = await updateValuesPromotion(req, body, req.token);
 
     let promotion = await promotionServices.findOnePromotion({
       _id: req.params?.id,
@@ -131,21 +99,21 @@ const updatePromotion = async (req, res) => {
       });
     }
 
-    let promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
-
-    console.log({ promotionCopy });
-
-    body = await setUpdateValuesFromForeignFields(body, req.token);
-
+    // copy promotion value to do fallback if error occured
+    promotionCopy = Object.assign({}, promotion._doc);
+    console.log({ client: promotion["client"] });
     // update promotion values
-
-    for (const field in body) {
-      if (Object.hasOwnProperty.call(body, field)) {
-        promotion[field] = body[field];
+    for (const field in bodyUpdate) {
+      if (Object.hasOwnProperty.call(bodyUpdate, field)) {
+        if (field === "client") {
+          promotion["clients"] = [...promotion["clients"], bodyUpdate[field]];
+        } else {
+          promotion[field] = bodyUpdate[field];
+        }
       }
     }
 
-    let promotionUpdated = await promotion.save();
+    promotionUpdated = await promotion.save();
 
     console.log({ promotionUpdated }, "~");
 
@@ -153,7 +121,7 @@ const updatePromotion = async (req, res) => {
       let response = await addElementToHistorical(
         async () => {
           let addResponse = await promotionServices.addPromotionToHistorical(
-            creator._id,
+            promotionUpdated._creator._id,
             {
               promotions: {
                 _id: promotionUpdated?._id,
@@ -179,15 +147,20 @@ const updatePromotion = async (req, res) => {
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Promotion has been updated successfully!!!",
-        "Promotion has been not updated successfully,please try again later,thanks!!!"
-      );
+      if (response.status === 200) {
+        return res
+          .status(200)
+          .json({ message: "Promotion has been update successfully!!!" });
+      } else {
+        return res.status(500).json({
+          message:
+            "Updating of promotion failled,please try again later,thanks!!!",
+        });
+      }
     } else {
       res.status(401).json({
-        message: "Promotion has been not updated successfully!!",
+        message:
+          "Updating of promotion failled,please try again later,thanks!!!",
       });
     }
   } catch (error) {
@@ -199,22 +172,22 @@ const updatePromotion = async (req, res) => {
 };
 // delete one promotion in database
 const deletePromotion = async (req, res) => {
+  let promotionCopy;
+  let promotionDeleted = null;
   try {
-    let body = req.body;
+    // let body = req.body;
+    console.log({body:req.headers.body})
+    let body = JSON.parse(req.headers.body);
 
     let creator = await promotionServices.getUserAuthor(
       body?._creator,
       req.token
     );
 
-    if (!creator?._id) {
-      return res.status(401).json({
-        message:
-          "unable to delete this promotion element because creator not exists!!!",
-      });
-    }
-
-    if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
+    if (
+      !creator ||
+      ![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)
+    ) {
       return res.status(401).json({
         message:
           "your cannot delete promotion element because you don't have an authorization,please see your administrator",
@@ -233,7 +206,7 @@ const deletePromotion = async (req, res) => {
       });
     }
 
-    let promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
+    promotionCopy = Object.assign({}, promotion._doc); // copy promotion value to do fallback if error occured
 
     console.log({ promotionCopy });
 
@@ -241,7 +214,7 @@ const deletePromotion = async (req, res) => {
     promotion._creator = creator;
 
     // find and delete promotion
-    let promotionDeleted = await promotion.save();
+    promotionDeleted = await promotion.save();
 
     console.log({ promotionDeleted });
 
@@ -263,11 +236,11 @@ const deletePromotion = async (req, res) => {
           return response;
         },
         async () => {
-          for (const field in promotionCopy) {
-            if (Object.hasOwnProperty.call(promotionCopy, field)) {
-              promotionDeleted[field] = promotionCopy[field];
-            }
-          }
+          // restore only fields would had changed in database
+          promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
+          promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
+          promotionDeleted["createdAt"] = promotionCopy["createdAt"];
+
           let promotionRestored = await promotionDeleted.save({
             timestamps: false,
           }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
@@ -276,16 +249,30 @@ const deletePromotion = async (req, res) => {
         }
       );
 
-      return closeRequest(
-        response,
-        res,
-        "Promotion has been delete successfully!!!",
-        "Promotion has not been delete successfully,please try again later,thanks!!!"
-      );
-    } else {
-      return res.status(500).json({ message: "deletion of promotion failed" });
+      if (response.status === 200) {
+        return res
+          .status(200)
+          .json({ message: "Promotion has been deleted successfully!!!" });
+      } else {
+        return res.status(500).json({
+          message:
+            "Deleting of promotion failled,please try again later,thanks!!!",
+        });
+      }
     }
   } catch (error) {
+    if (promotionDeleted && promotionCopy) {
+      // restore only fields would had changed in database
+      promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
+      promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
+      promotionDeleted["createdAt"] = promotionCopy["createdAt"];
+
+      let promotionRestored = await promotionDeleted.save({
+        timestamps: false,
+      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      console.log({ promotionRestored });
+      return promotionRestored;
+    }
     console.log(error.message);
     return res.status(500).json({
       message: "Error occured during the deletion of promotion!!!",

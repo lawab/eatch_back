@@ -8,18 +8,20 @@ const api_consumer = require('../services/api_consumer');
 
 //Create Raw in Data Base
 const createRaw = async (req, res) =>{
-    const body = JSON.parse(req.headers.body);
-    body.file =req.file? "/datas/"+req.file.filename: "";
-    const token = req.token;
 
-   
-    try{
-        const user = await api_consumer.getUserById(body.creator, req.token);
+    try {
+        const body = JSON.parse(req.headers.body);
+        console.log("ENTER########");
+        console.log(body);
+        body.file = req.file ? "/datas/" + req.file.filename : "";
+        const token = req.token;
+        const user = await api_consumer.getUserById(body._creator, req.token);
         if(!user){
             console.log("User not authenticated!!!")
             return res.status(401).json({"message" : "User not authenticated!!!"});
         }
-        const laboratory = await laboratoryService.findOneLaboratory(body.laboratoryId);
+        console.log("PASS 1########")
+        const laboratory = await laboratoryService.getLaboratoryById(body.laboratoryId);
         if(!laboratory){
             console.log("Laboratory not found!!!")
             return res.status(401).json({"message" : "Laboratory not found!!!"});
@@ -29,6 +31,7 @@ const createRaw = async (req, res) =>{
         //     title: subject.data.title,
         //     description: subject.data.description,
         // }
+        console.log("PASS 2########");
         const creator = {
             _id: user.data._id,
             email: user.data.email,
@@ -39,11 +42,12 @@ const createRaw = async (req, res) =>{
         }
         body.creator = creator;
         body.laboratory = laboratory.id;
-        //body.creator = user.data;
+        body.provider = body.providerId;
         
         console.log("THE USER:");
 
         const raw = await rawService.createRaw(body);
+        console.log("PASS 3########");
         // if(subjectRaw.laboratorys){
         //     subjectRaw.laboratorys.push(laboratory);
         // }
@@ -51,7 +55,16 @@ const createRaw = async (req, res) =>{
         //     subjectRaw.laboratorys.push(laboratory);
         // }
         const laboratoryUpdated = await laboratoryService.addRawToLaboratoryById(laboratory.id, raw.id)
-        res.status(200).json({"message" : "Raw created successfuly!!!"});
+        console.log("PASS 4########");
+        const providerBody = {
+          provider: body.providerId,
+          raw: raw.id,
+          grammage: raw.available,
+          date_provider: Date.now(),
+        };
+        const providing = await laboratoryService.providingLaboratoryById(laboratory.id, providerBody)
+        console.log("PASS 5########");
+        res.status(200).json({ "message": "Raw created successfuly!!!" });
 
     }
     catch(error){
@@ -151,7 +164,7 @@ const getRaws = async (req, res) =>{
         // if(!user){
         //     res.status(401).json({"message" : "User not authenticated!!!"});
         // }
-        const laboratorys = await laboratoryService.getRaws();
+        const laboratorys = await rawService.getRaws();
         res.status(200).json(laboratorys);
     }
     catch(err){

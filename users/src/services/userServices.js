@@ -78,6 +78,24 @@ const getRestaurant = async (id = null, token = null) => {
   );
   return restaurant;
 };
+
+/**
+ *
+ * @param {Number} id [id from laboratory will fetch]
+ * @param {*} token [token to valid session of user authenticated]
+ * @returns {Promise}
+ */
+const getLaboratory = async (id = null, token = null) => {
+  let { data: laboratory } = await axios.get(
+    `${process.env.APP_URL_LABORATORY}/fetch/one/${id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return laboratory;
+};
 /**
  *
  * @param {String} id [id from creator who created user]
@@ -85,6 +103,9 @@ const getRestaurant = async (id = null, token = null) => {
  * @returns {Promise<Object>}
  */
 const addToHistorical = async (id = null, bodyUpdate = {}, token) => {
+  console.log("############UUUUUURRRLLL")
+  console.log(`${process.env.APP_URL_HISTORICAL}/update/${id}`);
+  console.log("############UUUUUURRRLLL");
   let response = await axios.put(
     `${process.env.APP_URL_HISTORICAL}/update/${id}`,
     bodyUpdate,
@@ -106,4 +127,5 @@ module.exports = {
   getRestaurant,
   addToHistorical,
   deleteTrustlyUser,
+  getLaboratory,
 };

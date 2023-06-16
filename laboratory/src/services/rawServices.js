@@ -11,6 +11,11 @@ const getRawById = async(rawId) =>{
   return raw;
 };
 
+const getRaws = async () => {
+  const raws = await Raw.find();
+  return raws;
+};
+
 const getRawByLaboratoryId = async (laboratoryId) =>{
   const raws = await Raw.find({laboratory: laboratoryId});
   return raws;
@@ -19,10 +24,10 @@ const getRawByLaboratoryId = async (laboratoryId) =>{
 //Update Raw by Id
 const updateRawById = async (rawId, rawBody) =>{
 
-  console.log("Raw Id: ")
-  console.log(rawId)
-  console.log("BOOODDDYYYY: ")
-  console.log(rawBody)
+  // console.log("Raw Id: ")
+  // console.log(rawId)
+  // console.log("BOOODDDYYYY: ")
+  // console.log(rawBody)
   const raw = await Raw.findByIdAndUpdate(
       rawId,
       {$set: rawBody},
@@ -100,6 +105,7 @@ const validatedCommentByRawId = async (rawIs) =>{
   module.exports = {
     createRaw,
     getRawById,
+    getRaws,
     deleteRawById,
     getRawByLaboratoryId,
     updateRawCommentsById,

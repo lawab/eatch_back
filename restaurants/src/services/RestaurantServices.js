@@ -105,6 +105,57 @@ const addRetaurantToHistorical = async (id = null, bodyUpdate = {}, token) => {
   return response;
 };
 
+//Request Material by Id
+const requestMaterialById = async (requestBody) => {
+  const restaurant = await Restaurant.findById(requestBody.restaurantId);
+  // console.log("Request Id: ");
+  // console.log(requestBody.restaurantId);
+  if (restaurant.providings) {
+    restaurant.providings.push(requestBody);
+    // console.log("Request providing: ");
+    // console.log(restaurant);
+  }
+  else {
+    restaurant.providings = [requestBody];
+    // console.log("Request No providing: ");
+    // console.log(restaurant);
+  }
+  restaurant.save()
+  // console.log("Restaurant saved***********: ");
+  // console.log(restaurant);
+  return restaurant
+};
+
+//Request Material by Id
+const validateOrAcceptMaterialById = async (restaurantId, requestBody) => {
+
+  console.log("VALIDATE BODY##############@@@@@@@@@@@@@@@@: ");
+  console.log(requestBody);
+  console.log("##############@@@@@@@@@@@@@@@@VALIDATE BODY##############@@@@@@@@@@@@@@@@: ");
+  const restaurant = await Restaurant.findById(restaurantId);
+  if (restaurant.providings) {
+    const providings = restaurant.providings
+    let test = false
+    let i = 0
+    while (test == false && i < providings.length) {
+      if (providings[i]._id == requestBody.body.requestId) {
+        providings[i].validated = requestBody.body.validated
+        providings[i].date_validated = requestBody.body.date_validated
+        test = true
+        console.log("Restaurant ******BEFORE SAVED***********: ");
+        console.log(restaurant);
+        restaurant.save()
+      }
+      i++
+    }
+    console.log("Restaurant saved***********: ");
+    console.log(restaurant);
+    return restaurant;
+  }
+  
+};
+
+
 module.exports = {
   createRestaurant,
   findOnerestaurant,
@@ -114,6 +165,8 @@ module.exports = {
   findRestaurant,
   getUserAuthor,
   addRetaurantToHistorical,
+  requestMaterialById,
+  validateOrAcceptMaterialById,
   //getClients,
   //getProducts,
 };

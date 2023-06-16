@@ -73,42 +73,40 @@ const productType = {
     default: 0,
   },
 };
-const OrderType = {
+const menuType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
-  order_title: {
+  price: { type: Number, required: true },
+  devise: {
     type: String,
-    default: null,
-  },
-  is_tracking: { type: Boolean, default: false },
-  client: { type: clientType },
-  restaurant: {
-    type: restaurantType,
+    default: "MAD",
   },
   products: {
+    required: true,
     type: [{ type: productType }],
+    validate: {
+      validator(products = []) {
+        return products.length > 0 ? true : false;
+      },
+    },
   },
-  status: {
-    type: String,
-    enum: [
-      orderstatus.DONE,
-      orderstatus.TREATMENT,
-      orderstatus.PAID,
-      orderstatus.WAITED,
-    ],
-    default: orderstatus.WAITED,
-  },
+  _creator: { required: true, type: mongoose.Types.ObjectId },
+  description: { type: String, minlength: 1, default: "description" },
+  menu_title: { type: String, minlength: 1, required: true },
+  image: { type: String, default: "/datas/avatar.png" },
   deletedAt: { type: Date, default: null },
 };
 
 const promotionSchemaObject = {
-  promotion_name: { type: String, required: true },
-  clients: { type: [clientType] },
-  end_date: { type: Date, required: false, default: null }, //must remove default value for production
-  order: { type: OrderType, required: true },
   restaurant: {
     required: true,
     type: restaurantType,
   },
+  promotion_name: { type: String, required: true },
+  clients: { type: [clientType] },
+  end_date: { type: Date, required: false, default: null }, //must remove default value for production
+  percent: { type: Number, default: 0 },
+  product: { type: productType },
+  menu: { type: menuType },
   image: { type: String, default: "/datas/avatar.png" },
   _creator: {
     type: mongoose.Types.ObjectId,

@@ -24,7 +24,7 @@ const productType = {
   category: {
     type: {
       _id: { type: mongoose.Types.ObjectId, required: true },
-      category_name: { type: String, maxlength: 50 },
+      title: { type: String, maxlength: 50 },
     },
     required: true,
   },
@@ -55,21 +55,19 @@ const productType = {
 };
 
 const clientSchemaObject = {
-  commandes: {
-    type: [
-      {
-        _id: { type: String },
-        order_title: {
-          type: String,
-          default: null,
-        },
-        products: {
-          required: false,
-          type: [{ type: productType }],
-        },
+  commandes: [
+    {
+      _id: { type: String },
+      order_title: {
+        type: String,
+        default: null,
       },
-    ],
-  },
+      products: {
+        required: false,
+        type: [{ type: productType }],
+      },
+    },
+  ],
   status: {
     type: String,
     enum: [status.DONE, status.TREATMENT, status.PAID, status.WAITED],
@@ -79,15 +77,12 @@ const clientSchemaObject = {
   firstname: { type: String, required: true, default: null, maxlength: 50 },
 
   restaurant: {
-    required: true,
-    type: {
-      _id: { type: String },
-      restaurant_name: { type: String, maxlength: 50 },
-      info: {
-        town: { type: String },
-        address: { type: String },
-        logo: { type: String },
-      },
+    _id: { type: String },
+    restaurant_name: { type: String, maxlength: 50 },
+    info: {
+      town: { type: String },
+      address: { type: String },
+      logo: { type: String },
     },
   },
   is_auth: { type: Boolean, maxlength: 50 },
@@ -96,7 +91,6 @@ const clientSchemaObject = {
 
   email: {
     type: String,
-    unique: true,
     validate: {
       validator: function (V) {
         return isEmail(V);
@@ -105,23 +99,6 @@ const clientSchemaObject = {
     maxlength: 50,
   },
   phone_number: { type: String },
-
-  // username: {
-  //type: String,
-  // required: true,
-  // unique: true,
-  // },
-
-  password: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-
-  avatar: {
-    type: String,
-    default: "/datas/avatar.png",
-  },
 
   isOnline: { type: Boolean, default: false },
 

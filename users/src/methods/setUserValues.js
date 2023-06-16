@@ -1,6 +1,9 @@
 const roles = require("../models/roles");
 const userServices = require("../services/userServices");
+const roleServices = require("../services/roleServices");
+
 const cryptoJS = require("crypto-js");
+
 /**
  *
  * @param {Object} body [Body from request]
@@ -25,13 +28,48 @@ module.exports = async (body, req, token) => {
       );
     }
 
-    // fetch restaurant since microservice restaurant
-    let restaurant = await userServices.getRestaurant(body?.restaurant, token);
+    if (body?.restaurant) {
+      // fetch restaurant since microservice restaurant
+      let restaurant = await userServices.getRestaurant(
+        body?.restaurant,
+        token
+      );
 
-    if (restaurant?._id) {
-      body["restaurant"] = restaurant;
+      if (restaurant?._id) {
+        body["restaurant"] = restaurant;
+      } else {
+        throw new Error("restaurant not found!!");
+      }
+    }
+
+    if (body?.laboratory) {
+      // fetch laboratory since microservice laboratory
+      let laboratory = await userServices.getLaboratory(
+        body?.laboratory,
+        token
+      );
+      console.log({ laboratory });
+
+      if (laboratory?._id) {
+        body["laboratory"] = laboratory;
+      } else {
+        throw new Error("laboratory not found!!");
+      }
+    }
+
+    // get role in database
+
+    // fetch restaurant since microservice restaurant
+    // let role = await roleServices.findRole({
+    //   _id: body?.role,
+    //   restaurant: body?.restaurant,
+    // });
+
+    let role = body?.role;
+    if (Object.values(roles).includes(role)) {
+      body["role"] = role;
     } else {
-      throw new Error("restaurant not found!!");
+      throw new Error("Role not found!!");
     }
 
     // set password encrypt

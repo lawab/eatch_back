@@ -238,6 +238,7 @@ const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
         productsFound = await findProducts({
           "category._id": category._id,
           "restaurant._id": restaurantId,
+          deletedAt: null,
         });
 
         productsByCategoryAndRestaurant.push({

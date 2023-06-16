@@ -137,6 +137,25 @@ const getRestaurant = async (id = null, token = null) => {
 
 /**
  *
+ * @param {Number} id [id to find author in database from eatch_users microservice]
+ * @param {String} token [token to valid the session of author before to fetch him in database]
+ * @returns {Promise} [return the current author send by eatch_users microservice]
+ */
+
+const getRaw = async (id = null, token = null) => {
+  let { data: raw } = await axios.get(
+    `${process.env.APP_URL_RAW_MATERIAL}/fetch/one/${id}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return raw;
+};
+
+/**
+ *
  * @param {String} id [id from creator who created user]
  * @param {Object} bodyUpdate [body to update historical]
  * @returns {Promise<Object>}
@@ -166,4 +185,5 @@ module.exports = {
   getMaterials,
   getRestaurant,
   addRecetteToHistorical,
+  getRaw,
 };

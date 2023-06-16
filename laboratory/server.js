@@ -8,7 +8,9 @@ const connection = require("./db");
 
 //import routes
 const laboratoryRouter = require("./src/routes/laboratoryRoutes");
-const rwaRouter = require("./src/routes/rawRoute");
+const rawRouter = require("./src/routes/rawRoute");
+const materialRouter = require("./src/routes/materialRoute");
+const providerRouter = require("./src/routes/providerRoute");
 //bodyParser
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -24,7 +26,9 @@ app.use(cors());
 
 // All router app
 app.use("/api/laboratories", laboratoryRouter);
-app.use("/api/raws", rwaRouter);
+app.use("/api/raws", rawRouter);
+app.use("/api/semiMaterials", materialRouter);
+app.use("/api/providers", providerRouter);
 
 //Public files
 app.use(express.static(path.join(__dirname, "public")));

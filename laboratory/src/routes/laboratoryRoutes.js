@@ -12,6 +12,10 @@ const {
   updateLaboratory,
   fetchOneLaboratory,
   addProvider,
+  updateProvidingLaboratory,
+  updateManufacturingLaboratory,
+  addRequestingToLaboratory,
+  validateRequestingToLaboratory
   // fetchClients,
 } = require("../controllers/laboratoryControllers");
 
@@ -45,6 +49,24 @@ laboratoryRouter.put(
   authmiddleware,
   upload.single("file"),
   addProvider
+);
+
+//update providing
+laboratoryRouter.patch("/updateProviding", authmiddleware, updateProvidingLaboratory);
+
+//update manufacturing
+laboratoryRouter.patch("/updateManufacturing", authmiddleware, updateManufacturingLaboratory);
+
+//Add requesting from Restaurant
+laboratoryRouter.patch(
+  "/addRequesting/:laboratoryId",
+  addRequestingToLaboratory
+);
+
+//Validate requesting from Restaurant
+laboratoryRouter.patch(
+  "/validateRequesting",
+  validateRequestingToLaboratory
 );
 
 //get clients

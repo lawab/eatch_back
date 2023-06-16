@@ -4,10 +4,10 @@ const multer = require("multer");
 function uploadMiddleFile() {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, "./public/datas/");
+      cb(null, "./public/datas");
     },
     filename: (req, file, cb) => {
-      cb(null, file.originalname);
+      cb(null, Date.now() + "_" + file.originalname);
     },
   });
   const upload = multer({ storage: storage });

@@ -11,9 +11,9 @@ const updateUserValues = require("../methods/updateUserValues");
 const createUser = async (req, res) => {
   let newuser = null;
   try {
-    let body = req.body;
-    // let body = JSON.parse(req.headers?.body);
-
+    // let body = req.body;
+    let body = JSON.parse(req.headers?.body);
+    console.log({ body });
     // check if user already exits
     let user = await userService.findUser({ email: body?.email });
 
@@ -25,6 +25,8 @@ const createUser = async (req, res) => {
     let bodyUpdate = await setUserValues(body, req, req.token);
 
     // save new user in database
+    console.log("console.log(bodyUpdate)***********");
+    console.log(bodyUpdate)
     newuser = await userService.createUser(bodyUpdate);
 
     if (newuser) {
@@ -82,22 +84,27 @@ const createUser = async (req, res) => {
 //Create new role of user in Data Base
 const createUserRole = async (req, res) => {
   try {
-    let body = req.body;
-
-    // verify fields on body
-    let { validate } = fieldsValidator(Object.keys(body), fieldsRoleRequired);
-
-    // if body have invalid fields
-    if (!validate) {
-      return res.status(401).json({ message: "invalid data!!!" });
-    }
-
+    // let body = req.body;
+    let body = JSON.parse(req.headers?.body);
+    console.log({ body });
     // fetch creator inside of database
     let creator = await userService.findUser({ _id: body?._creator });
 
     if (!creator) {
       return res.status(401).json({ message: "invalid data!!!" });
     }
+
+    // fetch creator inside of database
+    let restaurant = await userService.getRestaurant(
+      body?.restaurant,
+      req.token
+    );
+
+    if (!restaurant) {
+      return res.status(401).json({ message: "invalid data!!!" });
+    }
+
+    body["restaurant"] = restaurant;
 
     if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
       return res.status(401).json({
@@ -193,8 +200,8 @@ const UpdateUser = async (req, res) => {
   let userUpdated = null;
 
   try {
-    // let body = JSON.parse(req.headers?.body);
-    let body = req.body;
+    let body = JSON.parse(req.headers?.body);
+    // let body = req.body;
 
     let bodyUpdate = await updateUserValues(body, req);
 
@@ -286,9 +293,9 @@ const deleteUser = async (req, res) => {
   let userCopy = null;
   let userDeleted = null;
   try {
-    // let body = JSON.parse(req.headers?.body);
+    let body = JSON.parse(req.headers?.body);
 
-    const body = req.body;
+    // const body = req.body;
 
     let creator = await userService.findUser({
       _id: body?._creator,
