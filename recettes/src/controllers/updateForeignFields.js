@@ -34,7 +34,7 @@ module.exports = async (recetteServices, body, token) => {
 
   let rawMaterialIds = rawMaterials.map((e) => e?.raw_material);
 
-  if (materialIds.length) {
+  if (materialIds.length && materialIds.every((m) => m != null)) {
     let materials = await recetteServices.getMaterials(materialIds, token);
     console.log({ materials });
     // formation des ingredients
@@ -56,7 +56,7 @@ module.exports = async (recetteServices, body, token) => {
     console.log({ materialsEngrediants });
   }
 
-  if (rawMaterialIds.length) {
+  if (rawMaterialIds.length && rawMaterialIds.every((rm) => rm != null)) {
     let raw_materials = [];
 
     for (const id of rawMaterialIds) {
