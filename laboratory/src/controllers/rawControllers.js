@@ -13,7 +13,7 @@ const createRaw = async (req, res) =>{
         const body = JSON.parse(req.headers.body);
         console.log("ENTER########");
         console.log(body);
-        body.file = req.file ? "/datas/" + req.file.filename : "";
+        body.image = req.file ? "/datas/" + req.file.filename : "";
         const token = req.token;
         const user = await api_consumer.getUserById(body._creator, req.token);
         if(!user){
@@ -79,7 +79,7 @@ const updateRaw = async (req, res) =>{
     const body = JSON.parse(req.headers.body);
     
     if(req.file){
-        body.file = "/datas/"+req.file.filename;
+        body.image = "/datas/" + req.file.filename;
     }
     try{
         const user = await api_consumer.getUserById(body.creator, req.token);

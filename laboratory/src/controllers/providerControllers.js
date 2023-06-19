@@ -13,7 +13,7 @@ const createProvider = async (req, res) => {
         console.log("BOOOODDDDDDYYYY: ");
         const body = JSON.parse(req.headers.body);
         if (req.file) {
-          body.file = "/datas/" + req.file.filename;
+          body.image = "/datas/" + req.file.filename;
         }
         const token = req.token;
         console.log("BOOOODDDDDDYYYY: ");
@@ -72,7 +72,7 @@ const updateProvider = async (req, res) =>{
         const body = JSON.parse(req.headers.body);
 
         if (req.file) {
-          body.file = "/datas/" + req.file.filename;
+          body.image = "/datas/" + req.file.filename;
         }
         const user = await api_consumer.getUserById(body._creator, req.token);
         if(!user){
