@@ -78,14 +78,18 @@ const updateRaw = async (req, res) =>{
 
     const body = JSON.parse(req.headers.body);
     
-    if(req.file){
+    if (req.file) {
+        console.log("FIIIIILLLLLLLLLLLLLLEEEEEE:");
+        console.log(req.file)
         body.image = "/datas/" + req.file.filename;
     }
     try{
-        const user = await api_consumer.getUserById(body.creator, req.token);
+        const user = await api_consumer.getUserById(body._creator, req.token);
         if(!user){
            return res.status(401).json({"message" : "User not authenticated!!!"});
         }
+        console.log("###########USEEEEERRRR:")
+        console.log(user.data)
         const creator = {
             _id: user.data._id,
             email: user.data.email,

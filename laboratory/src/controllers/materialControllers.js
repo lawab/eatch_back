@@ -80,7 +80,7 @@ const updateMaterial = async (req, res) =>{
         body.image = "/datas/" + req.file.filename;
     }
     try{
-        const user = await api_consumer.getUserById(body.creator, req.token);
+        const user = await api_consumer.getUserById(body._creator, req.token);
         if(!user){
            return res.status(401).json({"message" : "User not authenticated!!!"});
         }
