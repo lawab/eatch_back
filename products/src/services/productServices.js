@@ -109,9 +109,6 @@ const getRestaurant = async (id = null, token = null) => {
  * @returns {Promise<[Object]>} [return the current category send by eatch_category microservice]
  */
 const getCategory = async (id = null, token = null) => {
-  console.log("test", id, {
-    url: `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
-  });
   let { data: category } = await axios.get(
     `${process.env.APP_URL_CATEGORY}/fetch/one/${id}`,
     {

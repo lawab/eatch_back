@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const { actionTypes } = require("../statusTypes");
 
 const productType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId },
   restaurant: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     restaurant_name: String,
     infos: {
       town: String,
@@ -15,7 +15,7 @@ const productType = {
   comments: [
     {
       client: {
-        _id: { type: mongoose.Types.ObjectId, required: true },
+        _id: { type: mongoose.Types.ObjectId },
         fisrtName: {
           type: String,
         },
@@ -32,16 +32,16 @@ const productType = {
     },
   ],
   recette: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     title: { type: String, maxlength: 50 },
     image: { type: String },
     description: { type: String, maxlength: 50 },
     engredients: [
       {
         material: {
-          _id: { type: mongoose.Types.ObjectId, required: true },
+          _id: { type: mongoose.Types.ObjectId },
           restaurant: {
-            _id: { type: mongoose.Types.ObjectId, required: true },
+            _id: { type: mongoose.Types.ObjectId },
             restaurant_name: String,
             infos: {
               town: String,
@@ -68,9 +68,9 @@ const productType = {
           deletedAt: { type: Date, default: null },
         },
         raw_material: {
-          title: { type: String, require: true },
-          quantity: { type: Number, require: true },
-          unit: { type: String, require: true },
+          title: { type: String },
+          quantity: { type: Number },
+          unit: { type: String },
           lifetime: { type: Date },
           image: { type: String, default: "/datas/avatar.png" },
           _creator: {
@@ -83,7 +83,6 @@ const productType = {
           laboratory: {
             type: mongoose.Types.ObjectId,
             ref: "Laboratory",
-            required: true,
           },
           deletedAt: { type: Date, default: null },
         },
@@ -98,7 +97,7 @@ const productType = {
   },
 
   category: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     title: { type: String },
     image: { type: String },
     _creator: {

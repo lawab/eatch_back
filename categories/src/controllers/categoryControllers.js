@@ -353,6 +353,7 @@ const getCategory = async (req, res) => {
     const category = await categoryService.getCategoryById(
       req.params.categoryId
     );
+    console.log({ category });
     res.status(200).json(category);
   } catch (err) {
     console.log(err);
