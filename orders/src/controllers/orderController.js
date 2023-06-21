@@ -10,7 +10,7 @@ const {
 // create one order in database
 const createOrder = async (req, res) => {
   try {
-    let bodyContent = req.body;
+    let bodyContent = JSON.parse(req.headers.body);
 
     console.log({ bodyContent });
     // set all values required
@@ -69,7 +69,7 @@ const updateOrder = async (req, res) => {
 
   try {
     // get body request
-    let body = req.body;
+    let body = JSON.parse(req.headers.body);
 
     // get order that should be update
     let order = await orderServices.findOrder({
@@ -90,11 +90,15 @@ const updateOrder = async (req, res) => {
     // update products only because it is a user that update his order
     body = await updateOrderValues(body, req);
 
-    // update products in order model found in database
-    order["products"] = body["products"];
-
     // update order in database
-    orderUpdated = await order.save();
+    orderUpdated = await orderServices.updateOrder(
+      {
+        _id: order._id,
+      },
+      {
+        ...body,
+      }
+    );
 
     console.log({ orderUpdated });
 
@@ -102,7 +106,7 @@ const updateOrder = async (req, res) => {
       let response = await addElementToHistorical(
         async () => {
           return await orderServices.addOrderToHistorical(
-            orderUpdated._creator._id,
+            orderUpdated._id,
             {
               orders: {
                 _id: orderUpdated._id,
@@ -157,7 +161,7 @@ const updateOrder = async (req, res) => {
       console.log({ orderRestored });
     }
 
-    console.log(error.message);
+    console.log(error);
     res.status(500).json({
       message: "Error(s) occured during the update order!!!",
     });
@@ -197,7 +201,9 @@ const deleteOrder = async (req, res) => {
   let orderCopy = null;
   let orderDeleted = null;
   try {
-    let body = req.body;
+    // get body request
+    let body = JSON.parse(req.headers.body);
+
     // check if creator has authorization
     let creator = await orderServices.getUserAuthor(body?._creator, req.token);
 

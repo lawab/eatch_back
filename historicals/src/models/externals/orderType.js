@@ -8,7 +8,7 @@ const orderType = {
   },
   is_tracking: { type: Boolean },
   client: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     fisrtName: {
       type: String,
     },
@@ -31,7 +31,7 @@ const orderType = {
   },
   menus: [
     {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId },
       menu_title: { type: String },
       restaurant: {
         _id: { type: mongoose.Types.ObjectId },
@@ -42,7 +42,7 @@ const orderType = {
           logo: { type: String },
         },
       },
-      price: { type: Number, required: true },
+      price: { type: Number },
       devise: {
         type: String,
       },
@@ -62,7 +62,7 @@ const orderType = {
             type: String,
           },
           recette: {
-            _id: { type: mongoose.Types.ObjectId, required: true },
+            _id: { type: mongoose.Types.ObjectId },
             title: { type: String },
             image: { type: String },
             description: { type: String },
@@ -90,7 +90,7 @@ const orderType = {
   ],
   products: [
     {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId },
       pusharePrice: {
         type: Number,
       },
@@ -104,7 +104,7 @@ const orderType = {
         type: String,
       },
       recette: {
-        _id: { type: mongoose.Types.ObjectId, required: true },
+        _id: { type: mongoose.Types.ObjectId },
         title: { type: String },
         image: { type: String },
         description: { type: String },
@@ -124,10 +124,6 @@ const orderType = {
   ],
   status: {
     type: String,
-  },
-  _creator: {
-    required: true,
-    type: mongoose.Types.ObjectId,
   },
   action: {
     type: String,

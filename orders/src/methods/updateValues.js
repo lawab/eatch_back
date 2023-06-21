@@ -14,13 +14,6 @@ module.exports = async (body, req) => {
 
     let token = req.token;
 
-    // set ids list from products
-    let productsIds = body?.products?.map((product) => product._id);
-
-    if (!productsIds?.length) {
-      throw new Error(errorMessage("products"));
-    }
-
     if (body?.products) {
       let productsIds = body?.products?.map((p) => p);
       // get list of products
@@ -44,7 +37,7 @@ module.exports = async (body, req) => {
 
     if (body?.menus) {
       let menus = await orderServices.getMenus(body?.menus, token);
-      if (!menus.filter((menu) => !menu) || !menus.length) {
+      if (menus.filter((menu) => !menu).length || !menus.length) {
         throw new Error(errorMessage("menus"));
       }
       console.log({ menus });
