@@ -157,13 +157,10 @@ const updateCategory = async (req, res) => {
 
     categoryCopied = Object.assign({}, oldCategory._doc);
 
-    for (const field in newCategory) {
-      if (Object.hasOwnProperty.call(newCategory, field)) {
-        oldCategory[field] = newCategory[field];
-      }
-    }
-
-    category = await oldCategory.save();
+    category = await categoryService.updateCategoryById(
+      oldCategory._id,
+      newCategory
+    );
 
     console.log({ categoryUpdated: category });
 
