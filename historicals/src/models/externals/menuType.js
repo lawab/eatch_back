@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const menuType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   restaurant: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     restaurant_name: String,
     infos: {
       town: { type: String },
@@ -12,13 +12,13 @@ const menuType = {
       logo: { type: String },
     },
   },
-  price: { type: Number, required: true },
+  price: { type: Number },
   devise: {
     type: String,
   },
   products: [
     {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId },
       pusharePrice: {
         type: Number,
       },
@@ -32,7 +32,7 @@ const menuType = {
         type: String,
       },
       recette: {
-        _id: { type: mongoose.Types.ObjectId, required: true },
+        _id: { type: mongoose.Types.ObjectId },
         title: { type: String },
         image: { type: String },
         description: { type: String },
