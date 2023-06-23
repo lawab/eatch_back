@@ -105,8 +105,11 @@ const updateRestaurant = async (req, res) => {
     let infos = {
       town: body?.town,
       address: body?.address,
-      logo: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     };
+    if(req.file){
+      infos.logo = "/datas/" + req.file.filename
+    }
+   
     let restaurantBody = {
       restaurant_name: body?.restaurant_name,
       infos: infos,
