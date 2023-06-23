@@ -26,7 +26,7 @@ const createCategory = async (req, res) => {
 
   const newCategory = {
     title: body?.title,
-    _creator: body?._creator,
+    user_id: body?.user_id,
     image: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     restaurant_id: body?.restaurant_id,
   };
@@ -34,10 +34,7 @@ const createCategory = async (req, res) => {
 
   // console.log("USER: " + newCategory.user_id, { newCategory });
   try {
-    const user = await api_consumer.getUserById(
-      newCategory._creator,
-      req.token
-    );
+    const user = await api_consumer.getUserById(newCategory.user_id, req.token);
 
     let restaurant = await api_consumer.getRestaurantById(
       newCategory.restaurant_id,
@@ -160,13 +157,10 @@ const updateCategory = async (req, res) => {
 
     categoryCopied = Object.assign({}, oldCategory._doc);
 
-    for (const field in newCategory) {
-      if (Object.hasOwnProperty.call(newCategory, field)) {
-        oldCategory[field] = newCategory[field];
-      }
-    }
-
-    category = await oldCategory.save();
+    category = await categoryService.updateCategoryById(
+      oldCategory._id,
+      newCategory
+    );
 
     console.log({ categoryUpdated: category });
 
@@ -356,6 +350,7 @@ const getCategory = async (req, res) => {
     const category = await categoryService.getCategoryById(
       req.params.categoryId
     );
+    console.log({ category });
     res.status(200).json(category);
   } catch (err) {
     console.log(err);

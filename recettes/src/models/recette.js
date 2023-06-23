@@ -27,7 +27,7 @@ const materialType = {
   deletedAt: { type: Date, default: null },
 };
 const rawType = {
-  title: { type: String, unique: true, require: true, maxlength: 50 },
+  title: { type: String, require: true, maxlength: 50 },
   quantity: { type: Number, require: true },
   unit: { type: String, require: true, maxlength: 10 },
   lifetime: { type: Date },

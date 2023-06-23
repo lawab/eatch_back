@@ -95,7 +95,7 @@ const updateMenu = async (req, res) => {
     // get body request
     // let body = req.body;
     let body = JSON.parse(req.headers.body);
-    console.log({body})
+    console.log({ body });
     let menu = await menuServices.findOneMenu({
       _id: req.params?.id,
     });
@@ -196,8 +196,7 @@ const deleteMenu = async (req, res) => {
   let MenuDeleted = null;
   let menuCopy = null;
   try {
-    let body = req.body;
-    // let body = JSON.parse(req.headers.body);
+    let body = JSON.parse(req.headers.body);
 
     // check if creator have authorization
     let creator = await menuServices.getUserAuthor(body?._creator, req.token);

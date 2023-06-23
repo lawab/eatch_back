@@ -6,29 +6,6 @@ const Schema = mongoose.Schema;
 const CategorySchemaObject = {
   title: { type: String, unique: true, require: true, maxlength: 50 },
   image: { type: String, default: "/datas/avatar.png" },
-  // products: {
-  //     type:[ {type: mongoose.SchemaTypes.ObjectId} ],
-  //     default: []
-  // }
-  // products: {
-  //   type: [
-  //     {
-  //       _id: { type: String },
-  //       price: { type: Number },
-  //       productName: { type: String, maxlength: 50 },
-  //       promotion: { type: Boolean, default: false },
-  //       description: { type: String },
-  //       devise: { type: String, default: "MAD" },
-  //       cookingtime: { type: String },
-  //       image: { type: String, default: "/data/uploads/mcf.png" },
-  //       liked: { type: Number, default: 0 },
-  //       likedPersonCount: { type: Number, default: 0 },
-  //       pusharePrice: { type: Number },
-  //       costPrice: { type: Number },
-  //       sellingPrice: { type: Number },
-  //     },
-  //   ],
-  // },
   _creator: {
     _id: { type: String },
     role: { type: String },

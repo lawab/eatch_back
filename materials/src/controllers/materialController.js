@@ -17,47 +17,6 @@ const createMaterial = async (req, res) => {
 
     let BodyUpdate = await setMaterialValues(body, req, req.token);
 
-    // // get creator since microservice users
-    // let creator = await materialServices.getUserAuthor(
-    //   body?._creator,
-    //   req.token
-    // );
-
-    // console.log({ creator: creator?._id }, "*");
-
-    // if (!creator?._id) {
-    //   return res.status(401).json({
-    //     message:
-    //       "invalid data send,you must authenticated to create a raw material!!!",
-    //   });
-    // }
-
-    // if (![roles.SUPER_ADMIN, roles.MANAGER].includes(creator.role)) {
-    //   return res.status(401).json({
-    //     message:
-    //       "you have not authorization to create material,please see you administrator",
-    //   });
-    // }
-
-    // body["_creator"] = creator; //set creator value found in database
-
-    // let restaurant = await materialServices.getRestaurant(
-    //   body?.restaurant,
-    //   req.token
-    // );
-    // console.log({ restaurant });
-    // if (!restaurant?._id) {
-    //   return res.status(401).json({
-    //     message: "invalid restaurant value send",
-    //   });
-    // }
-
-    // body["restaurant"] = restaurant; //set restaurant value found in database
-
-    // body["image"] = req.file
-    //   ? "/datas/" + req.file?.filename
-    //   : "/datas/avatar.png"; //set image for material
-
     newMaterial = await materialServices.createMaterial(BodyUpdate);
 
     console.log({ newMaterial }, "*");
@@ -119,8 +78,8 @@ const updateMaterial = async (req, res) => {
 
   try {
     // get body request
-    // let body = JSON.parse(req.headers.body);
-    let body = req.body;
+    let body = JSON.parse(req.headers.body);
+    // let body = req.body;
 
     let BodyUpdated = await updateForeignFields(body, req, req.token);
 
@@ -271,7 +230,7 @@ const deleteMaterial = async (req, res) => {
   let materialCopy = null;
   let MaterialDeleted = null;
   try {
-    let body = req.body;
+    let body = JSON.parse(req.headers.body);
     // check if creator have authorization
     let creator = await materialServices.getUserAuthor(
       body?._creator,

@@ -50,6 +50,7 @@ module.exports = async (body, req, token) => {
 
     // get products in databsase
     let productParsed = JSON.parse(body?.products);
+    // let productParsed = body?.products;
 
     let products = await menuServices.getProducts(productParsed, token);
     console.log({ productsFound: products });

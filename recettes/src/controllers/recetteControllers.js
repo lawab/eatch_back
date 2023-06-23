@@ -169,6 +169,7 @@ const fetchRecette = async (req, res) => {
     let recette = await recetteServices.findRecette({
       _id: req.params?.id,
     });
+    console.log({ recette });
     if (recette?._id) {
       res.status(200).json(recette);
     } else {
