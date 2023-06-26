@@ -17,12 +17,11 @@ const productType = {
     maxlength: 50,
   },
   recette: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     title: { type: String },
     image: { type: String },
     description: { type: String },
     engredients: {
-      required: true,
       type: [
         {
           material: { type: mongoose.Types.ObjectId },
@@ -72,7 +71,6 @@ const productType = {
   },
   image: {
     type: String,
-    default: "/datas/avatar.png",
   },
   liked: {
     type: Number,
@@ -141,15 +139,14 @@ const OrderschemaObject = {
     default: null,
   },
   is_tracking: { type: Boolean, default: false },
-  client: { type: clientType, required: true },
+  client: { type: clientType },
   restaurant: {
-    required: true,
     type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId },
       restaurant_name: String,
       infos: {
-        town: { type: String, required: true },
-        address: { type: String, required: true },
+        town: { type: String },
+        address: { type: String },
         logo: { type: String, default: "/datas/avatar.png" },
       },
     },
@@ -157,18 +154,13 @@ const OrderschemaObject = {
   menus: {
     type: [menuType],
     validator(menus) {
-      let invalidMenus = menus.filter((el) => !el._id);
-
-      return invalidMenus.lenght > 0;
+      return menus.filter((el) => !el._id).lenght > 0;
     },
   },
   products: {
-    required: true,
     type: [{ type: productType }],
     validator(products) {
-      let invalidProducts = products.filter((el) => !el._id);
-
-      return invalidProducts.lenght > 0;
+      return products.filter((el) => !el._id).lenght > 0;
     },
   },
   status: {
