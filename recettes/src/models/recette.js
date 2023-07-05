@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const restaurantSchemaObject = {
-  restaurant_name: { type: String, required: true, maxlength: 50 },
+  restaurant_name: { type: String, maxlength: 50 },
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
+    town: { type: String },
+    address: { type: String},
     logo: { type: String, default: "/datas/avatar.png" },
   },
 
@@ -12,24 +12,22 @@ const restaurantSchemaObject = {
 const materialType = {
   _id: { type: String },
   restaurant: {
-    required: true,
     type: restaurantSchemaObject,
   },
 
   lifetime: {
-    required: true,
     type: Date,
     default: Date.now,
   },
-  mp_name: { required: true, type: String, maxlength: 50 },
-  quantity: { type: Number, default: 0, required: true },
+  mp_name: {type: String, maxlength: 50 },
+  quantity: { type: Number, default: 0},
   min_quantity: { type: Number, default: 0 },
   deletedAt: { type: Date, default: null },
 };
 const rawType = {
-  title: { type: String, require: true, maxlength: 50 },
-  quantity: { type: Number, require: true },
-  unit: { type: String, require: true, maxlength: 10 },
+  title: { type: String, maxlength: 50 },
+  quantity: { type: Number},
+  unit: { type: String, maxlength: 10 },
   lifetime: { type: Date },
   image: { type: String, default: "/datas/avatar.png" },
   _creator: {
@@ -42,7 +40,6 @@ const rawType = {
   laboratory: {
     type: mongoose.Types.ObjectId,
     ref: "Laboratory",
-    required: true,
   },
   deletedAt: { type: Date, default: null },
 };
