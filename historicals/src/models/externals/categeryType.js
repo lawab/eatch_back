@@ -5,7 +5,7 @@ const categeryType = {
   title: { type: String },
   image: { type: String },
   restaurant: {
-    _id: { type: String, required: true },
+    _id: { type: String },
     restaurant_name: { type: String },
     logo: { type: String },
   },

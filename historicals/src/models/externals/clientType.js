@@ -2,7 +2,7 @@ const { actionTypes } = require("../statusTypes");
 const mongoose = require("mongoose");
 
 const clientType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId },
   fisrtName: {
     type: String,
   },

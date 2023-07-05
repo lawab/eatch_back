@@ -2,7 +2,7 @@ const { actionTypes } = require("../statusTypes");
 const mongoose = require("mongoose");
 
 const recetteType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId },
   title: { type: String },
   image: { type: String },
   description: { type: String },
