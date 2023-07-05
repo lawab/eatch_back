@@ -2,9 +2,9 @@ const { actionTypes } = require("../statusTypes");
 const mongoose = require("mongoose");
 
 const promotionType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId },
   restaurant: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     restaurant_name: String,
     infos: {
       town: { type: String },
@@ -16,7 +16,7 @@ const promotionType = {
   promotion_name: { type: String },
   clients: [
     {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId },
       fisrtName: {
         type: String,
       },
@@ -35,7 +35,7 @@ const promotionType = {
   end_date: { type: Date },
   percent: { type: Number },
   product: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     pusharePrice: {
       type: Number,
     },
@@ -49,7 +49,7 @@ const promotionType = {
       type: String,
     },
     recette: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId },
       title: { type: String },
       image: { type: String },
       description: { type: String },
@@ -67,9 +67,9 @@ const promotionType = {
     },
   },
   menu: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     restaurant: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId},
       restaurant_name: String,
       infos: {
         town: { type: String },
@@ -77,13 +77,13 @@ const promotionType = {
         logo: { type: String },
       },
     },
-    price: { type: Number, required: true },
+    price: { type: Number,},
     devise: {
       type: String,
     },
     products: [
       {
-        _id: { type: mongoose.Types.ObjectId, required: true },
+        _id: { type: mongoose.Types.ObjectId },
         pusharePrice: {
           type: Number,
         },
@@ -97,7 +97,7 @@ const promotionType = {
           type: String,
         },
         recette: {
-          _id: { type: mongoose.Types.ObjectId, required: true },
+          _id: { type: mongoose.Types.ObjectId},
           title: { type: String },
           image: { type: String },
           description: { type: String },

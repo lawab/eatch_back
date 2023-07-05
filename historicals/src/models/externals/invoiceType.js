@@ -2,9 +2,9 @@ const { actionTypes } = require("../statusTypes");
 const mongoose = require("mongoose");
 
 const invoiceType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId },
   order: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     order_title: {
       type: String,
     },
@@ -32,7 +32,7 @@ const invoiceType = {
     },
     products: [
       {
-        _id: { type: mongoose.Types.ObjectId, required: true },
+        _id: { type: mongoose.Types.ObjectId },
         pusharePrice: {
           type: Number,
         },
@@ -46,7 +46,7 @@ const invoiceType = {
           type: String,
         },
         recette: {
-          _id: { type: mongoose.Types.ObjectId, required: true },
+          _id: { type: mongoose.Types.ObjectId },
           title: { type: String },
           image: { type: String },
           description: { type: String },
@@ -66,7 +66,7 @@ const invoiceType = {
     ],
     menus: [
       {
-        _id: { type: mongoose.Types.ObjectId, required: true },
+        _id: { type: mongoose.Types.ObjectId },
         menu_title: { type: String },
         restaurant: {
           _id: { type: mongoose.Types.ObjectId },
@@ -77,13 +77,13 @@ const invoiceType = {
             logo: { type: String },
           },
         },
-        price: { type: Number, required: true },
+        price: { type: Number },
         devise: {
           type: String,
         },
         products: [
           {
-            _id: { type: mongoose.Types.ObjectId, required: true },
+            _id: { type: mongoose.Types.ObjectId },
             pusharePrice: {
               type: Number,
             },
@@ -97,7 +97,7 @@ const invoiceType = {
               type: String,
             },
             recette: {
-              _id: { type: mongoose.Types.ObjectId, required: true },
+              _id: { type: mongoose.Types.ObjectId },
               title: { type: String },
               image: { type: String },
               description: { type: String },
@@ -129,7 +129,7 @@ const invoiceType = {
     },
   },
   restaurant: {
-    _id: { type: mongoose.Types.ObjectId, required: true },
+    _id: { type: mongoose.Types.ObjectId },
     restaurant_name: String,
     infos: {
       town: { type: String },

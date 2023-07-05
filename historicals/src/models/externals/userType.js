@@ -1,7 +1,7 @@
 const { actionTypes } = require("../statusTypes");
 const mongoose = require("mongoose");
 const userType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId},
   restaurant: {
     _id: { type: mongoose.Types.ObjectId },
     restaurant_name: String,

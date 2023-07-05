@@ -2,11 +2,11 @@ const { actionTypes } = require("../statusTypes");
 const mongoose = require("mongoose");
 
 const restaurantType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
-  restaurant_name: { type: String, required: true },
+  _id: { type: mongoose.Types.ObjectId },
+  restaurant_name: { type: String },
   infos: {
-    town: { type: String, required: true },
-    address: { type: String, required: true },
+    town: { type: String },
+    address: { type: String },
     logo: { type: String },
   },
   _creator: {
