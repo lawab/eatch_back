@@ -26,7 +26,7 @@ const createCategory = async (req, res) => {
 
   const newCategory = {
     title: body?.title,
-    user_id: body?._creator,
+    _creator: body?._creator,
     image: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     restaurant_id: body?.restaurant_id,
   };
@@ -34,7 +34,10 @@ const createCategory = async (req, res) => {
 
   // console.log("USER: " + newCategory.user_id, { newCategory });
   try {
-    const user = await api_consumer.getUserById(newCategory.user_id, req.token);
+    const user = await api_consumer.getUserById(
+      newCategory._creator,
+      req.token
+    );
 
     let restaurant = await api_consumer.getRestaurantById(
       newCategory.restaurant_id,
@@ -126,7 +129,7 @@ const updateCategory = async (req, res) => {
   const body = JSON.parse(req.headers.body);
   // const body = req.body;
 
-  const user = await api_consumer.getUserById(body.user_id, req.token);
+  const user = await api_consumer.getUserById(body._creator, req.token);
 
   const newCategory = {
     title: body.title,
