@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 //Material Schema Object
 const MaterialSchemaObject = {
-  title: { type: String, unique: false, require: true, maxlength: 50 },
+  title: { type: String, require: true, maxlength: 50 },
   quantity: { type: Number, require: true },
   unit: { type: String, require: true, maxlength: 10 },
   lifetime: { type: Date },

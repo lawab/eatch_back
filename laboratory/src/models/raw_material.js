@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 //Raw Schema Object
 const RawSchemaObject = {
-  title: { type: String, unique: true, require: true, maxlength: 50 },
+  title: { type: String, require: true, maxlength: 50 },
   available: { type: Number, require: true },
   unit: { type: String, require: true, maxlength: 10 },
   image: { type: String, default: "/datas/avatar.png" },
