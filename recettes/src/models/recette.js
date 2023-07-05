@@ -3,7 +3,7 @@ const restaurantSchemaObject = {
   restaurant_name: { type: String, maxlength: 50 },
   infos: {
     town: { type: String },
-    address: { type: String},
+    address: { type: String },
     logo: { type: String, default: "/datas/avatar.png" },
   },
 
@@ -14,19 +14,19 @@ const materialType = {
   restaurant: {
     type: restaurantSchemaObject,
   },
-
   lifetime: {
     type: Date,
     default: Date.now,
   },
-  mp_name: {type: String, maxlength: 50 },
+  mp_name: {  type: String},
   quantity: { type: Number, default: 0},
   min_quantity: { type: Number, default: 0 },
   deletedAt: { type: Date, default: null },
 };
 const rawType = {
+  _id: { type: String },
   title: { type: String, maxlength: 50 },
-  quantity: { type: Number},
+  quantity: { type: Number, },
   unit: { type: String, maxlength: 10 },
   lifetime: { type: Date },
   image: { type: String, default: "/datas/avatar.png" },
@@ -39,7 +39,6 @@ const rawType = {
   },
   laboratory: {
     type: mongoose.Types.ObjectId,
-    ref: "Laboratory",
   },
   deletedAt: { type: Date, default: null },
 };
