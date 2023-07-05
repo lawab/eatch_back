@@ -51,8 +51,8 @@ const recetteSchemaObject = {
     required: true,
     type: [
       {
-        material: { type: materialType },
-        raw_material: { type: rawType },
+        material: materialType,
+        raw_material:rawType,
         grammage: { type: Number },
         unity: { type: String, default: "g" },
       },
