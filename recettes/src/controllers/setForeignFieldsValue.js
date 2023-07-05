@@ -47,7 +47,7 @@ module.exports = async (recetteServices, body, token) => {
     return engredient?.raw_material;
   });
 
-  //console.log({ _materials, rawMaterials });
+  console.log({ _materials, rawMaterials });
 
   let materialIds = _materials.map((e) => e?.material);
 
@@ -55,7 +55,7 @@ module.exports = async (recetteServices, body, token) => {
 
   if (materialIds.length) {
     let materials = await recetteServices.getMaterials(materialIds, token);
-    //console.log({ materials });
+    console.log({ materials });
     // formation des ingredients
     materialsEngrediants = materials.map((material) => {
       let index = _materials.findIndex((engredient) => {
@@ -64,9 +64,11 @@ module.exports = async (recetteServices, body, token) => {
       if (index != -1) {
         let Ingredient = _materials[index];
         return {
-          material,
-          grammage: Ingredient.grammage,
-          unity: Ingredient?.unity ? Ingredient?.unity : "g",
+          material: {
+            ...material,
+            grammage: Ingredient.grammage,
+            unity: Ingredient?.unity ? Ingredient?.unity : "g",
+          },
         };
       } else {
         throw new Error(errorMessage("engredient"));
@@ -97,9 +99,11 @@ module.exports = async (recetteServices, body, token) => {
       if (rawIndex != -1) {
         let Ingredient = rawMaterials[rawIndex];
         return {
-          raw_material: raw,
-          grammage: Ingredient.grammage,
-          unity: Ingredient?.unity ? Ingredient?.unity : "g",
+          raw_material: {
+            ...raw,
+            grammage: Ingredient.grammage,
+            unity: Ingredient?.unity ? Ingredient?.unity : "g",
+          },
         };
       } else {
         throw new Error(errorMessage("engredients"));
