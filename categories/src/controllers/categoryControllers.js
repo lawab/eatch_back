@@ -26,7 +26,7 @@ const createCategory = async (req, res) => {
 
   const newCategory = {
     title: body?.title,
-    user_id: body?.user_id,
+    user_id: body?._creator,
     image: req.file ? "/datas/" + req.file.filename : "/datas/avatar.png",
     restaurant_id: body?.restaurant_id,
   };
