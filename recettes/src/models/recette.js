@@ -39,7 +39,6 @@ const rawType = {
   },
   laboratory: {
     type: mongoose.Types.ObjectId,
-    ref: "Laboratory",
   },
   deletedAt: { type: Date, default: null },
 };

@@ -8,6 +8,12 @@ const updateForeignFields = require("./updateForeignFields");
 const createRecette = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
+    
+    console.log("body===============")
+    	
+    	    console.log({body})
+    
+    console.log("body===============")
     //let body = req.body;
     // check if creator has authorization
     let creator = await recetteServices.getUserAuthor(
