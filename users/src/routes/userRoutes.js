@@ -72,7 +72,7 @@ userRouter.put(
 );
 
 //************DISCONNECT ONE USER********************
-userRouter.put("/disconnect/:id", authmiddleware, disconnectUser);
+userRouter.put("/disconnect/:id", disconnectUser);
 
 //**************************************** GET ALL ROUTE //****************************************//
 
