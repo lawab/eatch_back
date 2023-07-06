@@ -120,7 +120,12 @@ const updateMenu = async (req, res) => {
     }
 
     // update field in database
-    menusaved = await menu.save();
+    menusaved = await menuServices.updateMenu(
+      {
+        _id: req.params?.id,
+      },
+      bodyUpdated
+    );
 
     console.log({ menusaved });
 
