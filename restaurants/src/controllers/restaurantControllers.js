@@ -90,6 +90,7 @@ const deleteRestaurant = async (req, res) => {
 const updateRestaurant = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
+    const id = req.params.id;
     //let body = req.body;
     let creator = await RestaurantServices.getUserAuthor(
       body?._creator,
@@ -100,7 +101,10 @@ const updateRestaurant = async (req, res) => {
         message: "invalid data send!!!",
       });
     }
-
+    const restaurantFound = await RestaurantServices.getRestaurantById(id)
+    if (!restaurantFound) {
+      return res.status(401).json({message : "Restaurant not found!!!"})
+    }
     //let body = req.body;
     let infos = {
       town: body?.town,
@@ -116,7 +120,7 @@ const updateRestaurant = async (req, res) => {
       _creator: body?._creator,
     };
 
-    const id = req.params.id;
+    
 
     let restaurant = await RestaurantServices.updateRestaurant(
       id,

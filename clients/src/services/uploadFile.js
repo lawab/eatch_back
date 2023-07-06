@@ -7,14 +7,7 @@ function uploadMiddleFile() {
       cb(null, "./public/datas");
     },
     filename: (req, file, cb) => {
-      cb(
-        null,
-        req.headers.nom_file +
-          "_" +
-          req.headers.type_affichage +
-          "." +
-          file.originalname.split(".").pop()
-      );
+      cb(null, file.originalname);
     },
   });
   const upload = multer({ storage: storage });
