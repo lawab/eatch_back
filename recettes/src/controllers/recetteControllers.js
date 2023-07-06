@@ -169,7 +169,7 @@ const deleteRecette = async (req, res) => {
     }
   } catch (error) {
     console.log("*****error.message********666");
-    console.log(error.message);
+    console.log(error);
     
     return res
       .status(500)
