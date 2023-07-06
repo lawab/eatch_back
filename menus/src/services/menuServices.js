@@ -60,7 +60,7 @@ const findMenu = async (query = null) => {
 const updateMenu = async (query = null, bodyUpdate = {}) => {
   const menu = await Menu.findOneAndUpdate(
     query,
-    { $set: { ...bodyUpdate } },
+    { ...bodyUpdate },
     { new: true }
   );
   return menu;
