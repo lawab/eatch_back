@@ -122,7 +122,7 @@ const updateRecette = async (req, res) => {
 // delete one recette in database
 const deleteRecette = async (req, res) => {
   try {
-    let body = req.headers.body
+    let body = JSON.parse(req.headers.body)
     console.log(body)
     // check if creator has authorization
     let creator = await recetteServices.getUserAuthor(
