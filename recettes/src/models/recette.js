@@ -4,7 +4,7 @@ const restaurantSchemaObject = {
   infos: {
     town: { type: String },
     address: { type: String },
-    logo: { type: String, default: "/datas/avatar.png" },
+    logo: { type: String },
   },
 
   deletedAt: { type: Date, default: null },
@@ -16,20 +16,18 @@ const materialType = {
   },
   lifetime: {
     type: Date,
-    default: Date.now,
   },
-  mp_name: {  type: String},
-  quantity: { type: Number, default: 0},
-  min_quantity: { type: Number, default: 0 },
-  deletedAt: { type: Date, default: null },
+  mp_name: { type: String },
+  quantity: { type: Number },
+  min_quantity: { type: Number },
 };
 const rawType = {
   _id: { type: String },
-  title: { type: String, maxlength: 50 },
-  quantity: { type: Number, },
-  unit: { type: String, maxlength: 10 },
+  title: { type: String },
+  quantity: { type: Number },
+  unit: { type: String },
   lifetime: { type: Date },
-  image: { type: String, default: "/datas/avatar.png" },
+  image: { type: String },
   _creator: {
     _id: { type: String },
     role: { type: String },
@@ -40,7 +38,6 @@ const rawType = {
   laboratory: {
     type: mongoose.Types.ObjectId,
   },
-  deletedAt: { type: Date, default: null },
 };
 
 const recetteSchemaObject = {
@@ -51,10 +48,16 @@ const recetteSchemaObject = {
     required: true,
     type: [
       {
-        material: materialType,
-        raw_material:rawType,
-        grammage: { type: Number },
-        unity: { type: String, default: "g" },
+        material: {
+          ...materialType,
+          grammage: { type: Number },
+          unity: { type: String },
+        },
+        raw_material: {
+          ...rawType,
+          grammage: { type: Number },
+          unity: { type: String },
+        },
       },
     ],
   },
