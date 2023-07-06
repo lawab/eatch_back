@@ -166,13 +166,16 @@ const updateMenu = async (req, res) => {
           return menuRestored;
         }
       );
+      
+      
+      if (response?.status === 200) {
+    console.log({ response: response.data?.message });
+    return res.status(200).json({ message: "Menu has been updated successfully!!!" });
+  } else {
+    return res.status(401).json({ message: "Menu has not been Updated successfully,please try again later,thanks!!!" });
+  }
 
-      return closeRequest(
-        response,
-        res,
-        "Menu has been updated successfully!!!",
-        "Menu has not been Updated successfully,please try again later,thanks!!!"
-      );
+     
     } else {
       return res.status(401).json({
         message: "menu has been not updated successfully!!!",
