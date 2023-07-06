@@ -128,6 +128,7 @@ const deleteRecette = async (req, res) => {
       req.token
     );
     if (!creator?._id) {
+      console.log("*****error.message********111");
       return res.status(401).json({
         message: "invalid data send!!!",
       });
@@ -145,25 +146,31 @@ const deleteRecette = async (req, res) => {
 
       // if recette not exits or had already deleted
       if (!recetteDeleted?._id) {
+        console.log("*****error.message********222");
         return res
           .status(401)
           .json({ message: "recette not exists or already deleted" });
       }
       // recette exits and had deleted successfully
       if (recetteDeleted.deletedAt) {
+        console.log("*****error.message********333");
         console.log({ recetteDeleted: recetteDeleted._id });
         return res
           .status(200)
           .json({ message: "recette has been delete sucessfully" });
       } else
+        console.log("*****error.message********444");
         return res.status(500).json({ message: "deletion of recette failed" });
     } else {
+      console.log("*****error.message********555");
       return res.status(401).json({
         message: "you cannot delete the recette please see you admin,thanks!!!",
       });
     }
   } catch (error) {
+    console.log("*****error.message********666");
     console.log(error.message);
+    
     return res
       .status(500)
       .json({ message: "Error(s) occured during the deletion of recette!!!" });
