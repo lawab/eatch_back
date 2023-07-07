@@ -9,12 +9,12 @@ const createRecette = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
     
-    console.log("body===============")
+    console.log("===============[body]===============")
     	
     	    console.log({body})
     
-    console.log("body===============")
-    //let body = req.body;
+    console.log("===============[body]===============")
+
     // check if creator has authorization
     let creator = await recetteServices.getUserAuthor(
       body?._creator,
@@ -60,7 +60,7 @@ const createRecette = async (req, res) => {
 const updateRecette = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
-    // let body = req.body;
+
 
     // get the auathor to update recette
     let creator = await recetteServices.getUserAuthor(
@@ -122,9 +122,11 @@ const updateRecette = async (req, res) => {
 // delete one recette in database
 const deleteRecette = async (req, res) => {
   try {
+  
+    let body = JSON.parse(req.headers.body);
     // check if creator has authorization
     let creator = await recetteServices.getUserAuthor(
-      req.body?._creator,
+      body?._creator,
       req.token
     );
     if (!creator?._id) {
