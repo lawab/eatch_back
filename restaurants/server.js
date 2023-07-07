@@ -22,6 +22,7 @@ app.use(express.static(path.join(__dirname, "./build/web")));
 app.use(cors());
 
 // All router app
+// app.use("", restaurantRouter);
 app.use("/api/restaurants", restaurantRouter);
 
 //Public files

@@ -5,6 +5,9 @@
   "description": "",
   "main": "server.js",
   "author": "",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
   "license": "ISC",
   "dependencies": {
     "@rusticisoftware/scormcloud-api-v2-client-javascript": "^2.0.1",
@@ -29,7 +32,6 @@
     "multer-gridfs-storage": "^1.3.0",
     "node-stream-zip": "^1.15.0",
     "nodemailer": "^6.8.0",
-    "nodemon": "^2.0.22",
     "passport": "^0.5.2",
     "path": "^0.12.7",
     "pow-mongodb-fixtures": "^0.1.0",
@@ -41,7 +43,8 @@
     "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.9",
     "@babel/node": "^7.16.8",
-    "@babel/preset-env": "^7.16.11"
+    "@babel/preset-env": "^7.16.11",
+    "nodemon": "^2.0.22"
   },
   "browserslist": [
     "> 0.5%",
