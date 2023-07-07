@@ -50,8 +50,9 @@ const createRestaurant = async (req, res) => {
 
 const deleteRestaurant = async (req, res) => {
   try {
+    let body = JSON.parse(req.headers.body);
     let creator = await RestaurantServices.getUserAuthor(
-      req.body?._creator,
+      body?._creator,
       req.token
     );
     if (!creator?._id) {
@@ -65,7 +66,7 @@ const deleteRestaurant = async (req, res) => {
         _id: req.params?.id,
         deletedAt: null,
       },
-      { _creator: req.body._creator, deletedAt: Date.now() }
+      { _creator: body._creator, deletedAt: Date.now() }
     );
 
     // if restaurant not exits or had already deleted
@@ -90,7 +91,6 @@ const deleteRestaurant = async (req, res) => {
 const updateRestaurant = async (req, res) => {
   try {
     let body = JSON.parse(req.headers.body);
-    const id = req.params.id;
     //let body = req.body;
     let creator = await RestaurantServices.getUserAuthor(
       body?._creator,
@@ -101,26 +101,33 @@ const updateRestaurant = async (req, res) => {
         message: "invalid data send!!!",
       });
     }
-    const restaurantFound = await RestaurantServices.getRestaurantById(id)
-    if (!restaurantFound) {
-      return res.status(401).json({message : "Restaurant not found!!!"})
+
+    let restaurantExist = await RestaurantServices.findRestaurant({
+      _id: req.params.id,
+    });
+
+    if (!restaurantExist) {
+      return res.status(401).json({
+        message: "Unable to update restaurant because it not exists!!!",
+      });
     }
+
     //let body = req.body;
     let infos = {
-      town: body?.town,
-      address: body?.address,
+      town: body?.town ? body?.town : restaurantExist.infos.town,
+      address: body?.address ? body?.address : restaurantExist.infos.address,
+      logo: req.file
+        ? "/datas/" + req.file.filename
+        : restaurantExist.infos.logo,
     };
-    if(req.file){
-      infos.logo = "/datas/" + req.file.filename
-    }
-   
+
     let restaurantBody = {
       restaurant_name: body?.restaurant_name,
       infos: infos,
       _creator: body?._creator,
     };
 
-    
+    const id = req.params.id;
 
     let restaurant = await RestaurantServices.updateRestaurant(
       id,
