@@ -15,7 +15,7 @@ var orderRouter = express.Router();
 const upload = uploadFileService.uploadMiddleFile();
 
 //Create product
-orderRouter.post("/create", authmiddleware, upload.single("file"), createOrder);
+orderRouter.post("/create", createOrder);
 
 //delete product
 orderRouter.delete("/delete/:id", authmiddleware, deleteOrder);

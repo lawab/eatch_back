@@ -10,8 +10,10 @@ const {
 // create one order in database
 const createOrder = async (req, res) => {
   try {
-    let bodyContent = JSON.parse(req.headers.body);
-
+    console.log("*******************req******************");
+    console.log(req)
+    //let bodyContent = JSON.parse(req.headers.body);
+    let bodyContent = req.body;
     console.log({ bodyContent });
     // set all values required
     body = await setOrderValues(bodyContent, req);

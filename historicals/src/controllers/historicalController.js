@@ -129,9 +129,21 @@ const fetchHistoricalByFieldWithAction = async (req, res) => {
   }
 };
 
+const getHistoricals = async (req, res) => {
+
+  try {
+    const historicals = await historicalServices.findHIstoricals()
+    res.status(200).json(historicals)
+    
+  } catch (error) {
+    res.status(500).json({"message" : "An Error occured!!!"})
+  }
+}
+
 module.exports = {
   updateHistorical,
   fetchHistorical,
   fetchHistoricalsByField,
   fetchHistoricalByFieldWithAction,
+  getHistoricals,
 };

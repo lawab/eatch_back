@@ -9,7 +9,7 @@ const { getRestaurant } = require("./generateJsonFile");
 const shellService = async (restaurantId, token) => {
   let restaurant = await getRestaurant(restaurantId, token);
   //sshpass -pPASSWORD ssh -tt [username]@[host] 'echo PASSWORD | sudo -S -s /bin/bash -c "service snmpd stop; reboot"'
-  let command = `sshpass -p wabimmo ssh pi@${restaurant?._ip} 'sudo /app/scripts/stop.sh'`;
+  let command = `sshpass -p wabimmo ssh pi@${restaurant?._ip} 'pm2 restart all'`;
   exec(command, (error, stdout, stderr) => {
     if (error !== null) {
       console.log(error);
