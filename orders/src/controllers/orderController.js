@@ -37,11 +37,11 @@ const createOrder = async (req, res) => {
           );
         },
         async () => {
-          let elementDeleted = await orderServices.deleteTrustlyOrder({
-            _id: orderCreated._id,
-          });
+          // let elementDeleted = await orderServices.deleteTrustlyOrder({
+          //   _id: orderCreated._id,
+          // });
           console.log({ elementDeleted });
-          return elementDeleted;
+          //return elementDeleted;
         }
       );
 
