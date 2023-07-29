@@ -14,7 +14,7 @@ const createOrder = async (req, res) => {
     console.log(req)
     //let bodyContent = JSON.parse(req.headers.body);
     let bodyContent = req.body;
-    console.log({ bodyContent });
+    console.log(bodyContent);
     // set all values required
     body = await setOrderValues(bodyContent, req);
 
@@ -37,11 +37,11 @@ const createOrder = async (req, res) => {
           );
         },
         async () => {
-          // let elementDeleted = await orderServices.deleteTrustlyOrder({
-          //   _id: orderCreated._id,
-          // });
+           let elementDeleted = await orderServices.deleteTrustlyOrder({
+             _id: orderCreated._id,
+           });
           console.log({ elementDeleted });
-          //return elementDeleted;
+          return elementDeleted;
         }
       );
 
