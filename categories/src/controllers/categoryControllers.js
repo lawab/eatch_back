@@ -179,72 +179,82 @@ const updateCategory = async (req, res) => {
 
     if (category) {
       // add new user create in historical
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await api_consumer.addToHistorical(
-            category._creator._id,
-            {
-              categories: {
-                _id: category._id,
-                action: "UPDATED",
-              },
-            },
-            req.token
-          );
+      //   let response = await addElementToHistorical(
+      //     async () => {
+      //       let response = await api_consumer.addToHistorical(
+      //         category._creator._id,
+      //         {
+      //           categories: {
+      //             _id: category._id,
+      //             action: "UPDATED",
+      //           },
+      //         },
+      //         req.token
+      //       );
 
-          let { content } = await addProductFromJsonFile(
-            restaurant._id,
-            req.token
-          );
-          console.log({
-            content: JSON.parse(content),
-          });
+      //       let { content } = await addProductFromJsonFile(
+      //         restaurant._id,
+      //         req.token
+      //       );
+      //       console.log({
+      //         content: JSON.parse(content),
+      //       });
 
-          await shellService(restaurant._id, req.token);
+      //       await shellService(restaurant._id, req.token);
 
-          return response;
-        },
-        async () => {
-          for (const field in categoryCopied) {
-            if (Object.hasOwnProperty.call(categoryCopied, field)) {
-              category[field] = categoryCopied[field];
-            }
-          }
+      //       return response;
+      //     },
+      //     async () => {
+      //       for (const field in categoryCopied) {
+      //         if (Object.hasOwnProperty.call(categoryCopied, field)) {
+      //           category[field] = categoryCopied[field];
+      //         }
+      //       }
 
-          let elementRestored = await category.save({
-            timestamps: false,
-          });
-          console.log({ elementRestored });
-        }
-      );
+      //       let elementRestored = await category.save({
+      //         timestamps: false,
+      //       });
+      //       console.log({ elementRestored });
+      //     }
+      //   );
 
-      if (response?.status === 200) {
-        console.log({ response: response.data?.message });
-        return res
-          .status(200)
-          .json({ message: "Category has been updated successfully!!!" });
-      } else {
-        return res.status(401).json({
-          message: "update Category failed,please try again!!!",
-        });
-      }
-    } else {
-      res
-        .status(401)
-        .json({ message: "Update Category failed,please try again!!!" });
+      //   if (response?.status === 200) {
+      //     console.log({ response: response.data?.message });
+      //     return res
+      //       .status(200)
+      //       .json({ message: "Category has been updated successfully!!!" });
+      //   } else {
+      //     return res.status(401).json({
+      //       message: "update Category failed,please try again!!!",
+      //     });
+      //   }
+      // } else {
+      //   res
+      //     .status(401)
+      //     .json({ message: "Update Category failed,please try again!!!" });
+            let { content } = await addProductFromJsonFile(
+              restaurant._id,
+              req.token
+            );
+            console.log({
+              content: JSON.parse(content),
+            });
+
+            await shellService(restaurant._id, req.token);
+      res.status(200).json({ message: "Category updated successfully!!!" });
     }
   } catch (err) {
-    if (category && categoryCopied) {
-      for (const field in categoryCopied) {
-        if (Object.hasOwnProperty.call(categoryCopied, field)) {
-          category[field] = categoryCopied[field];
-        }
-      }
-      let elementRestored = await category.save({
-        timestamps: false,
-      });
-      console.log({ elementRestored });
-    }
+    // if (category && categoryCopied) {
+    //   for (const field in categoryCopied) {
+    //     if (Object.hasOwnProperty.call(categoryCopied, field)) {
+    //       category[field] = categoryCopied[field];
+    //     }
+    //   }
+    //   let elementRestored = await category.save({
+    //     timestamps: false,
+    //   });
+    //   console.log({ elementRestored });
+    // }
     console.log(err);
     res.status(500).json({ message: "Error encounterd creating category!!!" });
   }
