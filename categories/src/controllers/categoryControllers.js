@@ -136,30 +136,36 @@ const createCategory = async (req, res) => {
 
 //Update Category in Data Base
 const updateCategory = async (req, res) => {
-  const body = JSON.parse(req.headers.body);
-  // const body = req.body;
-
-  const user = await api_consumer.getUserById(body._creator, req.token);
-
-  const newCategory = {
-    title: body.title,
-    _creator: user._id,
-    restaurant_id: body.restaurant_id,
-  };
-
-  let restaurant = await api_consumer.getRestaurantById(
-    newCategory.restaurant_id,
-    req.token
-  );
-
-  if (req.file) {
-    newCategory["image"] = "/datas/" + req.file.filename;
-  }
-
-  let categoryCopied = null;
-  let category = null;
-
+  
   try {
+
+    const body = JSON.parse(req.headers.body);
+    // const body = req.body;
+
+    const user = await api_consumer.getUserById(body._creator, req.token);
+
+    const newCategory = {
+      title: body.title,
+      _creator: user._id,
+      restaurant_id: body.restaurant_id,
+    };
+
+    let restaurant = await api_consumer.getRestaurantById(
+      newCategory.restaurant_id,
+      req.token
+    );
+
+    if (req.file) {
+      console.log("********************");
+      console.log(req.file);
+      console.log("FILLLLEEEE*******");
+      newCategory["image"] = "/datas/" + req.file.filename;
+    }
+    
+    let categoryCopied = null;
+    let category = null;
+
+
     let oldCategory = await categoryService.getCategoryById(
       req.params.categoryId
     );
