@@ -56,6 +56,7 @@ const createOrder = async (req, res) => {
     //     .status(401)
     //     .json({ message: "Order has been not created successfully!!!" });
     // }
+    res.status(200).json({"message" : "Order created successfully!!!"})
   } catch (error) {
     console.log(error, "x");
     return res
@@ -104,64 +105,65 @@ const updateOrder = async (req, res) => {
 
     console.log({ orderUpdated });
 
-    if (orderUpdated?._id) {
-      let response = await addElementToHistorical(
-        async () => {
-          return await orderServices.addOrderToHistorical(
-            orderUpdated._id,
-            {
-              orders: {
-                _id: orderUpdated._id,
-                action: "UPDATED",
-              },
-            },
-            req.token
-          );
-        },
-        async () => {
-          for (const field in orderCopy) {
-            if (Object.hasOwnProperty.call(orderCopy, field)) {
-              orderUpdated[field] = orderCopy[field];
-            }
-          }
-          /*
-            restore Object in database,not update timestamps 
-            because it is restoration from olds values fields in database
-          */
-          let orderRestored = await orderUpdated.save({
-            timestamps: false,
-          });
-          console.log({ orderRestored });
-          return orderRestored;
-        }
-      );
+    // if (orderUpdated?._id) {
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       return await orderServices.addOrderToHistorical(
+    //         orderUpdated._id,
+    //         {
+    //           orders: {
+    //             _id: orderUpdated._id,
+    //             action: "UPDATED",
+    //           },
+    //         },
+    //         req.token
+    //       );
+    //     },
+    //     async () => {
+    //       for (const field in orderCopy) {
+    //         if (Object.hasOwnProperty.call(orderCopy, field)) {
+    //           orderUpdated[field] = orderCopy[field];
+    //         }
+    //       }
+    //       /*
+    //         restore Object in database,not update timestamps
+    //         because it is restoration from olds values fields in database
+    //       */
+    //       let orderRestored = await orderUpdated.save({
+    //         timestamps: false,
+    //       });
+    //       console.log({ orderRestored });
+    //       return orderRestored;
+    //     }
+    //   );
 
-      return closeRequest(
-        response,
-        res,
-        "Order has been updated successfully!!!",
-        "Order has not been Updated successfully,please try again later,thanks!!!"
-      );
-    } else {
-      return res.status(401).json({
-        message: "Order update failed: order not exits in database!!",
-      });
-    }
+    //   return closeRequest(
+    //     response,
+    //     res,
+    //     "Order has been updated successfully!!!",
+    //     "Order has not been Updated successfully,please try again later,thanks!!!"
+    //   );
+    // } else {
+    //   return res.status(401).json({
+    //     message: "Order update failed: order not exits in database!!",
+    //   });
+    // }
+    res.status(200).json({"message" : "Order updated successfully"})
   } catch (error) {
-    if (orderUpdated && orderCopy) {
-      for (const field in orderCopy) {
-        if (Object.hasOwnProperty.call(orderCopy, field)) {
-          orderUpdated[field] = orderCopy[field];
-        }
-      }
+    // if (orderUpdated && orderCopy) {
+    //   for (const field in orderCopy) {
+    //     if (Object.hasOwnProperty.call(orderCopy, field)) {
+    //       orderUpdated[field] = orderCopy[field];
+    //     }
+    //   }
 
-      //restore Object in database,not update timestamps
-      //because it is restoration from olds values fields in database
-      let orderRestored = await orderUpdated.save({
-        timestamps: false,
-      });
-      console.log({ orderRestored });
-    }
+    //   //restore Object in database,not update timestamps
+    //   //because it is restoration from olds values fields in database
+    //   let orderRestored = await orderUpdated.save({
+    //     timestamps: false,
+    //   });
+    //   console.log({ orderRestored });
+    // }
 
     console.log(error);
     res.status(500).json({
@@ -250,55 +252,55 @@ const deleteOrder = async (req, res) => {
     orderDeleted = await order.save();
     console.log({ orderDeleted });
     // order exits and had deleted successfully
-    if (orderDeleted?.deletedAt) {
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await orderServices.addOrderToHistorical(
-            creator?._id,
-            {
-              orders: {
-                _id: orderDeleted?._id,
-                action: "DELETED",
-              },
-            },
-            req.token
-          );
+    // if (orderDeleted?.deletedAt) {
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       let response = await orderServices.addOrderToHistorical(
+    //         creator?._id,
+    //         {
+    //           orders: {
+    //             _id: orderDeleted?._id,
+    //             action: "DELETED",
+    //           },
+    //         },
+    //         req.token
+    //       );
 
-          return response;
-        },
-        async () => {
-          // restore only fields would had changed in database
-          orderDeleted["deletedAt"] = orderCopy["deletedAt"];
-          orderDeleted["updatedAt"] = orderCopy["updatedAt"];
-          orderDeleted["createdAt"] = orderCopy["createdAt"];
-          let orderRestored = await orderDeleted.save({
-            timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          console.log({ orderRestored });
-          return orderRestored;
-        }
-      );
+    //       return response;
+    //     },
+    //     async () => {
+    //       // restore only fields would had changed in database
+    //       orderDeleted["deletedAt"] = orderCopy["deletedAt"];
+    //       orderDeleted["updatedAt"] = orderCopy["updatedAt"];
+    //       orderDeleted["createdAt"] = orderCopy["createdAt"];
+    //       let orderRestored = await orderDeleted.save({
+    //         timestamps: false,
+    //       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //       console.log({ orderRestored });
+    //       return orderRestored;
+    //     }
+    //   );
 
-      return closeRequest(
-        response,
-        res,
-        "Order has been delete successfully!!!",
-        "Order has not been delete successfully,please try again later,thanks!!!"
-      );
-    } else {
-      return res.status(500).json({ message: "deletion order failed" });
-    }
+    //   return closeRequest(
+    //     response,
+    //     res,
+    //     "Order has been delete successfully!!!",
+    //     "Order has not been delete successfully,please try again later,thanks!!!"
+    //   );
+    // } else {
+    //   return res.status(500).json({ message: "deletion order failed" });
+    // }
   } catch (error) {
-    if (orderDeleted && orderCopy) {
-      // restore only fields would had changed in database
-      orderDeleted["deletedAt"] = orderCopy["deletedAt"];
-      orderDeleted["updatedAt"] = orderCopy["updatedAt"];
-      orderDeleted["createdAt"] = orderCopy["createdAt"];
-      let orderRestored = await orderDeleted.save({
-        timestamps: false,
-      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      console.log({ orderRestored });
-    }
+    // if (orderDeleted && orderCopy) {
+    //   // restore only fields would had changed in database
+    //   orderDeleted["deletedAt"] = orderCopy["deletedAt"];
+    //   orderDeleted["updatedAt"] = orderCopy["updatedAt"];
+    //   orderDeleted["createdAt"] = orderCopy["createdAt"];
+    //   let orderRestored = await orderDeleted.save({
+    //     timestamps: false,
+    //   }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //   console.log({ orderRestored });
+    // }
 
     console.log(error, "x");
     return res

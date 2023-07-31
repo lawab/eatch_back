@@ -29,63 +29,70 @@ const createProduct = async (req, res) => {
 
     console.log({ newproduct });
 
-    if (newproduct) {
-      // add new product create in historical
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await productServices.addProductToHistorical(
-            newproduct._creator._id,
-            {
-              products: {
-                _id: newproduct._id,
-                action: "CREATED",
-              },
-            },
-            req.token
-          );
+    // if (newproduct) {
+    //   // add new product create in historical
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       let response = await productServices.addProductToHistorical(
+    //         newproduct._creator._id,
+    //         {
+    //           products: {
+    //             _id: newproduct._id,
+    //             action: "CREATED",
+    //           },
+    //         },
+    //         req.token
+    //       );
 
-          let { content } = await addProductFromJsonFile(
-            bodyUpdated.restaurant._id,
-            req.token
-          );
+    //       let { content } = await addProductFromJsonFile(
+    //         bodyUpdated.restaurant._id,
+    //         req.token
+    //       );
 
-          await shellService(bodyUpdated.restaurant._id, req.token);
-          console.log({ content: JSON.parse(content) });
+    //       await shellService(bodyUpdated.restaurant._id, req.token);
+    //       console.log({ content: JSON.parse(content) });
 
-          return response;
-        },
-        async () => {
-          let elementDeleted = await productServices.deleteTrustlyProduct({
-            _id: newproduct?._id,
-          });
-          console.log({ elementDeleted });
-          return elementDeleted;
-        }
-      );
+    //       return response;
+    //     },
+    //     async () => {
+    //       let elementDeleted = await productServices.deleteTrustlyProduct({
+    //         _id: newproduct?._id,
+    //       });
+    //       console.log({ elementDeleted });
+    //       return elementDeleted;
+    //     }
+    //   );
 
-      if (response?.status === 200) {
-        console.log({ response: response.data?.message });
-        return res
-          .status(200)
-          .json({ message: "Product has been created successfully!!!" });
-      } else {
-        return res.status(401).json({
-          message:
-            "Product has  been not creadted successfully,please try again later,thanks!!!",
-        });
-      }
-    } else {
-      res
-        .status(401)
-        .json({ message: "product has been not created successfully!!!" });
-    }
+    //   if (response?.status === 200) {
+    //     console.log({ response: response.data?.message });
+    //     return res
+    //       .status(200)
+    //       .json({ message: "Product has been created successfully!!!" });
+    //   } else {
+    //     return res.status(401).json({
+    //       message:
+    //         "Product has  been not creadted successfully,please try again later,thanks!!!",
+    //     });
+    //   }
+    // } else {
+    //   res
+    //     .status(401)
+    //     .json({ message: "product has been not created successfully!!!" });
+    // }
+    let { content } = await addProductFromJsonFile(
+      bodyUpdated.restaurant._id,
+      req.token
+    );
+    await shellService(bodyUpdated.restaurant._id, req.token);
+    console.log({ content: JSON.parse(content) });
+    res.status(200).json({"message" : "Product created successfully!!!"})
   } catch (error) {
     console.log({ error });
-    if (newproduct) {
-      await productServices.deleteTrustlyProduct({
-        _id: newproduct._id,
-      });
-    }
+    // if (newproduct) {
+    //   await productServices.deleteTrustlyProduct({
+    //     _id: newproduct._id,
+    //   });
+    // }
 
     return res
       .status(500)
