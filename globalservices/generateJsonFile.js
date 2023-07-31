@@ -63,6 +63,7 @@ const getRestaurant = async (restaurantId, token) => {
  */
 const addProductFromJsonFile = async (restaurantId, token) => {
   try {
+    console.log("const FILENAME = categories.json")
     const FILENAME = "categories.json";
     // get all catégories for current restaurant in database
     let categories =
@@ -129,6 +130,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
             p["image"] = product.image.toString();
             p["deletedAt"] = "null";
             p["createdAt"] = product.createdAt;
+            p["recette"] = product.recette;
             p["updatedAt"] = product.updatedAt;
             p["quantity"] = Math.floor(Math.random() * 50).toString();
             return p;

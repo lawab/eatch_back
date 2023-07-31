@@ -25,7 +25,7 @@ orderRouter.delete("/delete/remomte/:id", authmiddleware, deleteOrderRemote);
 orderRouter.get("/fetch/one/:id", authmiddleware, fetchOrder);
 
 //get products
-orderRouter.get("/fetch/all", authmiddleware, fetchOrders);
+orderRouter.get("/fetch/all", fetchOrders);
 
 //get products by restaurant
 orderRouter.get(

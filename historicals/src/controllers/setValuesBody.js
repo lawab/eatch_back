@@ -13,7 +13,8 @@ module.exports = async (historicalservices, body = {}, token) => {
   try {
     // set all field value send in body request
     let [key] = Object.keys(body);
-
+    console.log("*****************body : ")
+    console.log(body)
     let value = body[key];
     let keyService = key.charAt(0).toUpperCase() + key.slice(1, key.length - 1); // transform first letter to upperCase(example: client to Client)
     let keyMethod = `get${keyService}`;

@@ -27,57 +27,58 @@ const createMenu = async (req, res) => {
     console.log({ menucreated: menu }, "*");
 
     if (menu) {
-      let response = await addElementToHistorical(
-        async () => {
-          let addResponse = await menuServices.addMenuToHistorical(
-            menu._creator._id,
-            {
-              menus: {
-                _id: menu._id,
-                action: "CREATED",
-              },
-            },
-            req.token
-          );
+      // let response = await addElementToHistorical(
+      //   async () => {
+      //     let addResponse = await menuServices.addMenuToHistorical(
+      //       menu._creator._id,
+      //       {
+      //         menus: {
+      //           _id: menu._id,
+      //           action: "CREATED",
+      //         },
+      //       },
+      //       req.token
+      //     );
 
-          let { content } = await addProductFromJsonFile(
-            bodyUpdated.restaurant._id,
-            req.token
-          );
+         
 
-          console.log({ content: JSON.parse(content) });
+      //     console.log({ content: JSON.parse(content) });
 
-          await shellService(bodyUpdated.restaurant._id, req.token);
+      //     await shellService(bodyUpdated.restaurant._id, req.token);
 
-          return addResponse;
-        },
-        async () => {
-          let elementDeleted = await menuServices.deleteTrustlyMenu({
-            _id: menu._id,
-          });
-          console.log({ elementDeleted });
-          return elementDeleted;
-        }
-      );
+      //     return addResponse;
+      //   },
+      //   async () => {
+      //     let elementDeleted = await menuServices.deleteTrustlyMenu({
+      //       _id: menu._id,
+      //     });
+      //     console.log({ elementDeleted });
+      //     return elementDeleted;
+      //   }
+      // );
 
-      return closeRequest(
-        response,
-        res,
-        "Menu has been created successfully!!!",
-        "Menu has  been not created successfully,please try again later,thanks!!!"
-      );
-    } else {
+      // return closeRequest(
+      //   response,
+      //   res,
+      //   "Menu has been created successfully!!!",
+      //   "Menu has  been not created successfully,please try again later,thanks!!!"
+      // );
+       let { content } = await addProductFromJsonFile(
+         bodyUpdated.restaurant._id,
+         req.token
+       );
+    
       res
         .status(200)
         .json({ message: "Menu has been not created successfully!!!" });
     }
   } catch (error) {
-    if (menu) {
-      let elementDeleted = await menuServices.deleteTrustlyMenu({
-        _id: menu._id,
-      });
-      console.log({ elementDeleted });
-    }
+    // if (menu) {
+    //   let elementDeleted = await menuServices.deleteTrustlyMenu({
+    //     _id: menu._id,
+    //   });
+    //   console.log({ elementDeleted });
+    // }
 
     console.log({ error });
 

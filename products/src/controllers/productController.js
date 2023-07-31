@@ -109,6 +109,7 @@ const updateProduct = async (req, res) => {
     });
 
     if (!product) {
+      console.log("eRRREUR 1")
       return res.status(401).json({
         message: "unable to update product because it not exists!!!",
       });
@@ -131,52 +132,55 @@ const updateProduct = async (req, res) => {
 
     if (productUpdated) {
       // add new product create in historical
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await productServices.addProductToHistorical(
-            productUpdated._creator._id,
-            {
-              products: {
-                _id: productUpdated._id,
-                action: "UPDATED",
-              },
-            },
-            req.token
-          );
+      // let response = await addElementToHistorical(
+      //   async () => {
+          // let response = await productServices.addProductToHistorical(
+          //   productUpdated._creator._id,
+          //   {
+          //     products: {
+          //       _id: productUpdated._id,
+          //       action: "UPDATED",
+          //     },
+          //   },
+          //   req.token
+          // );
+          let response = 200
           let { content } = await addProductFromJsonFile(
             bodyUpdated.restaurant._id,
             req.token
           );
-
+            console.log("{ content: JSON.parse(content) }");
           console.log({ content: JSON.parse(content) });
 
           await shellService(bodyUpdated.restaurant._id, req.token);
 
-          return response;
-        },
-        async () => {
-          for (const field in productCopy) {
-            if (Object.hasOwnProperty.call(productCopy, field)) {
-              productUpdated[field] = productCopy[field];
-            }
-          }
+          //return response;
+        // },
+        // async () => {
+        //   for (const field in productCopy) {
+        //     if (Object.hasOwnProperty.call(productCopy, field)) {
+        //       productUpdated[field] = productCopy[field];
+        //     }
+        //   }
 
-          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          let productRestored = await productUpdated.save({
-            timestamps: false,
-          });
-          console.log({ productRestored });
-          return productRestored;
-        }
-      );
+        //   // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+        //   let productRestored = await productUpdated.save({
+        //     timestamps: false,
+        //   });
+        //   console.log({ productRestored });
+        //   return productRestored;
+        // }
+      // );
 
-      return closeRequest(
-        response,
-        res,
-        "Product has been updated successfully!!!",
-        "Product has not been Updated successfully,please try again later,thanks!!!"
-      );
+      // return closeRequest(
+      //   response,
+      //   res,
+      //   "Product has been updated successfully!!!",
+      //   "Product has not been Updated successfully,please try again later,thanks!!!"
+      // );
+      res.status(200).json({"message" : "Product updated successfully!!!"})
     } else {
+      console.log("eRRREUR 2");
       res.status(401).json({
         message: "product has been not updated successfully!!",
       });
@@ -190,11 +194,11 @@ const updateProduct = async (req, res) => {
       }
 
       // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      let productRestored = await productUpdated.save({
-        validateModifiedOnly: true,
-        timestamps: false,
-      });
-      console.log({ productRestored });
+      // let productRestored = await productUpdated.save({
+      //   validateModifiedOnly: true,
+      //   timestamps: false,
+      // });
+      //console.log({ productRestored });
     }
 
     console.log(error);

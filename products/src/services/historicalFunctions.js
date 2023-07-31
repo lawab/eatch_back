@@ -7,12 +7,12 @@
 const addElementToHistorical = async (addElementToHistorical, errorHanhler) => {
   try {
     // add new user create in historical
-    let response = await addElementToHistorical();
+    //let response = await addElementToHistorical();
 
-    if (response.status !== 200) {
-      await errorHanhler();
-    }
-    return response;
+    // if (response.status !== 200) {
+    //   await errorHanhler();
+    // }
+    return 200;
   } catch (error) {
     await errorHanhler();
     throw new Error(error.message);

@@ -22,40 +22,40 @@ const createOrder = async (req, res) => {
 
     console.log({ orderCreated }, "*");
 
-    if (orderCreated?._id) {
-      let response = await addElementToHistorical(
-        async () => {
-          return await orderServices.addOrderToHistorical(
-            orderCreated._id,
-            {
-              orders: {
-                _id: orderCreated._id,
-                action: "CREATED",
-              },
-            },
-            req.token
-          );
-        },
-        async () => {
-           let elementDeleted = await orderServices.deleteTrustlyOrder({
-             _id: orderCreated._id,
-           });
-          console.log({ elementDeleted });
-          return elementDeleted;
-        }
-      );
+    // if (orderCreated?._id) {
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       return await orderServices.addOrderToHistorical(
+    //         orderCreated._id,
+    //         {
+    //           orders: {
+    //             _id: orderCreated._id,
+    //             action: "CREATED",
+    //           },
+    //         },
+    //         req.token
+    //       );
+    //     },
+    //     async () => {
+    //        let elementDeleted = await orderServices.deleteTrustlyOrder({
+    //          _id: orderCreated._id,
+    //        });
+    //       console.log({ elementDeleted });
+    //       return elementDeleted;
+    //     }
+    //   );
 
-      return closeRequest(
-        response,
-        res,
-        "Order has been created successfully!!!",
-        "Order has  been not creadted successfully,please try again later,thanks!!!"
-      );
-    } else {
-      res
-        .status(401)
-        .json({ message: "Order has been not created successfully!!!" });
-    }
+    //   return closeRequest(
+    //     response,
+    //     res,
+    //     "Order has been created successfully!!!",
+    //     "Order has  been not creadted successfully,please try again later,thanks!!!"
+    //   );
+    // } else {
+    //   res
+    //     .status(401)
+    //     .json({ message: "Order has been not created successfully!!!" });
+    // }
   } catch (error) {
     console.log(error, "x");
     return res

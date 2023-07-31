@@ -212,7 +212,7 @@ const fetchRecettes = async (req, res) => {
 const fetchrecettesByRestaurant = async (req, res) => {
   try {
     let recettes = await recetteServices.findRecettes({
-      "restaurant._id": req.params?.id,
+      "restaurant": req.params?.id,
     });
     res.status(200).json(recettes);
   } catch (error) {

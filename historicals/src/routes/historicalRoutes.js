@@ -14,7 +14,6 @@ const upload = uploadFileService.uploadMiddleFile();
 //Create historical
 historicalRouter.put(
   "/update/:_creator",
-  authmiddleware,
   upload.single("file"),
   updateHistorical
 );
