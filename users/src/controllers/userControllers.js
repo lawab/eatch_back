@@ -342,61 +342,62 @@ const deleteUser = async (req, res) => {
 
     if (userDeleted?.deletedAt) {
       // add new user create in historical
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await userService.addToHistorical(
-            userDeleted._creator._id,
-            {
-              users: {
-                _id: userDeleted?._id,
-                action: "DELETED",
-              },
-            },
-            req.token
-          );
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       let response = await userService.addToHistorical(
+    //         userDeleted._creator._id,
+    //         {
+    //           users: {
+    //             _id: userDeleted?._id,
+    //             action: "DELETED",
+    //           },
+    //         },
+    //         req.token
+    //       );
 
-          return response;
-        },
-        async () => {
-          // restore only fields would had changed in database
-          userDeleted["deletedAt"] = userCopy["deletedAt"];
-          userDeleted["updatedAt"] = userCopy["updatedAt"];
-          userDeleted["createdAt"] = userCopy["createdAt"];
+    //       return response;
+    //     },
+    //     async () => {
+    //       // restore only fields would had changed in database
+    //       userDeleted["deletedAt"] = userCopy["deletedAt"];
+    //       userDeleted["updatedAt"] = userCopy["updatedAt"];
+    //       userDeleted["createdAt"] = userCopy["createdAt"];
 
-          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          let userRestored = await userDeleted.save({ timestamps: false });
-          console.log({ userRestored });
-          return userRestored;
-        }
-      );
+    //       // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //       let userRestored = await userDeleted.save({ timestamps: false });
+    //       console.log({ userRestored });
+    //       return userRestored;
+    //     }
+    //   );
 
-      if (response?.status === 200) {
-        console.log({ response: response.data?.message });
-        return res
-          .status(200)
-          .json({ message: "User has been delete successfully!!!" });
-      } else {
-        return res.status(401).json({
-          message: "Delete user failed,please try again",
-        });
-      }
-    } else {
-      return res
-        .status(401)
-        .json({ message: "Delete user failed,please try again" });
+    //   if (response?.status === 200) {
+    //     console.log({ response: response.data?.message });
+    //     return res
+    //       .status(200)
+    //       .json({ message: "User has been delete successfully!!!" });
+    //   } else {
+    //     return res.status(401).json({
+    //       message: "Delete user failed,please try again",
+    //     });
+    //   }
+    // } else {
+    //   return res
+    //     .status(401)
+    //     .json({ message: "Delete user failed,please try again" });
+    res.status(200).json({"massage" : "User deleted successfully!!!"})
     }
   } catch (error) {
-    if (userDeleted && userCopy) {
-      // restore only fields would had changed in database
-      userDeleted["deletedAt"] = userCopy["deletedAt"];
-      userDeleted["updatedAt"] = userCopy["updatedAt"];
-      userDeleted["createdAt"] = userCopy["createdAt"];
+    // if (userDeleted && userCopy) {
+    //   // restore only fields would had changed in database
+    //   userDeleted["deletedAt"] = userCopy["deletedAt"];
+    //   userDeleted["updatedAt"] = userCopy["updatedAt"];
+    //   userDeleted["createdAt"] = userCopy["createdAt"];
 
-      // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      let userRestored = await userDeleted.save({ timestamps: false });
-      console.log({ userRestored });
-      return userRestored;
-    }
+    //   // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //   let userRestored = await userDeleted.save({ timestamps: false });
+    //   console.log({ userRestored });
+    //   return userRestored;
+    // }
     console.log(error);
     res.status(500).json({ message: "Error occured during delete request!!" });
   }

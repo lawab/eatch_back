@@ -220,59 +220,60 @@ const deletePromotion = async (req, res) => {
 
     // promotion exits and had deleted successfully
     if (promotionDeleted?.deletedAt) {
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await promotionServices.addPromotionToHistorical(
-            creator?._id,
-            {
-              promotions: {
-                _id: promotionDeleted?._id,
-                action: "DELETED",
-              },
-            },
-            req.token
-          );
+      // let response = await addElementToHistorical(
+      //   async () => {
+      //     let response = await promotionServices.addPromotionToHistorical(
+      //       creator?._id,
+      //       {
+      //         promotions: {
+      //           _id: promotionDeleted?._id,
+      //           action: "DELETED",
+      //         },
+      //       },
+      //       req.token
+      //     );
 
-          return response;
-        },
-        async () => {
-          // restore only fields would had changed in database
-          promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
-          promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
-          promotionDeleted["createdAt"] = promotionCopy["createdAt"];
+      //     return response;
+      //   },
+      //   async () => {
+      //     // restore only fields would had changed in database
+      //     promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
+      //     promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
+      //     promotionDeleted["createdAt"] = promotionCopy["createdAt"];
 
-          let promotionRestored = await promotionDeleted.save({
-            timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          console.log({ promotionRestored });
-          return promotionRestored;
-        }
-      );
+      //     let promotionRestored = await promotionDeleted.save({
+      //       timestamps: false,
+      //     }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      //     console.log({ promotionRestored });
+      //     return promotionRestored;
+      //   }
+      // );
 
-      if (response.status === 200) {
-        return res
-          .status(200)
-          .json({ message: "Promotion has been deleted successfully!!!" });
-      } else {
-        return res.status(500).json({
-          message:
-            "Deleting of promotion failled,please try again later,thanks!!!",
-        });
-      }
+      // if (response.status === 200) {
+      //   return res
+      //     .status(200)
+      //     .json({ message: "Promotion has been deleted successfully!!!" });
+      // } else {
+      //   return res.status(500).json({
+      //     message:
+      //       "Deleting of promotion failled,please try again later,thanks!!!",
+      //   });
+      // }
+      res.status(200).json({"message" : "Promotion deleted successfully!!!"})
     }
   } catch (error) {
-    if (promotionDeleted && promotionCopy) {
-      // restore only fields would had changed in database
-      promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
-      promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
-      promotionDeleted["createdAt"] = promotionCopy["createdAt"];
+    // if (promotionDeleted && promotionCopy) {
+    //   // restore only fields would had changed in database
+    //   promotionDeleted["deletedAt"] = promotionCopy["deletedAt"];
+    //   promotionDeleted["updatedAt"] = promotionCopy["updatedAt"];
+    //   promotionDeleted["createdAt"] = promotionCopy["createdAt"];
 
-      let promotionRestored = await promotionDeleted.save({
-        timestamps: false,
-      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      console.log({ promotionRestored });
-      return promotionRestored;
-    }
+    //   let promotionRestored = await promotionDeleted.save({
+    //     timestamps: false,
+    //   }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //   console.log({ promotionRestored });
+    //   return promotionRestored;
+    // }
     console.log(error.message);
     return res.status(500).json({
       message: "Error occured during the deletion of promotion!!!",

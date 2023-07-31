@@ -44,7 +44,7 @@ const recetteSchemaObject = {
   title: { type: String, required: true, maxlength: 50 },
   restaurant: { type: String},
   image: { type: String, default: "/datas/avatar.png" },
-  description: { type: String, required: true, maxlength: 50 },
+  description: { type: String},
   engredients: {
     required: true,
     type: [
