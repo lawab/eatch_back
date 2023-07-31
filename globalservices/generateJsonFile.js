@@ -131,6 +131,7 @@ const addProductFromJsonFile = async (restaurantId, token) => {
             p["deletedAt"] = "null";
             p["createdAt"] = product.createdAt;
             p["recette"] = product.recette;
+            p["description"] = product.description;
             p["updatedAt"] = product.updatedAt;
             p["quantity"] = Math.floor(Math.random() * 50).toString();
             return p;
