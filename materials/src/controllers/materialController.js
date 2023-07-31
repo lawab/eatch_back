@@ -22,46 +22,47 @@ const createMaterial = async (req, res) => {
     console.log({ newMaterial }, "*");
 
     if (newMaterial) {
-      let response = await addElementToHistorical(
-        async () => {
-          return await materialServices.addMaterialToHistorical(
-            newMaterial._creator._id,
-            {
-              materials: {
-                _id: newMaterial._id,
-                action: "CREATED",
-              },
-            },
-            req.token
-          );
-        },
-        async () => {
-          let elementDeleted = await materialServices.deleteTrustlyMaterial({
-            _id: newMaterial?._id,
-          });
-          console.log({ elementDeleted });
-          return elementDeleted;
-        }
-      );
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       return await materialServices.addMaterialToHistorical(
+    //         newMaterial._creator._id,
+    //         {
+    //           materials: {
+    //             _id: newMaterial._id,
+    //             action: "CREATED",
+    //           },
+    //         },
+    //         req.token
+    //       );
+    //     },
+    //     async () => {
+    //       let elementDeleted = await materialServices.deleteTrustlyMaterial({
+    //         _id: newMaterial?._id,
+    //       });
+    //       console.log({ elementDeleted });
+    //       return elementDeleted;
+    //     }
+    //   );
 
-      return closeRequest(
-        response,
-        res,
-        "Material has been created successfully!!!",
-        "Create Material failed,please try again"
-      );
-    } else {
-      res
-        .status(200)
-        .json({ message: "Create Material failed,please try again" });
+    //   return closeRequest(
+    //     response,
+    //     res,
+    //     "Material has been created successfully!!!",
+    //     "Create Material failed,please try again"
+    //   );
+    // } else {
+    //   res
+    //     .status(200)
+    //     .json({ message: "Create Material failed,please try again" });
+      res.status(200).json({"message" : "Material created successfully!!!"})
     }
   } catch (error) {
-    if (newMaterial) {
-      let elementDeleted = await materialServices.deleteTrustlyMaterial({
-        _id: newMaterial?._id,
-      });
-      console.log({ elementDeleted });
-    }
+    // if (newMaterial) {
+    //   let elementDeleted = await materialServices.deleteTrustlyMaterial({
+    //     _id: newMaterial?._id,
+    //   });
+    //   console.log({ elementDeleted });
+    // }
 
     console.log(error, "x");
 

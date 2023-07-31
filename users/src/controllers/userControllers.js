@@ -30,51 +30,52 @@ const createUser = async (req, res) => {
     newuser = await userService.createUser(bodyUpdate);
 
     if (newuser) {
-      // add new user create in historical
-      let response = await addElementToHistorical(
-        async () => {
-          return await userService.addToHistorical(
-            newuser._creator._id,
-            {
-              users: {
-                _id: newuser._id,
-                action: "CREATED",
-              },
-            },
-            req.token
-          );
-        },
-        async () => {
-          let elementDeleted = await userService.deleteTrustlyUser({
-            _id: newuser._id,
-          });
-          console.log({ elementDeleted });
-        }
-      );
+    //   // add new user create in historical
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       return await userService.addToHistorical(
+    //         newuser._creator._id,
+    //         {
+    //           users: {
+    //             _id: newuser._id,
+    //             action: "CREATED",
+    //           },
+    //         },
+    //         req.token
+    //       );
+    //     },
+    //     async () => {
+    //       let elementDeleted = await userService.deleteTrustlyUser({
+    //         _id: newuser._id,
+    //       });
+    //       console.log({ elementDeleted });
+    //     }
+    //   );
 
-      if (response?.status === 200) {
-        console.log({ response: response.data?.message });
-        return res
-          .status(200)
-          .json({ message: "User has been created successfully!!!" });
-      } else {
-        return res.status(401).json({
-          message: "Created User failed,please try again!!!",
-        });
-      }
-    } else {
-      res
-        .status(401)
-        .json({ message: "Created User failed,please try again!!!" });
+    //   if (response?.status === 200) {
+    //     console.log({ response: response.data?.message });
+    //     return res
+    //       .status(200)
+    //       .json({ message: "User has been created successfully!!!" });
+    //   } else {
+    //     return res.status(401).json({
+    //       message: "Created User failed,please try again!!!",
+    //     });
+    //   }
+    // } else {
+    //   res
+    //     .status(401)
+    //     .json({ message: "Created User failed,please try again!!!" });
+      res.status(200).json({"message" : "User created successfully!!!"})
     }
   } catch (err) {
     console.log({ err });
-    if (newuser) {
-      let elementDeleted = await userService.deleteTrustlyUser({
-        _id: newuser._id,
-      });
-      console.log({ elementDeleted });
-    }
+    // if (newuser) {
+    //   let elementDeleted = await userService.deleteTrustlyUser({
+    //     _id: newuser._id,
+    //   });
+    //   console.log({ elementDeleted });
+    // }
     res
       .status(500)
       .json({ message: "Error occured during creation of user!!!" });
@@ -229,59 +230,60 @@ const UpdateUser = async (req, res) => {
 
     if (userUpdated) {
       // add new user create in historical
-      let response = await addElementToHistorical(
-        async () => {
-          return await userService.addToHistorical(
-            userUpdated._creator._id,
-            {
-              users: {
-                _id: userUpdated._id,
-                action: "UPDATED",
-              },
-            },
-            req.token
-          );
-        },
-        async () => {
-          for (const field in bodyCopy) {
-            if (Object.hasOwnProperty.call(bodyCopy, field)) {
-              userUpdated[field] = bodyCopy[field];
-            }
-          }
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       return await userService.addToHistorical(
+    //         userUpdated._creator._id,
+    //         {
+    //           users: {
+    //             _id: userUpdated._id,
+    //             action: "UPDATED",
+    //           },
+    //         },
+    //         req.token
+    //       );
+    //     },
+    //     async () => {
+    //       for (const field in bodyCopy) {
+    //         if (Object.hasOwnProperty.call(bodyCopy, field)) {
+    //           userUpdated[field] = bodyCopy[field];
+    //         }
+    //       }
 
-          // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          let userRestored = await userUpdated.save({ timestamps: false });
-          console.log({ userRestored });
-          return userRestored;
-        }
-      );
+    //       // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //       let userRestored = await userUpdated.save({ timestamps: false });
+    //       console.log({ userRestored });
+    //       return userRestored;
+    //     }
+    //   );
 
-      if (response?.status === 200) {
-        console.log({ response: response.data?.message });
-        return res
-          .status(200)
-          .json({ message: "User has been updated successfully!!!" });
-      } else {
-        return res.status(401).json({
-          message: "Update user failed,please try again!!!",
-        });
-      }
-    } else {
-      res.status(401).json({
-        message: "Update user failed,please try again!!!",
-      });
+    //   if (response?.status === 200) {
+    //     console.log({ response: response.data?.message });
+    //     return res
+    //       .status(200)
+    //       .json({ message: "User has been updated successfully!!!" });
+    //   } else {
+    //     return res.status(401).json({
+    //       message: "Update user failed,please try again!!!",
+    //     });
+    //   }
+    // } else {
+    //   res.status(401).json({
+    //     message: "Update user failed,please try again!!!",
+    //   });
+      res.status(200).json({"message" : "User updated successfully!!!"})
     }
   } catch (error) {
-    if (userUpdated && bodyCopy) {
-      for (const field in bodyCopy) {
-        if (Object.hasOwnProperty.call(bodyCopy, field)) {
-          userUpdated[field] = bodyCopy[field];
-        }
-      }
+    // if (userUpdated && bodyCopy) {
+    //   for (const field in bodyCopy) {
+    //     if (Object.hasOwnProperty.call(bodyCopy, field)) {
+    //       userUpdated[field] = bodyCopy[field];
+    //     }
+    //   }
       // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      let userRestored = await userUpdated.save({ timestamps: false });
-      console.log({ userRestored });
-    }
+      // let userRestored = await userUpdated.save({ timestamps: false });
+      // console.log({ userRestored });
+    
     console.log({ error }, "x");
     // if error occured,remove user created if exists in database
     res.status(500).json({ message: "Error occured during delete request!!" });

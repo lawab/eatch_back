@@ -64,61 +64,71 @@ const createCategory = async (req, res) => {
 
     if (category) {
       // add new user create in historical
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await api_consumer.addToHistorical(
-            category._creator._id,
-            {
-              categories: {
-                _id: category._id,
-                action: "CREATED",
-              },
-            },
-            req.token
-          );
+      //   let response = await addElementToHistorical(
+      //     async () => {
+      //       let response = await api_consumer.addToHistorical(
+      //         category._creator._id,
+      //         {
+      //           categories: {
+      //             _id: category._id,
+      //             action: "CREATED",
+      //           },
+      //         },
+      //         req.token
+      //       );
 
-          let { content } = await addProductFromJsonFile(
-            restaurant._id,
-            req.token
-          );
-          console.log({
-            content: JSON.parse(content),
-          });
+      //       let { content } = await addProductFromJsonFile(
+      //         restaurant._id,
+      //         req.token
+      //       );
+      //       console.log({
+      //         content: JSON.parse(content),
+      //       });
 
-          await shellService(restaurant._id, req.token);
+      //       await shellService(restaurant._id, req.token);
 
-          return response;
-        },
-        async () => {
-          let elementDeleted = await categoryService.deleteTrustlyCategory({
-            _id: category._id,
-          });
-          console.log({ elementDeleted });
-        }
-      );
+      //       return response;
+      //     },
+      //     async () => {
+      //       let elementDeleted = await categoryService.deleteTrustlyCategory({
+      //         _id: category._id,
+      //       });
+      //       console.log({ elementDeleted });
+      //     }
+      //   );
 
-      if (response?.status === 200) {
-        console.log({ response: response.data?.message });
-        return res
-          .status(200)
-          .json({ message: "Category has been created successfully!!!" });
-      } else {
-        return res.status(401).json({
-          message: "Created Category failed,please try again!!!",
-        });
-      }
-    } else {
-      res
-        .status(401)
-        .json({ message: "Created Category failed,please try again!!!" });
+      //   if (response?.status === 200) {
+      //     console.log({ response: response.data?.message });
+      //     return res
+      //       .status(200)
+      //       .json({ message: "Category has been created successfully!!!" });
+      //   } else {
+      //     return res.status(401).json({
+      //       message: "Created Category failed,please try again!!!",
+      //     });
+      //   }
+      // } else {
+      //   res
+      //     .status(401)
+      //     .json({ message: "Created Category failed,please try again!!!" });
+            let { content } = await addProductFromJsonFile(
+              restaurant._id,
+              req.token
+            );
+            console.log({
+              content: JSON.parse(content),
+            });
+
+            await shellService(restaurant._id, req.token);
+      res.status(200).json({ message: "category created successfully!!!" });
     }
   } catch (error) {
-    if (category) {
-      let elementDeleted = await categoryService.deleteTrustlyCategory({
-        _id: category._id,
-      });
-      console.log({ elementDeleted });
-    }
+    // if (category) {
+    //   let elementDeleted = await categoryService.deleteTrustlyCategory({
+    //     _id: category._id,
+    //   });
+    //   console.log({ elementDeleted });
+    // }
     console.log(error);
     res.status(500).json({ message: "Error encounterd creating Category!!!" });
   }
