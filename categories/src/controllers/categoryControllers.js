@@ -154,7 +154,8 @@ const updateCategory = async (req, res) => {
       newCategory.restaurant_id,
       req.token
     );
-
+    console.log("#########################");
+    console.log(req);
     if (req.file) {
       console.log("********************");
       console.log(req.file);
