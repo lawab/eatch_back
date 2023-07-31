@@ -12,6 +12,8 @@ module.exports = async (recetteServices, body, token) => {
   // verify restaurant in database
   let restaurant = await recetteServices.getRestaurant(body?.restaurant, token);
 
+  console.log("**************: ")
+  console.log(body)
   if (!restaurant?._id) {
     throw new Error(errorMessage("restaurant"));
   }

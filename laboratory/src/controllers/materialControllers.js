@@ -92,7 +92,7 @@ const updateMaterial = async (req, res) =>{
             firstName: user.data.firstName,
             lastName: user.data.lastName
         }
-        body.creator = creator;
+        body.creator = creator._id;
         const material = await materialService.updateMaterialById(req.params.materialId, body);
         res.status(200).json({"message" : "Material updated successfuly!!!"});
     }

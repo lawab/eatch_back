@@ -28,13 +28,16 @@ const rawType = {
   unit: { type: String },
   lifetime: { type: Date },
   image: { type: String },
-  _creator: {
-    _id: { type: String },
-    role: { type: String },
-    email: { type: String },
-    firstName: { type: String },
-    lastName: { type: String },
-  },
+  // _creator: {
+  //   _id: { type: String },
+  //   role: { type: String },
+  //   email: { type: String },
+  //   firstName: { type: String },
+  //   lastName: { type: String },
+  // },
+  // _creator: {
+  //   type: mongoose.Types.ObjectId,
+  // },
   laboratory: {
     type: mongoose.Types.ObjectId,
   },

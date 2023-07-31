@@ -25,7 +25,7 @@ const createRecette = async (req, res) => {
         message: "invalid data send!!!",
       });
     }
-    body["_creator"] = creator?._id;
+    body["_creator"] = creator._id;
 
     body = await setForeignFieldsValue(recetteServices, body, req.token);
 
@@ -87,7 +87,10 @@ const updateRecette = async (req, res) => {
         });
       }
       body = await updateForeignFields(recetteServices, body, req.token);
-
+      // add image from recette
+      body["image"] = req.file
+        ? "/datas/" + req.file?.filename
+        : "/datas/avatar.png";
       // update all valid fields before save it in database
       for (let key in body) {
         if (fieldsRequired.includes(key)) {

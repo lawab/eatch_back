@@ -98,7 +98,7 @@ const updateRaw = async (req, res) =>{
             firstName: user.data.firstName,
             lastName: user.data.lastName
         }
-        body.creator = creator;
+        body.creator = creator._id;
         const raw = await rawService.updateRawById(req.params.rawId, body);
         res.status(200).json({"message" : "Raw updated successfuly!!!"});
     }
