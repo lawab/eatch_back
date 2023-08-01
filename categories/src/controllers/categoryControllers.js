@@ -141,7 +141,8 @@ const updateCategory = async (req, res) => {
 
     const body = JSON.parse(req.headers.body);
     // const body = req.body;
-
+    console.log("#########################");
+    console.log(req);
     const user = await api_consumer.getUserById(body._creator, req.token);
 
     const newCategory = {
