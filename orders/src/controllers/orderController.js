@@ -18,6 +18,7 @@ const createOrderversion2 = async (req, res) => {
     //console.log(body)
     const menu = body.menus
     const products = body.products
+    const total_cost = body.adition
     for (let i = 0; i < menu.length; i++){
       const menuFound = await api_consumer.getMenuById(menu[i]._id);
       // if (!menuFound) {
@@ -33,6 +34,7 @@ const createOrderversion2 = async (req, res) => {
     //console.log(menu)
 
     const order = {
+      total_cost: total_cost.totale,
       products: products,
       menus: menus
     }

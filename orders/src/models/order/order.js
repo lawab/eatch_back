@@ -138,6 +138,7 @@ const OrderschemaObject = {
     type: String,
     default: null,
   },
+  total_cost: { type: Number },
   is_tracking: { type: Boolean, default: false },
   client: { type: clientType },
   restaurant: {
