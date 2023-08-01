@@ -131,69 +131,79 @@ const updateMenu = async (req, res) => {
     console.log({ menusaved });
 
     if (menusaved?._id) {
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await menuServices.addMenuToHistorical(
-            menusaved._creator._id,
-            {
-              menus: {
-                _id: menusaved._id,
-                action: "UPDATED",
-              },
-            },
-            req.token
-          );
+    //   let response = await addElementToHistorical(
+    //     async () => {
+    //       let response = await menuServices.addMenuToHistorical(
+    //         menusaved._creator._id,
+    //         {
+    //           menus: {
+    //             _id: menusaved._id,
+    //             action: "UPDATED",
+    //           },
+    //         },
+    //         req.token
+    //       );
 
-          let { content } = await addProductFromJsonFile(
-            bodyUpdated.restaurant._id,
-            req.token
-          );
-          console.log({ content: JSON.parse(content) });
+    //       let { content } = await addProductFromJsonFile(
+    //         bodyUpdated.restaurant._id,
+    //         req.token
+    //       );
+    //       console.log({ content: JSON.parse(content) });
 
-          await shellService(bodyUpdated.restaurant._id, req.token);
+    //       await shellService(bodyUpdated.restaurant._id, req.token);
 
-          return response;
-        },
-        async () => {
-          for (const field in menuCopy) {
-            if (Object.hasOwnProperty.call(menuCopy, field)) {
-              menusaved[field] = menuCopy[field];
-            }
-          }
-          let menuRestored = await menusaved.save({
-            timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          console.log({ menuRestored });
-          return menuRestored;
-        }
-      );
+    //       return response;
+    //     },
+    //     async () => {
+    //       for (const field in menuCopy) {
+    //         if (Object.hasOwnProperty.call(menuCopy, field)) {
+    //           menusaved[field] = menuCopy[field];
+    //         }
+    //       }
+    //       let menuRestored = await menusaved.save({
+    //         timestamps: false,
+    //       }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //       console.log({ menuRestored });
+    //       return menuRestored;
+    //     }
+    //   );
       
       
-      if (response?.status === 200) {
-    console.log({ response: response.data?.message });
-    return res.status(200).json({ message: "Menu has been updated successfully!!!" });
-  } else {
-    return res.status(401).json({ message: "Menu has not been Updated successfully,please try again later,thanks!!!" });
-  }
+    //   if (response?.status === 200) {
+    // console.log({ response: response.data?.message });
+    
+  // } else {
+  //   return res.status(401).json({ message: "Menu has not been Updated successfully,please try again later,thanks!!!" });
+  // }
 
      
-    } else {
-      return res.status(401).json({
-        message: "menu has been not updated successfully!!!",
-      });
+  //   } else {
+  //     return res.status(401).json({
+  //       message: "menu has been not updated successfully!!!",
+  //     });
+        let { content } = await addProductFromJsonFile(
+          bodyUpdated.restaurant._id,
+          req.token
+        );
+        console.log({ content: JSON.parse(content) });
+
+        await shellService(bodyUpdated.restaurant._id, req.token);
+        return res
+          .status(200)
+          .json({ message: "Menu has been updated successfully!!!" });
     }
   } catch (error) {
-    if (menuCopy && menusaved) {
-      for (const field in menuCopy) {
-        if (Object.hasOwnProperty.call(menuCopy, field)) {
-          menusaved[field] = menuCopy[field];
-        }
-      }
-      let menuRestored = await menusaved.save({
-        timestamps: false,
-      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-      console.log({ menuRestored });
-    }
+    // if (menuCopy && menusaved) {
+    //   for (const field in menuCopy) {
+    //     if (Object.hasOwnProperty.call(menuCopy, field)) {
+    //       menusaved[field] = menuCopy[field];
+    //     }
+    //   }
+    //   let menuRestored = await menusaved.save({
+    //     timestamps: false,
+    //   }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    //   console.log({ menuRestored });
+    // }
     console.log(error.message, "x");
     res.status(500).json({
       message: "Error(s) occured during the update Menu!!!",
@@ -247,63 +257,73 @@ const deleteMenu = async (req, res) => {
     console.log({ MenuDeleted });
 
     if (MenuDeleted?.deletedAt) {
-      let response = await addElementToHistorical(
-        async () => {
-          let response = await menuServices.addMenuToHistorical(
-            MenuDeleted._creator._id,
-            {
-              menus: {
-                _id: MenuDeleted._id,
-                action: "DELETED",
-              },
-            },
-            req.token
-          );
+      // let response = await addElementToHistorical(
+      //   async () => {
+      //     let response = await menuServices.addMenuToHistorical(
+      //       MenuDeleted._creator._id,
+      //       {
+      //         menus: {
+      //           _id: MenuDeleted._id,
+      //           action: "DELETED",
+      //         },
+      //       },
+      //       req.token
+      //     );
 
-          let { content } = await addProductFromJsonFile(
-            MenuDeleted.restaurant._id,
-            req.token
-          );
-          console.log({ content: JSON.parse(content) });
+      //     let { content } = await addProductFromJsonFile(
+      //       MenuDeleted.restaurant._id,
+      //       req.token
+      //     );
+      //     console.log({ content: JSON.parse(content) });
 
-          await shellService(MenuDeleted.restaurant._id, req.token);
+      //     await shellService(MenuDeleted.restaurant._id, req.token);
 
-          return response;
-        },
-        async () => {
-          // restore only fields would had changed in database
-          MenuDeleted["deletedAt"] = menuCopy["deletedAt"];
-          MenuDeleted["updatedAt"] = menuCopy["updatedAt"];
-          MenuDeleted["createdAt"] = menuCopy["createdAt"];
-          let menuRestored = await MenuDeleted.save({
-            timestamps: false,
-          }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
-          console.log({ menuRestored });
-          return menuRestored;
-        }
-      );
+      //     return response;
+      //   },
+      //   async () => {
+      //     // restore only fields would had changed in database
+      //     MenuDeleted["deletedAt"] = menuCopy["deletedAt"];
+      //     MenuDeleted["updatedAt"] = menuCopy["updatedAt"];
+      //     MenuDeleted["createdAt"] = menuCopy["createdAt"];
+      //     let menuRestored = await MenuDeleted.save({
+      //       timestamps: false,
+      //     }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+      //     console.log({ menuRestored });
+      //     return menuRestored;
+      //   }
+      // );
 
-      return closeRequest(
-        response,
-        res,
-        "Menu has been delete successfully!!!",
-        "Menu has not been delete successfully,please try again later,thanks!!!"
-      );
-    } else {
-      return res.status(500).json({ message: "deletion of menu failed" });
-    }
+      // return closeRequest(
+      //   response,
+      //   res,
+      //   "Menu has been delete successfully!!!",
+      //   "Menu has not been delete successfully,please try again later,thanks!!!"
+      // );
+    // } else {
+    //   return res.status(500).json({ message: "deletion of menu failed" });
+       let { content } = await addProductFromJsonFile(
+         MenuDeleted.restaurant._id,
+         req.token
+       );
+       console.log({ content: JSON.parse(content) });
+
+      await shellService(MenuDeleted.restaurant._id, req.token);
+      return res
+        .status(200)
+        .json({ message: "Menu has been deleted successfully!!!" });
+     }
   } catch (error) {
-    if (MenuDeleted && menuCopy) {
-      // restore only fields would had changed in database
-      MenuDeleted["deletedAt"] = menuCopy["deletedAt"];
-      MenuDeleted["updatedAt"] = menuCopy["updatedAt"];
-      MenuDeleted["createdAt"] = menuCopy["createdAt"];
-      let menuRestored = await MenuDeleted.save({
-        timestamps: false,
-      }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
+    // if (MenuDeleted && menuCopy) {
+    //   // restore only fields would had changed in database
+    //   MenuDeleted["deletedAt"] = menuCopy["deletedAt"];
+    //   MenuDeleted["updatedAt"] = menuCopy["updatedAt"];
+    //   MenuDeleted["createdAt"] = menuCopy["createdAt"];
+    //   let menuRestored = await MenuDeleted.save({
+    //     timestamps: false,
+    //   }); // restore Object in database,not update timestamps because it is restoration from olds values fields in database
 
-      console.log({ menuRestored });
-    }
+    //   console.log({ menuRestored });
+    // }
     console.log(error.message);
     return res
       .status(500)
