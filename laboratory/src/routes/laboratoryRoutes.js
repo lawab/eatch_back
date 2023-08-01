@@ -38,10 +38,10 @@ laboratoryRouter.put(
 );
 
 //get one Laboratory
-laboratoryRouter.get("/fetch/one/:id", authmiddleware, fetchOneLaboratory);
+laboratoryRouter.get("/fetch/one/:id", fetchOneLaboratory);
 
 //get all Laboratory
-laboratoryRouter.get("/fetch/all", authmiddleware, fetchLaboratories);
+laboratoryRouter.get("/fetch/all", fetchLaboratories);
 
 //add provider
 laboratoryRouter.put(
