@@ -26,15 +26,15 @@ providerRouter.patch('/delete/:providerId', auth.authmiddleware, controller.dele
 //**************************************** *// 
 
 //************GET A PROVIDER********************
-providerRouter.get('/fetch/one/:providerId', auth.authmiddleware, controller.getProvider);
+providerRouter.get('/fetch/one/:providerId', controller.getProvider);
 //**************************************** *// 
 
 //************GET A PROVIDER BY LABORATORYID********************
-providerRouter.get('/fetch/laboratories/:laboratoryId', auth.authmiddleware, controller.getProviderLaboratory);
+providerRouter.get('/fetch/laboratories/:laboratoryId', controller.getProviderLaboratory);
 //**************************************** *// 
 
 //************GET ALL PROVIDERS********************
-providerRouter.get("/fetch/all", auth.authmiddleware, controller.getProviders);
+providerRouter.get("/fetch/all", controller.getProviders);
 //**************************************** *//
 
 //Export route to be used on another place

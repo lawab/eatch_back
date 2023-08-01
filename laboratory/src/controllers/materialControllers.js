@@ -14,12 +14,12 @@ const createMaterial = async (req, res) =>{
         console.log("ENTER########");
         console.log(body);
         body.image = req.file ? "/datas/" + req.file.filename : "";
-        const token = req.token;
-        const user = await api_consumer.getUserById(body._creator, req.token);
-        if(!user){
-            console.log("User not authenticated!!!")
-            return res.status(401).json({"message" : "User not authenticated!!!"});
-        }
+        //const token = req.token;
+        // const user = await api_consumer.getUserById(body._creator, req.token);
+        // if(!user){
+        //     console.log("User not authenticated!!!")
+        //     return res.status(401).json({"message" : "User not authenticated!!!"});
+        // }
         console.log("PASS 1########")
         const laboratory = await laboratoryService.getLaboratoryById(body.laboratoryId);
         if(!laboratory){
@@ -80,19 +80,19 @@ const updateMaterial = async (req, res) =>{
         body.image = "/datas/" + req.file.filename;
     }
     try{
-        const user = await api_consumer.getUserById(body._creator, req.token);
-        if(!user){
-           return res.status(401).json({"message" : "User not authenticated!!!"});
-        }
-        const creator = {
-            _id: user.data._id,
-            email: user.data.email,
-            role: user.data.role,
-            fullName: user.data.fullName,
-            firstName: user.data.firstName,
-            lastName: user.data.lastName
-        }
-        body.creator = creator._id;
+        // const user = await api_consumer.getUserById(body._creator, req.token);
+        // if(!user){
+        //    return res.status(401).json({"message" : "User not authenticated!!!"});
+        // }
+        // const creator = {
+        //     _id: user.data._id,
+        //     email: user.data.email,
+        //     role: user.data.role,
+        //     fullName: user.data.fullName,
+        //     firstName: user.data.firstName,
+        //     lastName: user.data.lastName
+        // }
+        // body.creator = creator._id;
         const material = await materialService.updateMaterialById(req.params.materialId, body);
         res.status(200).json({"message" : "Material updated successfuly!!!"});
     }

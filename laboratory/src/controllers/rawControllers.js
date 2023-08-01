@@ -15,11 +15,11 @@ const createRaw = async (req, res) =>{
         console.log(body);
         body.image = req.file ? "/datas/" + req.file.filename : "";
         const token = req.token;
-        const user = await api_consumer.getUserById(body._creator, req.token);
-        if(!user){
-            console.log("User not authenticated!!!")
-            return res.status(401).json({"message" : "User not authenticated!!!"});
-        }
+        // const user = await api_consumer.getUserById(body._creator, req.token);
+        // if(!user){
+        //     console.log("User not authenticated!!!")
+        //     return res.status(401).json({"message" : "User not authenticated!!!"});
+        // }
         console.log("PASS 1########")
         const laboratory = await laboratoryService.getLaboratoryById(body.laboratoryId);
         if(!laboratory){
@@ -32,15 +32,15 @@ const createRaw = async (req, res) =>{
         //     description: subject.data.description,
         // }
         console.log("PASS 2########");
-        const creator = {
-            _id: user.data._id,
-            email: user.data.email,
-            role: user.data.role,
-            fullName: user.data.fullName,
-            firstName: user.data.firstName,
-            lastName: user.data.lastName
-        }
-        body.creator = creator;
+        // const creator = {
+        //     _id: user.data._id,
+        //     email: user.data.email,
+        //     role: user.data.role,
+        //     fullName: user.data.fullName,
+        //     firstName: user.data.firstName,
+        //     lastName: user.data.lastName
+        // }
+        // body.creator = creator;
         body.laboratory = laboratory.id;
         body.provider = body.providerId;
         
@@ -84,21 +84,21 @@ const updateRaw = async (req, res) =>{
         body.image = "/datas/" + req.file.filename;
     }
     try{
-        const user = await api_consumer.getUserById(body._creator, req.token);
-        if(!user){
-           return res.status(401).json({"message" : "User not authenticated!!!"});
-        }
-        console.log("###########USEEEEERRRR:")
-        console.log(user.data)
-        const creator = {
-            _id: user.data._id,
-            email: user.data.email,
-            role: user.data.role,
-            fullName: user.data.fullName,
-            firstName: user.data.firstName,
-            lastName: user.data.lastName
-        }
-        body.creator = creator._id;
+        // const user = await api_consumer.getUserById(body._creator, req.token);
+        // if(!user){
+        //    return res.status(401).json({"message" : "User not authenticated!!!"});
+        // }
+        // console.log("###########USEEEEERRRR:")
+        // console.log(user.data)
+        // const creator = {
+        //     _id: user.data._id,
+        //     email: user.data.email,
+        //     role: user.data.role,
+        //     fullName: user.data.fullName,
+        //     firstName: user.data.firstName,
+        //     lastName: user.data.lastName
+        // }
+        // body.creator = creator._id;
         const raw = await rawService.updateRawById(req.params.rawId, body);
         res.status(200).json({"message" : "Raw updated successfuly!!!"});
     }

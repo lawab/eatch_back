@@ -10,11 +10,11 @@ const upload = uploadFileService.uploadMiddleFile();
 
 
 //************CREATE RAW********************
-materialRouter.post('/create', auth.authmiddleware, upload.single('file'), controller.createMaterial);
+materialRouter.post('/create', upload.single('file'), controller.createMaterial);
 //**************************************** *//  
 
 //************UPDATE RAW********************
-materialRouter.patch('/update/:materialId', auth.authmiddleware, upload.single('file'), controller.updateMaterial);
+materialRouter.patch('/update/:materialId', upload.single('file'), controller.updateMaterial);
 //**************************************** *// 
 
 // //************VALIDATE RAW********************
@@ -22,19 +22,19 @@ materialRouter.patch('/update/:materialId', auth.authmiddleware, upload.single('
 // //**************************************** *// 
 
 //************DELETE RAW********************
-materialRouter.patch('/delete/:materialId', auth.authmiddleware, controller.deleteMaterial);
+materialRouter.patch('/delete/:materialId', controller.deleteMaterial);
 //**************************************** *// 
 
 //************GET A RAW********************
-materialRouter.get('/fetch/one/:materialId', auth.authmiddleware, controller.getMaterial);
+materialRouter.get('/fetch/one/:materialId', controller.getMaterial);
 //**************************************** *// 
 
 //************GET A RAW BY LABORATORYID********************
-materialRouter.get('/fetch/laboratories/:laboratoryId', auth.authmiddleware, controller.getMaterialLaboratory);
+materialRouter.get('/fetch/laboratories/:laboratoryId', controller.getMaterialLaboratory);
 //**************************************** *// 
 
 //************GET ALL RAWS********************
-materialRouter.get("/fetch/all", auth.authmiddleware, controller.getMaterials);
+materialRouter.get("/fetch/all", controller.getMaterials);
 //**************************************** *//
 
 //Export route to be used on another place
