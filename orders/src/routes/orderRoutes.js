@@ -41,8 +41,6 @@ orderRouter.get(
 //update product
 orderRouter.put(
   "/update/:id",
-  authmiddleware,
-  upload.single("file"),
   updateOrder
 );
 
