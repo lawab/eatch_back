@@ -52,10 +52,10 @@ laboratoryRouter.put(
 );
 
 //update providing
-laboratoryRouter.patch("/updateProviding", authmiddleware, updateProvidingLaboratory);
+laboratoryRouter.patch("/updateProviding", updateProvidingLaboratory);
 
 //update manufacturing
-laboratoryRouter.patch("/updateManufacturing", authmiddleware, updateManufacturingLaboratory);
+laboratoryRouter.patch("/updateManufacturing", updateManufacturingLaboratory);
 
 //Add requesting from Restaurant
 laboratoryRouter.patch(
