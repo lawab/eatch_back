@@ -21,6 +21,9 @@ menuRouter.delete("/delete/:id", authmiddleware, deleteMenu);
 //get menu
 menuRouter.get("/fetch/one/:id", authmiddleware, fetchMenu);
 
+//get menu without connecting
+menuRouter.get("/fetch/uno/:id", fetchMenu);
+
 //get menus
 menuRouter.get(["/fetch/all", "/fetch/all/:ids"], authmiddleware, fetchMenus);
 

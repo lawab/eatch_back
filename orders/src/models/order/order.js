@@ -83,7 +83,7 @@ const productType = {
   },
 };
 const clientType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId},
   fisrtName: {
     type: String,
     maxlenght: 50,
@@ -107,7 +107,7 @@ const menuType = {
   menu_title: { type: String },
   restaurant: {
     type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId},
       restaurant_name: String,
       infos: {
         town: { type: String },
@@ -153,15 +153,15 @@ const OrderschemaObject = {
   },
   menus: {
     type: [menuType],
-    validator(menus) {
-      return menus.filter((el) => !el._id).lenght > 0;
-    },
+    // validator(menus) {
+    //   return menus.filter((el) => !el._id).lenght > 0;
+    // },
   },
   products: {
     type: [{ type: productType }],
-    validator(products) {
-      return products.filter((el) => !el._id).lenght > 0;
-    },
+    // validator(products) {
+    //   return products.filter((el) => !el._id).lenght > 0;
+    // },
   },
   status: {
     type: String,
@@ -172,8 +172,8 @@ const OrderschemaObject = {
 };
 const Orderschema = new Schema(OrderschemaObject, { timestamps: true });
 
-module.exports.fieldsRequired = Object.keys(OrderschemaObject);
-module.exports.productFieldsRequired = Object.keys(productType);
-module.exports.clientsFieldsRequired = Object.keys(clientType);
+// module.exports.fieldsRequired = Object.keys(OrderschemaObject);
+// module.exports.productFieldsRequired = Object.keys(productType);
+// module.exports.clientsFieldsRequired = Object.keys(clientType);
 
 module.exports.default = mongoose.model("Order", Orderschema);

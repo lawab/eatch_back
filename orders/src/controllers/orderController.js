@@ -2,10 +2,47 @@ const orderServices = require("../services/orderServices");
 const roles = require("../models/roles");
 const updateOrderValues = require("../methods/updateValues");
 const setOrderValues = require("../methods/setOrderValues");
+const api_consumer = require('../services/api_consumer')
 const {
   addElementToHistorical,
   closeRequest,
 } = require("../services/historicalFunctions");
+
+
+//Create 2nd version Order
+const createOrderversion2 = async (req, res) => {
+  
+  try {
+    const body = req.body[0]
+    const menus = []
+    //console.log(body)
+    const menu = body.menus
+    const products = body.products
+    for (let i = 0; i < menu.length; i++){
+      const menuFound = await api_consumer.getMenuById(menu[i]._id);
+      // if (!menuFound) {
+      //   return res.status(401).json({ message: "Menu not found!!!" });
+      // }
+      menus.push(menuFound.data)
+    }
+    console.log("*******************************************");
+    console.log(menus)
+    console.log("###########################################");
+    //console.log(products)
+    console.log("********************************************")
+    //console.log(menu)
+
+    const order = {
+      products: products,
+      menus: menus
+    }
+    const orderCreated = await orderServices.createOrder(order)
+    console.log(orderCreated);
+    res.status(200).json({"message" : "Order created successfully!!!"})
+  } catch (error) {
+    res.status(500).json({"message" : "An Error occured!!!"})
+  }
+}
 
 // create one order in database
 const createOrder = async (req, res) => {
@@ -171,6 +208,9 @@ const updateOrder = async (req, res) => {
     });
   }
 };
+
+
+
 //update remote order
 const updateOrderRemote = async (req, res) => {
   try {
@@ -346,6 +386,7 @@ const fetchOrdersByRestaurant = async (req, res) => {
 
 module.exports = {
   createOrder,
+  createOrderversion2,
   deleteOrder,
   fetchOrders,
   updateOrder,

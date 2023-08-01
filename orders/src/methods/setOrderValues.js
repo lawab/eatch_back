@@ -26,7 +26,7 @@ module.exports = async (body, req) => {
 
         products.push(...newProducts);
       }
-      if (category.title === "menu") {
+      if (category.title == "menu") {
         menus.push(...category.menus);
       }
     }
