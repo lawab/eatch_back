@@ -30,6 +30,9 @@ menuRouter.get(["/fetch/all", "/fetch/all/:ids"], authmiddleware, fetchMenus);
 //get menus by restaurant
 menuRouter.get("/fetch/restaurant/:id", authmiddleware, fetchMenusByRestaurant);
 
+//get menus by restaurant zithout token
+menuRouter.get("/getMenus/restaurant/:id", fetchMenusByRestaurant);
+
 //update menu
 menuRouter.put(
   "/update/:id",
