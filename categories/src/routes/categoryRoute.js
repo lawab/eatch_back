@@ -53,5 +53,12 @@ categoryRouter.get(
 );
 //**************************************** *//
 
+//************GET ALL CATEGORIES WITHOUT TOKEN********************
+categoryRouter.get(
+  "/getCategories/restaurant/:restaurantId",
+  controller.getCategoriesByRestaurant
+);
+//**************************************** *//
+
 //Export route to be used on another place
 module.exports = categoryRouter;

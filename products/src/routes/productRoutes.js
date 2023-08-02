@@ -50,7 +50,7 @@ productRouter.get(
   fetchProductsByRestaurantAndCategory
 );
 
-//get products by restaurant and category
+//get products by restaurant and category without token
 productRouter.get(
   "/getProducts/categories/:restaurantId",
   fetchProductsByRestaurantAndCategory

@@ -201,6 +201,18 @@ const getCategoriesByRestaurant = async (id, token = null) => {
   return categories;
 };
 
+const getCategoriesByRestaurantOne = async (id, token = null) => {
+  let { data: categories } = await axios.get(
+    `${process.env.APP_URL_CATEGORY}/getCategories/restaurant/${id}`,
+    {
+      // headers: {
+      //   authorization: `Bearer ${token}`,
+      // },
+    }
+  );
+  return categories;
+};
+
 /**
  * @param {String} recetteID [id from recette that we want to retrive]
  * @param {String} token [token to valid the session of user]
@@ -242,7 +254,7 @@ const getRecette = async (recetteID, token = null) => {
 const getProductsByCategoriesForOneRestaurant = async (restaurantId, token) => {
   try {
     // get all categories
-    let categories = await getCategoriesByRestaurant(restaurantId, token);
+    let categories = await getCategoriesByRestaurantOne(restaurantId, token);
     let productsByCategoryAndRestaurant = [];
 
     for (let index = 0; index < categories.length; index++) {
@@ -285,4 +297,5 @@ module.exports = {
   getProductsByCategoriesForOneRestaurant,
   getRecette,
   getCategoriesByRestaurant,
+  getCategoriesByRestaurantOne,
 };
