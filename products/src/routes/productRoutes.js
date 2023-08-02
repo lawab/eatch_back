@@ -52,6 +52,12 @@ productRouter.get(
 
 //get products by restaurant and category
 productRouter.get(
+  "/getProducts/categories/:restaurantId",
+  fetchProductsByRestaurantAndCategory
+);
+
+//get products by restaurant and category
+productRouter.get(
   "/fetch/all/materials/:ids",
   authmiddleware,
   fetchMaterialsFromProdcuts
