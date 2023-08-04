@@ -56,19 +56,27 @@ const createOrderversionMobile = async (req, res) => {
     const products = []
     console.log(body)
     const menu = body.menus
-    const produit = menu.produit
+    //const produit = menu.produit
     const product = body.product
 
     const total_cost = body.prix
     const numTablette = body.num_Table
     const numOrder = body.num_order
     for (let i = 0; i < menu.length; i++){
-
-      const menuFound = await api_consumer.getProductById(produit[i].id);
+      const productMenu = menu[i].produit
+      const prod = []
+      for (let j = 0; j < productMenu.length; j++) {
+        const menuFound = await api_consumer.getProductById(productMenu[j]);
+        prod.push(menuFound.data)
+        
+      }
+     
+      const orderQte = menu[i].qte
+      menus.push({ "products" : prod, "orderQte" : orderQte });
       // if (!menuFound) {
       //   return res.status(401).json({ message: "Menu not found!!!" });
       // }
-      menus.push({ ...menuFound.data,  ...menu.qte})
+      
     }
     console.log("*******************************************");
     console.log(menus)
@@ -81,7 +89,7 @@ const createOrderversionMobile = async (req, res) => {
       // if (!menuFound) {
       //   return res.status(401).json({ message: "Menu not found!!!" });
       // }
-      products.push({ ...productFound.data, ...product[i].qte });
+      products.push({ ...productFound.data, "orderQte": product[i].qte });
     }
     const order = {
       total_cost: total_cost,
