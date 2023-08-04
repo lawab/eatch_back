@@ -34,7 +34,7 @@ const productType = {
     },
     deletedAt: { type: Date, default: null },
   },
-
+  orderQte: { type : Number, default : 0},
   price: {
     type: Number,
     required: true,
@@ -105,9 +105,10 @@ const clientType = {
 const menuType = {
   _id: { type: mongoose.Types.ObjectId, required: true },
   menu_title: { type: String },
+  orderQte: { type: Number, default: 0 },
   restaurant: {
     type: {
-      _id: { type: mongoose.Types.ObjectId},
+      _id: { type: mongoose.Types.ObjectId },
       restaurant_name: String,
       infos: {
         town: { type: String },
@@ -139,6 +140,8 @@ const OrderschemaObject = {
     default: null,
   },
   total_cost: { type: Number },
+  numTablette: { type: Number },
+  numOrder: { type: Number },
   is_tracking: { type: Boolean, default: false },
   client: { type: clientType },
   restaurant: {

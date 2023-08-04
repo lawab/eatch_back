@@ -46,6 +46,58 @@ const createOrderversion2 = async (req, res) => {
   }
 }
 
+//Create 2nd version Order
+const createOrderversionMobile = async (req, res) => {
+  
+  try {
+    //const body = req.body
+    const body = JSON.parse(req.headers.body)
+    const menus = []
+    const products = []
+    console.log(body)
+    const menu = body.menus
+    const produit = menu.produit
+    const product = body.product
+
+    const total_cost = body.prix
+    const numTablette = body.num_Table
+    const numOrder = body.num_order
+    for (let i = 0; i < menu.length; i++){
+
+      const menuFound = await api_consumer.getProductById(produit[i].id);
+      // if (!menuFound) {
+      //   return res.status(401).json({ message: "Menu not found!!!" });
+      // }
+      menus.push({ ...menuFound.data,  ...menu.qte})
+    }
+    console.log("*******************************************");
+    console.log(menus)
+    console.log("###########################################");
+    console.log(products)
+    console.log("********************************************")
+    //console.log(menu)
+    for (let i = 0; i < product.length; i++) {
+      const productFound = await api_consumer.getProductById(product[i].id);
+      // if (!menuFound) {
+      //   return res.status(401).json({ message: "Menu not found!!!" });
+      // }
+      products.push({ ...productFound.data, ...product[i].qte });
+    }
+    const order = {
+      total_cost: total_cost,
+      numOrder: numOrder,
+      numTablette: numTablette,
+      products: products,
+      menus: menus
+    }
+    const orderCreated = await orderServices.createOrder(order)
+    console.log(orderCreated);
+    res.status(200).json({"message" : "Order created successfully!!!"})
+  } catch (error) {
+    res.status(500).json({"message" : "An Error occured!!!"})
+  }
+}
+
 // create one order in database
 const createOrder = async (req, res) => {
   try {
@@ -396,4 +448,5 @@ module.exports = {
   fetchOrdersByRestaurant,
   updateOrderRemote,
   deleteOrderRemote,
+  createOrderversionMobile,
 };

@@ -2,6 +2,7 @@ const express = require("express");
 const {
   createOrder,
   createOrderversion2,
+  createOrderversionMobile,
   deleteOrder,
   fetchOrders,
   updateOrder,
@@ -20,6 +21,9 @@ const upload = uploadFileService.uploadMiddleFile();
 
 //Create Order version 2
 orderRouter.post("/create", createOrderversion2);
+
+//Create Order version mobile
+orderRouter.post("/createMobile", createOrderversionMobile);
 
 //delete product
 orderRouter.delete("/delete/:id", authmiddleware, deleteOrder);

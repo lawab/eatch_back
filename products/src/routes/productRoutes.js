@@ -30,6 +30,9 @@ productRouter.delete("/delete/:id", authmiddleware, deleteProduct);
 //get product
 productRouter.get("/fetch/one/:id", authmiddleware, fetchProduct);
 
+//get product without token
+productRouter.get("/fetch/uno/:id", fetchProduct);
+
 //get products
 productRouter.get(
   ["/fetch/all", "/fetch/all/:ids"],

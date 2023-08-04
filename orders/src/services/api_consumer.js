@@ -177,6 +177,25 @@ const getMenuById = async (menuId) => {
      }
 }
 
+const getProductById = async (productId) => {
+  try {
+    const menu = await axios.get(
+      config.url_product + `/fetch/uno/${productId}`,
+      {
+        //  headers: {
+        //    authorization: `Bearer ${token}`,
+        //  },
+      }
+    );
+    console.log("PRODUIITTT: ");
+    //console.log(menu.data);
+    return menu;
+  } catch (err) {
+    console.log(err.data);
+    return err;
+  }
+};
+
 module.exports = {
   getUserById,
   addClassToUserById,
@@ -186,4 +205,5 @@ module.exports = {
   removeClassToCourseById,
   validateRequestingByRestaurantId,
   getMenuById,
+  getProductById,
 };
