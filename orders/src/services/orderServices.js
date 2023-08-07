@@ -7,6 +7,8 @@ const { default: Order } = require("../models/order/order");
  * @returns {Promise}
  */
 const createOrder = async (orderBody = {}) => {
+  // console.log("*********orderBody: ")
+  // console.log(orderBody);
   const order = await Order.create(orderBody);
   return order;
 };

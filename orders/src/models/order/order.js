@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const status = require("./status");
 const Schema = mongoose.Schema;
 const productType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId},
   pusharePrice: {
     type: Number,
   },
@@ -36,12 +36,11 @@ const productType = {
   },
   orderQte: { type : Number, default : 0},
   price: {
-    type: Number,
-    required: true,
+    type: Number
   },
   category: {
     type: {
-      _id: { type: mongoose.Types.ObjectId, required: true },
+      _id: { type: mongoose.Types.ObjectId},
       title: String,
       image: String,
       _creator: {
@@ -103,7 +102,7 @@ const clientType = {
 };
 
 const menuType = {
-  _id: { type: mongoose.Types.ObjectId, required: true },
+  _id: { type: mongoose.Types.ObjectId},
   menu_title: { type: String },
   orderQte: { type: Number, default: 0 },
   restaurant: {
@@ -117,13 +116,12 @@ const menuType = {
       },
     },
   },
-  price: { type: Number, required: true },
+  price: { type: Number},
   devise: {
     type: String,
     default: "MAD",
   },
   products: {
-    required: true,
     type: [{ type: productType }],
   },
   _creator: {
@@ -156,7 +154,7 @@ const OrderschemaObject = {
     },
   },
   menus: {
-    type: [menuType],
+    type: [{ type: menuType }],
     // validator(menus) {
     //   return menus.filter((el) => !el._id).lenght > 0;
     // },

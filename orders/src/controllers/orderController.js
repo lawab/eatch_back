@@ -50,28 +50,34 @@ const createOrderversion2 = async (req, res) => {
 const createOrderversionMobile = async (req, res) => {
   
   try {
-    //const body = req.body
-    const body = JSON.parse(req.headers.body)
+    const body = req.body
+    //const body = JSON.parse(req.headers.body)
     const menus = []
     const products = []
-    console.log(body)
+    //console.log(body)
     const menu = body.menus
     //const produit = menu.produit
     const product = body.product
 
     const total_cost = body.prix
-    const numTablette = body.num_Table
+    const numTablette = body.num_table
     const numOrder = body.num_order
     for (let i = 0; i < menu.length; i++){
       const productMenu = menu[i].produit
+      const orderQte = menu[i].qte;
       const prod = []
       for (let j = 0; j < productMenu.length; j++) {
         const menuFound = await api_consumer.getProductById(productMenu[j]);
+        
+        //console.log(menuFound)
         prod.push(menuFound.data)
         
       }
-     
-      const orderQte = menu[i].qte
+      //console.log("*********Product Menu***********");
+      //console.log(prod)
+      
+      console.log("*********Product Menu***********");
+      console.log(orderQte)
       menus.push({ "products" : prod, "orderQte" : orderQte });
       // if (!menuFound) {
       //   return res.status(401).json({ message: "Menu not found!!!" });
@@ -79,10 +85,9 @@ const createOrderversionMobile = async (req, res) => {
       
     }
     console.log("*******************************************");
-    console.log(menus)
+    //console.log(menus)
     console.log("###########################################");
-    console.log(products)
-    console.log("********************************************")
+    
     //console.log(menu)
     for (let i = 0; i < product.length; i++) {
       const productFound = await api_consumer.getProductById(product[i].id);
@@ -91,6 +96,8 @@ const createOrderversionMobile = async (req, res) => {
       // }
       products.push({ ...productFound.data, "orderQte": product[i].qte });
     }
+    //console.log(products);
+    console.log("********************************************");
     const order = {
       total_cost: total_cost,
       numOrder: numOrder,
@@ -98,6 +105,8 @@ const createOrderversionMobile = async (req, res) => {
       products: products,
       menus: menus
     }
+
+    console.log(menus[0].products)
     const orderCreated = await orderServices.createOrder(order)
     console.log(orderCreated);
     res.status(200).json({"message" : "Order created successfully!!!"})
