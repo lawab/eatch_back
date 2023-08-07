@@ -50,8 +50,8 @@ const createOrderversion2 = async (req, res) => {
 const createOrderversionMobile = async (req, res) => {
   
   try {
-    const body = req.body
-    //const body = JSON.parse(req.headers.body)
+    //const body = req.body
+    const body = JSON.parse(req.headers.body)
     const menus = []
     const products = []
     //console.log(body)
